@@ -1,0 +1,7 @@
+# Hulk scripts
+social-media-agents/hulk/scripts/venv/
+social-media-agents/hulk/scripts/.env
+social-media-agents/hulk/scripts/drafts/*
+!social-media-agents/hulk/scripts/drafts/.gitkeep
+__pycache__/
+*.pyc

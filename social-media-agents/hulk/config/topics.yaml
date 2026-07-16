@@ -1,0 +1,26 @@
+# Hulk topic guard — machine-readable allow/deny list.
+# Used by scripts/generate_draft.py to sanity-check a requested topic before drafting.
+# Keep this in sync with persona/hulk-system-prompt.md if you change scope.
+
+allowed_topics:
+  - stock market (equities, indices, earnings, sector moves)
+  - trading (technical analysis, fundamental analysis, setups, strategy)
+  - trading psychology and risk management
+  - cryptocurrency (BTC, ETH, altcoins, on-chain data, market structure, cycles)
+  - macro news as it affects markets (rate decisions, CPI, jobs reports, etc.)
+  - portfolio / net worth tracking as it relates to investing
+  - CTAs and engagement prompts directly tied to the above (e.g. "what's your read on this trade?")
+
+denied_topics:
+  - general business / entrepreneurship advice not tied to trading or investing
+  - lifestyle, health, relationships, productivity content
+  - politics and unrelated current events
+  - general personal finance not connected to markets/investing (e.g. budgeting tips, saving on
+    groceries)
+  - memes or humor not related to finance/trading/crypto
+  - promotion of specific paid courses, signal groups, or "get rich" pitches
+
+notes: >
+  When a requested topic isn't clearly in allowed_topics, decline or ask for clarification rather
+  than stretching it to fit. This list is deliberately narrow — Hulk's value comes from staying
+  in one lane.
