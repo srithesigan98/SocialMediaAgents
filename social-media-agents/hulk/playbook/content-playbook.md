@@ -1,6 +1,7 @@
 # Hulk Content Playbook
 
-Distilled from `creator-research.md`. This is the actionable layer — use it to pick a hook and a
+Distilled from `creator-research.md` (pass 1, 6 creators) and `creator-research-pass2.md` (pass
+2, 11 more creators — 17 total). This is the actionable layer — use it to pick a hook and a
 framework for each post. See `../templates/` for fill-in-the-blank versions of each framework.
 
 Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
@@ -17,6 +18,10 @@ Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
 | **Curiosity gap + directional emoji** | Names a mover/event, teases the reason, arrow points down to it | stocktwits | "BTC dominance just did something it hasn't done since 2021 👇" |
 | **Position/"bags" disclosure** | States a real or illustrative position as the opening line | cryptokaleo | "Bought the dip on [asset]. Here's why." |
 | **Standalone aphorism** | One complete, quotable thought, no setup, no elaboration | hormozi | "The trade you didn't take is still a decision." |
+| **False-binary rejection** | Stage two opposing consensus camps, reject both, present a third data-backed position | bitcoin.daily | "Everyone's either screaming 'the bottom is in' or 'it's dead.' Both are wrong. Here's what the data says." |
+| **Ritual/cadence hook** | Opens by naming a recurring content ritual, trading on habit/anticipation rather than a one-off payload | hyperstocks | "Our favorite time of the week — the watchlist 👇" |
+| **Audience question / poll** | Pure engagement-bait question, offers no information, asks the audience to supply the content | investments | "What 'hype' trade are you avoiding right now?" |
+| **Historical-proof reveal** | Walks a real, dated historical chronology (splits, cycles, price history) to a jaw-dropping terminal number — credibility from documented fact, not personal risk | 13finance | "₹100 became ₹14.1 crore. Here's the exact 44-year timeline." |
 
 ## Content frameworks
 
@@ -33,6 +38,27 @@ Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
    numbered rules/mistakes). The most format-agnostic pattern across every creator studied.
 5. **Confession → lesson** — real or illustrative loss/mistake, then the takeaway. Use sparingly
    so it retains credibility weight.
+6. **Historical-proof compounding reveal** — a subtype of progress-reveal built on real, public
+   historical data (a stock's split/bonus history, a coin's cycle history) rather than the
+   poster's own trading. No personal risk disclosure needed since it's factual/historical.
+7. **Track-record / proof-of-performance** — self vs. benchmark comparison stated as a hard
+   number ("+30.7% vs. the S&P 500's +16.4%"). Use only with real, verifiable figures — never
+   fabricate a performance claim.
+
+## Tone/voice device: short-declarative closing rhythm
+
+Not a hook or a framework, but a recurring stylistic device worth using deliberately: close a
+post with two or three short, punchy declarative sentences ("Both are wrong." / "Small risk
+feels boring... Until boring becomes freedom."). This is what makes a post quotable and
+screenshot-able — reserve it for the last line, not the whole post.
+
+## Crypto-specific: anti-impersonation trust signal
+
+Crypto creators specifically (not stock-market creators) commonly include a bio-level or
+periodic-post disclaimer against impersonation scams, e.g. "I will never DM you first or ask you
+to send money/crypto." This is worth adopting for Hulk's own bio/pinned content once Hulk has a
+real account and following, purely as a defensive/trust measure against impersonators — not as a
+content hook to imitate in regular posts.
 
 ## Topic pillars
 
@@ -52,6 +78,20 @@ Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
 3. **Directional link-out** ("👇 [link]") — only when there's a genuine reason to send traffic
    somewhere (e.g. a linked chart, a longer analysis). Avoid if there's nothing to link to.
 4. Never a hard sales pitch, course plug, or signal-group pitch — Hulk is not selling anything.
+
+## Strategic notes from pass-2 research
+
+- **Threads is a secondary channel for most large finance creators.** Several accounts with huge
+  X/TikTok followings had surprisingly small Threads-specific followings (one account: 2.7K on
+  Threads vs. 1.2M on X). Most competitors are cross-posting, not writing Threads-native content
+  — a genuinely Threads-native strategy has real room to outperform on this platform specifically.
+- **Broad financial-literacy framing outperformed narrow trade-call content** in the accounts
+  studied — the largest Threads-specific followings belonged to accounts explaining concepts
+  (rules of thumb, economic literacy) rather than making individual stock/coin calls. Worth
+  weighting the content mix toward educational/explainer posts, not just calls.
+- **Named, memorable "rules"** (e.g. a "35% rule" for rent affordability) paired with a real,
+  personally-anchored number are a strong, repeatable hook mechanism — consider giving Hulk's own
+  recurring principles memorable names.
 
 ## Production principle (from Hormozi's pipeline)
 
