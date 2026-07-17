@@ -5,3 +5,9 @@ social-media-agents/hulk/scripts/drafts/*
 !social-media-agents/hulk/scripts/drafts/.gitkeep
 __pycache__/
 *.pyc
+
+# Blue Hulk scripts
+social-media-agents/blue-hulk/scripts/venv/
+social-media-agents/blue-hulk/scripts/.env
+social-media-agents/blue-hulk/scripts/drafts/*
+!social-media-agents/blue-hulk/scripts/drafts/.gitkeep

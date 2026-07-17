@@ -16,7 +16,7 @@ plus the ability to generate poster/graphic versions of posts via Canva.
 | [`playbook/content-playbook.md`](./playbook/content-playbook.md) | Distilled actionable playbook: hooks, storytelling frameworks, weekly content mix, CTA ladder, visuals, expectations. |
 | [`templates/`](./templates) | Seven fill-in-the-blank templates: loss-confession→lesson (flagship), numbered-step recap, origin-story arc, third-party war story, market-condition read, milestone arc (gated ⚠️), and the Malaysian post voice. |
 | [`config/topics.yaml`](./config/topics.yaml) | Topic allow/deny guard (mirrors Hulk's, plus research-driven denials: broker-recruitment content, scarcity mechanics). |
-| `scripts/` | 🚧 Planned — draft generation + Facebook Graph API posting script (waiting on Facebook Page/app setup). |
+| [`scripts/`](./scripts) | Draft generation (`generate_draft.py`) and Facebook Page posting (`post_to_facebook.py`, text + image). Credential setup guide in [`scripts/README.md`](./scripts/README.md). |
 
 ## Research basis
 
