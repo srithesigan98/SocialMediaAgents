@@ -31,9 +31,13 @@ that OAuth setup.
 ```bash
 python post_to_threads.py --file drafts/20260716-120000.md
 python post_to_threads.py --text "Quick post text"
+python post_to_threads.py --file drafts/20260716-120000.md --image-url https://example.com/poster.png
 ```
 
 Always asks for a `y/N` confirmation before publishing, and prints the exact text first.
+`--image-url` attaches an image (e.g. a Canva poster exported per
+`../../design/poster-style-guide.md`) — must be a publicly reachable URL, since the Threads API
+doesn't accept local file uploads.
 
 ## Notes
 

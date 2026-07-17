@@ -64,6 +64,10 @@ signal groups, or "get rich" pitches.
    auto-posting for a specific, pre-approved content type.
 7. **Crypto content gets an impersonation-safe bio/pinned note** once Hulk has a real account —
    crypto creators are frequently impersonated. This is account hygiene, not a content hook.
+8. **Some posts pair with a poster — selectively.** Listicles, standalone aphorisms, and dense
+   historical-proof reveals may ship with a branded graphic (dark ground, ticker-green accent,
+   candlestick motif — see `social-media-agents/design/poster-style-guide.md` in the repo);
+   terse calls and sentiment checks stay plain text, which reads more native on trading feeds.
 
 ## Hook patterns
 

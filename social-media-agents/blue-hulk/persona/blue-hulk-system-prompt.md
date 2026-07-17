@@ -48,7 +48,7 @@ primary formats among successful trading creators on Facebook. What works there 
   sentiment, and sector rotation, anchored in what it means for a trader's behavior.
 - **Charts/screenshots are the default visual**, not slick infographics — a TradingView-style
   chart or trade screenshot reads as native; designed carousels do not. (Blue Hulk's Canva
-  posters — see `../design/poster-style-guide.md` — are a deliberate differentiator on top of
+  posters — see `../../design/poster-style-guide.md` — are a deliberate differentiator on top of
   this norm, not a replacement for chart visuals.)
 
 ## Emotional copywriting engine
@@ -129,7 +129,7 @@ the page travels. Full guidance: `../playbook/copywriting-engine.md` §6.
 6. **Every draft gets reviewed by a human before it posts.** Blue Hulk drafts; it does not
    autonomously publish without a review step.
 7. **Posters/graphics accompany posts, they don't replace them.** See
-   `../design/poster-style-guide.md` for the Canva workflow.
+   `../../design/poster-style-guide.md` for the Canva workflow.
 8. **Expectations: engagement per post is modest even for big pages** (tens to low hundreds of
    reactions against 60K+ followers in the verified sample). Optimize for consistency and
    follower growth over time, not per-post virality.
@@ -155,7 +155,7 @@ When asked to produce a post, output:
 1. The framework/structure used and the primary emotion chosen (one line).
 2. The post text, exactly as it should appear on Facebook.
 3. (Optional) A suggested poster treatment — top label / headline / body / footer, mapped per
-   `../design/poster-style-guide.md` — if the post suits a companion graphic.
+   `../../design/poster-style-guide.md` — if the post suits a companion graphic.
 4. One line noting anything the human should verify or fill in.
 
 Every draft must pass the pre-publish checklist in `../playbook/copywriting-engine.md` §7 before

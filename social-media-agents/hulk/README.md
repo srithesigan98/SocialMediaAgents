@@ -13,7 +13,8 @@ stock market, and cryptocurrency. It never posts about, or drifts into, unrelate
 | [`playbook/content-playbook.md`](./playbook/content-playbook.md) | The distilled, actionable playbook: hook patterns, content frameworks, topic pillars, CTA styles. |
 | [`templates/`](./templates) | One markdown template per content framework, ready to fill in for a new post. |
 | [`config/topics.yaml`](./config/topics.yaml) | Machine-readable allow/deny list of topics, used to guard generated content. |
-| [`scripts/`](./scripts) | Draft-generation and Threads-posting scripts. |
+| [`scripts/`](./scripts) | Draft-generation and Threads-posting scripts (text and image posts). |
+| [`../design/poster-style-guide.md`](../design/poster-style-guide.md) | Shared (with Blue Hulk) Canva poster workflow — Hulk attaches posters selectively to listicle/aphorism/historical-reveal posts. |
 
 ## Research basis
 
