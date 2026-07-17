@@ -8,3 +8,6 @@ and (where applicable) scripts for drafting/posting content.
 
 - [`hulk/`](./hulk) — Threads content agent focused exclusively on finance, trading, the stock
   market, and cryptocurrency.
+- [`blue-hulk/`](./blue-hulk) — Facebook content agent, same topic scope as Hulk, built for
+  longer-form storytelling, stronger CTAs, and poster/graphic generation via Canva. 🚧 In
+  progress.
