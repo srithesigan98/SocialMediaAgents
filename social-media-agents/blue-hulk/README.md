@@ -11,6 +11,7 @@ plus the ability to generate poster/graphic versions of posts via Canva.
 |---|---|
 | [`persona/blue-hulk-system-prompt.md`](./persona/blue-hulk-system-prompt.md) | Blue Hulk's identity, voice, storytelling frameworks, CTA rules, and scope boundaries. Research-backed. |
 | [`playbook/creator-research.md`](./playbook/creator-research.md) | Raw research findings on 13 trading-focused Facebook creators/pages, with verified/inferred/unknown labeling and sources. |
+| [`playbook/copywriting-engine.md`](./playbook/copywriting-engine.md) | Emotional-copywriting training layer: drivers, conversion frameworks (PAS/BAB/open loops/Schwartz), CTA mechanics, human-touch rules, and the ≈1-in-5 Malaysian layer. Binding on every draft. |
 | [`design/poster-style-guide.md`](./design/poster-style-guide.md) | Canva poster-generation workflow and locked visual style spec. |
 | `playbook/content-playbook.md` | 🚧 Planned — distilled actionable playbook (like Hulk's). |
 | `templates/` | 🚧 Planned — fill-in-the-blank post templates per framework. |
