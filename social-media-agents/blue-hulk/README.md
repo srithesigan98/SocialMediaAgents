@@ -13,10 +13,10 @@ plus the ability to generate poster/graphic versions of posts via Canva.
 | [`playbook/creator-research.md`](./playbook/creator-research.md) | Raw research findings on 13 trading-focused Facebook creators/pages, with verified/inferred/unknown labeling and sources. |
 | [`playbook/copywriting-engine.md`](./playbook/copywriting-engine.md) | Emotional-copywriting training layer: drivers, conversion frameworks (PAS/BAB/open loops/Schwartz), CTA mechanics, human-touch rules, and the ≈1-in-5 Malaysian layer. Binding on every draft. |
 | [`../design/poster-style-guide.md`](../design/poster-style-guide.md) | Canva poster-generation workflow and locked visual style spec. |
-| `playbook/content-playbook.md` | 🚧 Planned — distilled actionable playbook (like Hulk's). |
-| `templates/` | 🚧 Planned — fill-in-the-blank post templates per framework. |
-| `config/topics.yaml` | 🚧 Planned — topic allow/deny guard (will mirror Hulk's). |
-| `scripts/` | 🚧 Planned — draft generation + Facebook Graph API posting script. |
+| [`playbook/content-playbook.md`](./playbook/content-playbook.md) | Distilled actionable playbook: hooks, storytelling frameworks, weekly content mix, CTA ladder, visuals, expectations. |
+| [`templates/`](./templates) | Seven fill-in-the-blank templates: loss-confession→lesson (flagship), numbered-step recap, origin-story arc, third-party war story, market-condition read, milestone arc (gated ⚠️), and the Malaysian post voice. |
+| [`config/topics.yaml`](./config/topics.yaml) | Topic allow/deny guard (mirrors Hulk's, plus research-driven denials: broker-recruitment content, scarcity mechanics). |
+| `scripts/` | 🚧 Planned — draft generation + Facebook Graph API posting script (waiting on Facebook Page/app setup). |
 
 ## Research basis
 
