@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# The Watcher runtime artifacts (downloaded videos / extracted frames)
+*.mp4
+*.webm
+*.jpg
+*.jpeg
+frames/
+.watch-cache/
+
+# Secrets
+.env
