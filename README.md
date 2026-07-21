@@ -4,9 +4,15 @@ Automated social-media agents.
 
 ## Agents
 
-- **Hulk** — Threads posting agent
-- **Blue Hulk** — Facebook posting agent
-- **The Watcher** 👁️ — short-form video review agent (this repo)
+- **Hulk** 🟢 — Threads posting agent
+- **Blue Hulk** 🔵 — Facebook posting agent
+- **Grey Hulk** 🩶 — Instagram + TikTok posting agent (stub → `.claude/skills/grey-hulk`)
+- **Repurposer** ♻️ — one video → platform-tailored variants (stub → `.claude/skills/repurposer`)
+- **The Watcher** 👁️ — short-form video review agent (built)
+
+The full operating map is in [`docs/growth-system.md`](docs/growth-system.md) —
+the 2026 Social Media Growth System with each branch tagged by agent, coverage
+gaps, a build roadmap, and filled forex/gold audience research.
 
 ---
 
