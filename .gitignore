@@ -12,3 +12,15 @@ frames/
 
 # Secrets
 .env
+
+# Hulk scripts
+agents/hulk/scripts/venv/
+agents/hulk/scripts/.env
+agents/hulk/scripts/drafts/*
+!agents/hulk/scripts/drafts/.gitkeep
+
+# Blue Hulk scripts
+agents/blue-hulk/scripts/venv/
+agents/blue-hulk/scripts/.env
+agents/blue-hulk/scripts/drafts/*
+!agents/blue-hulk/scripts/drafts/.gitkeep

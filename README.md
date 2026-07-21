@@ -4,14 +4,18 @@ Automated social-media agents.
 
 ## Agents
 
-Each agent has its own folder under [`agents/`](agents) (docs + assets); the
-runnable skills live under `.claude/skills/`.
+Each agent has its own folder under [`agents/`](agents) (docs, assets, and — for
+the posting agents — persona, playbook, templates, config, and scripts). The
+Claude Code skills live under `.claude/skills/`.
 
-- **Hulk** 🟢 — Threads posting agent → [`agents/hulk`](agents/hulk)
-- **Blue Hulk** 🔵 — Facebook posting agent → [`agents/blue-hulk`](agents/blue-hulk)
+- **Hulk** 🟢 — Threads finance/trading/crypto content agent (built) → [`agents/hulk`](agents/hulk)
+- **Blue Hulk** 🔵 — Facebook finance/trading/crypto content agent (built) → [`agents/blue-hulk`](agents/blue-hulk)
 - **Black Panther** 🐾 — Instagram + TikTok posting agent (stub) → [`agents/black-panther`](agents/black-panther)
 - **Repurposer** ♻️ — one video → platform-tailored variants (stub) → [`agents/repurposer`](agents/repurposer)
 - **The Watcher** 👁️ — short-form video review agent (built) → [`agents/the-watcher`](agents/the-watcher)
+
+Shared assets: [`agents/design/`](agents/design) — Canva poster style guide used
+by Hulk and Blue Hulk. See each agent's folder README for details.
 
 The full operating map is in [`docs/growth-system.md`](docs/growth-system.md) —
 the 2026 Social Media Growth System with each branch tagged by agent, coverage
@@ -83,3 +87,19 @@ setup.sh                     # installs yt-dlp + ffmpeg
 The Watcher's benchmarks are drawn from public creator-performance data
 (Feedspot, Traders Union, Socialync, OpusClip, Levitate Media, Kapwing);
 sources are listed at the bottom of `agents/the-watcher/benchmarks.md`.
+
+---
+
+## Hulk & Blue Hulk (posting agents)
+
+Finance/trading/crypto content agents with full personas, creator research,
+content playbooks, fill-in templates, topic guards, and drafting/posting scripts.
+
+- **Hulk** → Threads. See [`agents/hulk/`](agents/hulk). A single-file portable
+  version (persona + playbook in one document) is at
+  [`agents/hulk/hulk-agent.md`](agents/hulk/hulk-agent.md).
+- **Blue Hulk** → Facebook. See [`agents/blue-hulk/`](agents/blue-hulk) —
+  longer-form storytelling, stronger CTAs, plus Canva poster generation.
+
+Their scripts need credentials — copy each agent's `scripts/.env.example` to
+`.env` (git-ignored) and follow `scripts/README.md`.
