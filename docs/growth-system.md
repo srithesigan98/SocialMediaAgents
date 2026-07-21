@@ -5,7 +5,7 @@ trading education, Malaysia-first, global-second. Each branch is tagged with the
 **agent** that runs it, or marked as a gap to build next.
 
 Agent legend: 🟢 **Hulk** (Threads) · 🔵 **Blue Hulk** (Facebook) ·
-👁️ **The Watcher** (video review) · 🩶 **Grey Hulk** (Instagram + TikTok) ·
+👁️ **The Watcher** (video review) · 🐾 **Black Panther** (Instagram + TikTok) ·
 ♻️ **Repurposer** (1 → many). Connected tools: 🗓️ Buffer · 🎨 Canva.
 
 ```
@@ -23,9 +23,9 @@ Agent legend: 🟢 **Hulk** (Threads) · 🔵 **Blue Hulk** (Facebook) ·
 │
 ├─ 🗂️ Platform Strategy
 │  ├─ 🗂️ LinkedIn            ── ⚪ no agent yet
-│  ├─ 🗂️ Instagram           ── 🩶 Grey Hulk (posts) + 👁️ The Watcher (reviews)
+│  ├─ 🗂️ Instagram           ── 🐾 Black Panther (posts) + 👁️ The Watcher (reviews)
 │  ├─ 🗂️ Facebook            ── 🔵 Blue Hulk (posts) + 👁️ The Watcher (reviews)
-│  ├─ 🗂️ TikTok              ── 🩶 Grey Hulk (posts) + 👁️ The Watcher (reviews)
+│  ├─ 🗂️ TikTok              ── 🐾 Black Panther (posts) + 👁️ The Watcher (reviews)
 │  ├─ 🗂️ YouTube             ── 👁️ The Watcher (reviews) → Shorts posting: future agent
 │  ├─ 🗂️ X / Threads         ── 🟢 Hulk (Threads) → X: extend Hulk
 │  ├─ 🗂️ Podcast Content     ── ⚪ no agent yet
@@ -40,7 +40,7 @@ Agent legend: 🟢 **Hulk** (Threads) · 🔵 **Blue Hulk** (Facebook) ·
 ├─ 🗂️ Publishing & Scheduling       ── 📤 agent-run
 │  ├─ 🗂️ Threads                    ── 🟢 Hulk
 │  ├─ 🗂️ Facebook                   ── 🔵 Blue Hulk
-│  ├─ 🗂️ Instagram / TikTok         ── 🩶 Grey Hulk
+│  ├─ 🗂️ Instagram / TikTok         ── 🐾 Black Panther
 │  ├─ 🗂️ Queue / Calendar           ── 🗓️ Buffer
 │  └─ 🗂️ Cross-Platform Distribution ── ♻️ Repurposer → 🗓️ Buffer
 │
@@ -55,7 +55,7 @@ Agent legend: 🟢 **Hulk** (Threads) · 🔵 **Blue Hulk** (Facebook) ·
 
 | Layer | Automated now | Gap → next agent |
 |---|---|---|
-| **Posting** | Threads (Hulk), Facebook (Blue Hulk), Instagram + TikTok (Grey Hulk) | YouTube Shorts, LinkedIn, X |
+| **Posting** | Threads (Hulk), Facebook (Blue Hulk), Instagram + TikTok (Black Panther) | YouTube Shorts, LinkedIn, X |
 | **Video review** | TikTok, IG, FB, YouTube (The Watcher) | — covered |
 | **Production** | Hooks/scripts/rebuilds (Watcher), graphics (Canva), repurposing (Repurposer) | — covered |
 | **Scheduling** | Buffer queue + Repurposer hand-off | Dedicated Scheduler (optional) |
@@ -63,7 +63,7 @@ Agent legend: 🟢 **Hulk** (Threads) · 🔵 **Blue Hulk** (Facebook) ·
 
 ## Build roadmap (priority order)
 1. ✅ **The Watcher** — video review + rebuild. *Built.*
-2. 🩶 **Grey Hulk** — Instagram + TikTok posting. *Stubbed.*
+2. 🐾 **Black Panther** — Instagram + TikTok posting. *Stubbed.*
 3. ♻️ **Repurposer** — one video → platform-tailored cuts + captions. *Stubbed.*
 4. ⬜ **Analytics agent** — weekly Buffer metrics report so the system learns.
 5. ⬜ **Red Hulk** — YouTube Shorts posting.

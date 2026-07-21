@@ -25,8 +25,8 @@ then hand each variant to the right posting agent.
 ## Platform playbook
 | Platform | Length | Tune | Hand-off |
 |---|---|---|---|
-| TikTok | 21–34s, 9:16 | native, trend-aware hook | 🩶 Grey Hulk |
-| Instagram Reels | 21–34s, 9:16 | cleaner caption, save-bait | 🩶 Grey Hulk |
+| TikTok | 21–34s, 9:16 | native, trend-aware hook | 🐾 Black Panther |
+| Instagram Reels | 21–34s, 9:16 | cleaner caption, save-bait | 🐾 Black Panther |
 | YouTube Shorts | ≤60s, 9:16 | searchable title-hook | future agent / manual |
 | Facebook | 21–40s, 9:16 or 1:1 | slightly longer setup ok | 🔵 Blue Hulk |
 | Threads | text + clip | conversational, question-led | 🟢 Hulk |
@@ -46,5 +46,5 @@ then hand each variant to the right posting agent.
    rebuild, then repurpose that.
 3. Confirm target platforms (default: TikTok + Instagram + Facebook + Threads).
 4. Produce the per-platform variant table.
-5. On approval, route each variant to its posting agent (Grey Hulk / Blue Hulk /
+5. On approval, route each variant to its posting agent (Black Panther / Blue Hulk /
    Hulk) or the Buffer queue.

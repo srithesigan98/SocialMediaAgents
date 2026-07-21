@@ -6,7 +6,7 @@ Automated social-media agents.
 
 - **Hulk** 🟢 — Threads posting agent
 - **Blue Hulk** 🔵 — Facebook posting agent
-- **Grey Hulk** 🩶 — Instagram + TikTok posting agent (stub → `.claude/skills/grey-hulk`)
+- **Black Panther** 🐾 — Instagram + TikTok posting agent (stub → `.claude/skills/black-panther`)
 - **Repurposer** ♻️ — one video → platform-tailored variants (stub → `.claude/skills/repurposer`)
 - **The Watcher** 👁️ — short-form video review agent (built)
 
