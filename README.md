@@ -4,11 +4,14 @@ Automated social-media agents.
 
 ## Agents
 
-- **Hulk** 🟢 — Threads posting agent
-- **Blue Hulk** 🔵 — Facebook posting agent
-- **Black Panther** 🐾 — Instagram + TikTok posting agent (stub → `.claude/skills/black-panther`)
-- **Repurposer** ♻️ — one video → platform-tailored variants (stub → `.claude/skills/repurposer`)
-- **The Watcher** 👁️ — short-form video review agent (built)
+Each agent has its own folder under [`agents/`](agents) (docs + assets); the
+runnable skills live under `.claude/skills/`.
+
+- **Hulk** 🟢 — Threads posting agent → [`agents/hulk`](agents/hulk)
+- **Blue Hulk** 🔵 — Facebook posting agent → [`agents/blue-hulk`](agents/blue-hulk)
+- **Black Panther** 🐾 — Instagram + TikTok posting agent (stub) → [`agents/black-panther`](agents/black-panther)
+- **Repurposer** ♻️ — one video → platform-tailored variants (stub) → [`agents/repurposer`](agents/repurposer)
+- **The Watcher** 👁️ — short-form video review agent (built) → [`agents/the-watcher`](agents/the-watcher)
 
 The full operating map is in [`docs/growth-system.md`](docs/growth-system.md) —
 the 2026 Social Media Growth System with each branch tagged by agent, coverage
