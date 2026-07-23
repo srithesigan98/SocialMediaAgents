@@ -35,6 +35,28 @@ Facebook Graph API accepts **local file uploads** (`--image`), so a Canva-export
 attaches directly with no hosting step. Always asks `y/N` confirmation and prints the exact text
 first.
 
+## `daily_post.py` — fully automatic daily posting (GitHub Actions)
+
+Generates one on-brand post (rotating through [`../config/daily_topics.yaml`](../config/daily_topics.yaml))
+and publishes it — no human review. Reads creds from environment vars or `.env`.
+
+```bash
+python daily_post.py --dry-run   # generate + print only (safe test, needs ANTHROPIC_API_KEY)
+python daily_post.py             # generate + POST today's topic
+```
+
+**Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
+(runs daily at 12:30 UTC = 8:30pm Malaysia; change the `cron:` to reschedule). To activate:
+
+1. This workflow only runs the schedule from the repo's **default branch** — merge this branch into `main` first.
+2. Add three **repository secrets** (GitHub → Settings → Secrets and variables → Actions → New repository secret):
+   - `ANTHROPIC_API_KEY` — for drafting
+   - `FB_PAGE_ID` — `1020053851202106`
+   - `FB_PAGE_ACCESS_TOKEN` — your **permanent** Page token
+3. Test it immediately via **Actions tab → Blue Hulk daily post → Run workflow** (the `workflow_dispatch` button), then check your Page.
+
+Because the Page token is non-expiring, this keeps posting indefinitely with no maintenance.
+
 ## Getting Facebook credentials (`FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`)
 
 One-time setup at [developers.facebook.com](https://developers.facebook.com):
