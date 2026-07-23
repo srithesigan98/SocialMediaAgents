@@ -23,7 +23,8 @@ reproducible and never drifts:
 
 Credentials come from environment variables (GitHub Actions secrets) or a local .env:
     ANTHROPIC_API_KEY, FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN
-    CANVA_ACCESS_TOKEN, CANVA_BRAND_TEMPLATE_ID   (optional — enables rule 3 automation)
+    CANVA_CLIENT_ID, CANVA_CLIENT_SECRET, CANVA_REFRESH_TOKEN, CANVA_BRAND_TEMPLATE_ID
+        (optional — enables rule 3 automation; get the refresh token via get_canva_token.py)
 
 Run manually to test:
     python daily_post.py                    # generate + post today's topic/rules
@@ -35,6 +36,7 @@ import argparse
 import datetime
 import os
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -125,22 +127,101 @@ def generate_post(topic: str, striker_zone_day: bool) -> str:
     return "".join(b.text for b in resp.content if b.type == "text").strip()
 
 
+CANVA_TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
+CANVA_API_BASE = "https://api.canva.com/rest/v1"
+
+
+def _canva_access_token() -> str | None:
+    """Exchange the stored refresh token for a short-lived access token (Canva tokens ~4h)."""
+    import base64
+
+    client_id = os.environ.get("CANVA_CLIENT_ID")
+    client_secret = os.environ.get("CANVA_CLIENT_SECRET")
+    refresh_token = os.environ.get("CANVA_REFRESH_TOKEN")
+    if not (client_id and client_secret and refresh_token):
+        return None
+
+    basic = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+    r = requests.post(
+        CANVA_TOKEN_URL,
+        headers={"Authorization": f"Basic {basic}", "Content-Type": "application/x-www-form-urlencoded"},
+        data={"grant_type": "refresh_token", "refresh_token": refresh_token},
+        timeout=30,
+    )
+    if not r.ok:
+        print(f"[blue-hulk] Canva token refresh failed: {r.status_code} {r.text}")
+        return None
+    return r.json().get("access_token")
+
+
 def generate_poster(post_text: str) -> str | None:
     """Rule 3 hook: render a Canva poster for this post and return a publicly reachable image URL.
 
-    Returns None (graceful no-op) until Canva automation is wired — see scripts/README.md
-    "Automating Canva posters (rule 3)" for what CANVA_ACCESS_TOKEN + CANVA_BRAND_TEMPLATE_ID
-    need to be, and how to get them. Once set, replace this body with a Canva Connect API
-    autofill + export call (POST /v1/autofills, poll, GET the export URL) using the approved
-    "High-Contrast Trading Strategy Poster" template referenced in
-    ../../design/poster-style-guide.md.
+    Returns None (graceful no-op) until Canva automation is fully wired — see scripts/README.md
+    "Automating Canva posters (rule 3)". Needs CANVA_CLIENT_ID, CANVA_CLIENT_SECRET,
+    CANVA_REFRESH_TOKEN (from get_canva_token.py) and CANVA_BRAND_TEMPLATE_ID.
+
+    TODO: the autofill data fields below are a placeholder ("post_text") — before this works,
+    run a template-inspection call (GET /v1/brand-templates/{id}/dataset) to get this brand
+    template's actual field names, then update the `data=` mapping to match.
     """
-    token = os.environ.get("CANVA_ACCESS_TOKEN")
     template_id = os.environ.get("CANVA_BRAND_TEMPLATE_ID")
-    if not token or not template_id:
+    access_token = _canva_access_token()
+    if not access_token or not template_id:
         return None
-    # TODO: implement the Canva Connect API autofill/export call here once credentials exist.
-    print("[blue-hulk] CANVA_ACCESS_TOKEN is set but generate_poster() isn't implemented yet.")
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    job = requests.post(
+        f"{CANVA_API_BASE}/autofills",
+        headers=headers,
+        json={
+            "brand_template_id": template_id,
+            "data": {"post_text": {"type": "text", "text": post_text[:280]}},
+        },
+        timeout=30,
+    )
+    if not job.ok:
+        print(f"[blue-hulk] Canva autofill request failed: {job.status_code} {job.text}")
+        return None
+    job_id = job.json()["job"]["id"]
+
+    for _ in range(20):  # poll up to ~40s
+        time.sleep(2)
+        status = requests.get(f"{CANVA_API_BASE}/autofills/{job_id}", headers=headers, timeout=30)
+        result = status.json().get("job", {})
+        if result.get("status") == "success":
+            design_id = result["result"]["design"]["id"]
+            break
+        if result.get("status") == "failed":
+            print(f"[blue-hulk] Canva autofill job failed: {result}")
+            return None
+    else:
+        print("[blue-hulk] Canva autofill job timed out.")
+        return None
+
+    export = requests.post(
+        f"{CANVA_API_BASE}/exports",
+        headers=headers,
+        json={"design_id": design_id, "format": {"type": "png"}},
+        timeout=30,
+    )
+    if not export.ok:
+        print(f"[blue-hulk] Canva export request failed: {export.status_code} {export.text}")
+        return None
+    export_job_id = export.json()["job"]["id"]
+
+    for _ in range(20):
+        time.sleep(2)
+        status = requests.get(f"{CANVA_API_BASE}/exports/{export_job_id}", headers=headers, timeout=30)
+        result = status.json().get("job", {})
+        if result.get("status") == "success":
+            return result["urls"][0]
+        if result.get("status") == "failed":
+            print(f"[blue-hulk] Canva export job failed: {result}")
+            return None
+
+    print("[blue-hulk] Canva export job timed out.")
     return None
 
 

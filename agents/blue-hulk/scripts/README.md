@@ -61,12 +61,19 @@ All three run off one deterministic day counter (`date.today().toordinal()`), so
 land on predictable, non-overlapping-by-default days (`% 4 == 0` and `% 3 == 0`) without any
 state file to maintain.
 
-**Rule 3 status — not yet automated in the cloud.** Generating the Canva poster and getting a
-publicly reachable image URL for the Graph API requires the **Canva Connect API** (its own OAuth
-app + access token, analogous to the Facebook app setup below). `generate_poster()` in
-`daily_post.py` is the wired-in hook for this — until `CANVA_ACCESS_TOKEN` and
-`CANVA_BRAND_TEMPLATE_ID` secrets are added, poster days fall back to a text-only post (rule 1
-still fires) and print a `NOTE:` line in the run log so a missed poster is never silent.
+**Rule 3 status — wired, needs credentials + field-name check.** `generate_poster()` in
+`daily_post.py` calls the Canva Connect API (autofill the brand template, poll, export PNG,
+poll) using a refresh token it exchanges for a fresh access token every run — Canva access
+tokens only last ~4 hours, useless to store directly for a daily job. Until the four `CANVA_*`
+secrets below are set, poster days fall back to a text-only post (rule 1 still fires) and print
+a `NOTE:` line in the run log so a missed poster is never silent.
+
+**One placeholder to fix before it will actually work:** the autofill call sends
+`{"post_text": {"type": "text", "text": ...}}` — `post_text` is a guess, not yet confirmed
+against the real field name(s) in the "High-Contrast Trading Strategy Poster" brand template.
+Call `GET /v1/brand-templates/{CANVA_BRAND_TEMPLATE_ID}/dataset` (with a valid access token) to
+see the template's actual field names, then update the `data=` mapping in `generate_poster()`
+to match.
 
 **Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
 (runs daily at 12:30 UTC = 8:30pm Malaysia; change the `cron:` to reschedule). To activate:
@@ -82,19 +89,31 @@ Because the Page token is non-expiring, this keeps posting indefinitely with no 
 
 ### Automating Canva posters (rule 3)
 
-To turn poster days from "text-only fallback" into an actual attached poster:
-
-1. Create a **Canva Developer** integration at [canva.com/developers](https://www.canva.com/developers/) and
-   enable the **Connect API** with the `design:content:read` and `design:content:write` (autofill/export) scopes.
-2. Complete the OAuth flow once to get an access token (Canva tokens are short-lived — for a
-   scheduled job you'd store a refresh token and refresh it each run, similar in spirit to the
-   Threads 60-day refresh).
-3. Note the **brand template ID** for the approved "High-Contrast Trading Strategy Poster"
-   (see [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)).
-4. Add `CANVA_ACCESS_TOKEN` and `CANVA_BRAND_TEMPLATE_ID` as repository secrets, add them to the
-   workflow's `env:` block, and implement the autofill + export call inside `generate_poster()`
-   in `daily_post.py` (the function signature and call site are already wired — it just returns
-   `None` today).
+1. Create a **Canva Developer** integration at [canva.com/developers](https://www.canva.com/developers/)
+   → **Your integrations → Create an integration**. Note the app's the actual dashboard —
+   `canva.dev/docs/...` links are documentation only, not where you create anything.
+2. On **Credentials**: copy the **Client ID**, click **Generate secret**, copy the **Client
+   Secret** immediately (shown once).
+3. On **Scopes**, enable: `design:content:read`, `design:content:write`, `design:meta:read`,
+   `brandtemplate:meta:read`, `brandtemplate:content:read`, `asset:read`, `asset:write`.
+4. On **Authorized redirects**, add `http://localhost:8888/callback` (must match exactly —
+   it's just a value you type in, not a link to click; nothing is listening on that port until
+   step 5).
+5. Run the one-time OAuth helper locally (needs `CANVA_CLIENT_ID` / `CANVA_CLIENT_SECRET` in
+   `.env`, or it'll prompt):
+   ```bash
+   python get_canva_token.py
+   ```
+   It opens your browser for a one-time login/approve, catches the redirect, and prints
+   `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, and — the one that matters — `CANVA_REFRESH_TOKEN`.
+6. Note the **brand template ID** for the approved "High-Contrast Trading Strategy Poster"
+   (see [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)) — that's
+   `CANVA_BRAND_TEMPLATE_ID`.
+7. Add all four as **repository secrets**: `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`,
+   `CANVA_REFRESH_TOKEN`, `CANVA_BRAND_TEMPLATE_ID`. (Do **not** store a raw access token — it
+   expires in ~4 hours; `generate_poster()` derives one from the refresh token every run.)
+8. Before relying on it, confirm the autofill field name matches your template — see the
+   placeholder note above — then test with `python daily_post.py --dry-run --force-poster`.
 
 ## Getting Facebook credentials (`FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`)
 
