@@ -1,0 +1,28 @@
+name: Blue Hulk daily post
+
+# Generates one on-brand Facebook post and publishes it, once a day.
+# Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+
+on:
+  schedule:
+    # 12:30 UTC = 8:30pm Malaysia (UTC+8). Cron is always UTC; change this to reschedule.
+    # GitHub may start scheduled runs a few minutes late under load — that's normal.
+    - cron: "30 12 * * *"
+  workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r agents/blue-hulk/scripts/requirements.txt
+      - name: Generate and post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: python agents/blue-hulk/scripts/daily_post.py

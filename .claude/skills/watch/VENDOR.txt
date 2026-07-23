@@ -1,0 +1,1 @@
+VENDORED_FROM: https://github.com/bradautomates/claude-video (MIT, v0.2.0)

@@ -1,0 +1,24 @@
+# Blue Hulk daily topic pool — the auto-poster rotates through these one per day.
+# All must sit inside config/topics.yaml allowed scope. Add/remove freely; order doesn't matter.
+# Rotation is deterministic by date, so it cycles through the whole list before repeating.
+topics:
+  - the real reason most traders blow their accounts (over-leverage)
+  - why revenge trading destroys more accounts than bad setups
+  - risk management: never risking more than 1-2% per trade
+  - the psychology of holding a winner vs cutting it early
+  - what a losing streak actually teaches a disciplined trader
+  - position sizing for a small starting account
+  - reading the current market condition and adjusting behavior
+  - why patience beats prediction in trading
+  - the difference between a trader and a gambler
+  - how discipline compounds over a trading career
+  - a war story: a trade that taught a hard lesson about stops
+  - gold (XAU) as a beginner-friendly instrument vs forex pairs
+  - the emotional cost of chasing the market
+  - building a repeatable trading routine
+  - why most 'signals' fail without risk management
+  - crypto market cycles and managing FOMO
+  - journaling trades to find your real edge
+  - the mindset shift from 'making money fast' to 'not losing'
+  - handling a big drawdown without spiraling
+  - Malaysian angle: EPF/ASNB vs an active trading account (~1 in 5 posts)
