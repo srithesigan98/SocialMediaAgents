@@ -28,10 +28,10 @@ MODEL = "claude-sonnet-5"
 
 
 def load_context() -> str:
-    persona = (AGENT_DIR / "persona" / "blue-hulk-system-prompt.md").read_text(encoding="utf-8")
-    playbook = (AGENT_DIR / "playbook" / "content-playbook.md").read_text(encoding="utf-8")
-    engine = (AGENT_DIR / "playbook" / "copywriting-engine.md").read_text(encoding="utf-8")
-    topics = yaml.safe_load((AGENT_DIR / "config" / "topics.yaml").read_text(encoding="utf-8"))
+    persona = (AGENT_DIR / "persona" / "blue-hulk-system-prompt.md").read_text(encoding='utf-8')
+    playbook = (AGENT_DIR / "playbook" / "content-playbook.md").read_text(encoding='utf-8')
+    engine = (AGENT_DIR / "playbook" / "copywriting-engine.md").read_text(encoding='utf-8')
+    topics = yaml.safe_load((AGENT_DIR / "config" / "topics.yaml").read_text(encoding='utf-8'))
     topics_block = (
         "Allowed topics:\n- "
         + "\n- ".join(topics["allowed_topics"])
@@ -58,7 +58,7 @@ def generate(topic: str, framework: str | None) -> str:
         template_path = AGENT_DIR / "templates" / f"{framework}.md"
         if not template_path.exists():
             sys.exit(f"Unknown framework '{framework}'. Options: {', '.join(list_frameworks())}")
-        instruction += f"\n\nUse this framework/template:\n\n{template_path.read_text(encoding="utf-8")}"
+        instruction += f"\n\nUse this framework/template:\n\n{template_path.read_text(encoding='utf-8')}"
     else:
         instruction += "\n\nPick whichever framework from the playbook best fits this topic."
     instruction += (
