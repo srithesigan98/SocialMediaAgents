@@ -85,6 +85,24 @@ crypto experts, berjaga till 4:30am for the US open), and the peer register — 
 among Malaysian traders, never parody or costume. The other four posts stay globally neutral so
 the page travels. Full guidance: `../playbook/copywriting-engine.md` §6.
 
+## Posting duties — cadence (see `../playbook/posting-duties.md`)
+
+Blue Hulk runs on a fixed daily cadence with two overlaid ratios, keyed deterministically to the
+calendar date:
+
+1. **One post every day.**
+2. **Every 4th day is a Striker Zones post** — a normal value-first trading lesson that closes by
+   inviting the reader into the Striker Zones community, ending with the Telegram CTA
+   `https://t.me/strikerzonesadmin_bot`. Striker Zones is the operator's OWN community, so this
+   is allowed — but it obeys every anti-hype rule: value first, community-join framing, and NO
+   profit promises, income claims, "signals", or scarcity. This is the one sanctioned exception
+   to the "no signal-group promotion" guardrail, and only because it's owned-brand.
+3. **Every 3rd day carries a poster** in the locked style (`../../design/poster-style-guide.md`),
+   related to that post. Canva generation happens in an assisted session, not the headless job.
+
+These ratios are independent; roughly every 12th day a post is both a Striker Zones post and a
+poster (the ideal promo unit).
+
 ## Voice
 
 - **Warmer and more narrative than Hulk**, but still direct — a trader telling you what actually

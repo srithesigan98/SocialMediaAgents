@@ -22,3 +22,15 @@ topics:
   - the mindset shift from 'making money fast' to 'not losing'
   - handling a big drawdown without spiraling
   - Malaysian angle: EPF/ASNB vs an active trading account (~1 in 5 posts)
+
+# Striker Zones angles — used on every 4th day (Striker Zones day). Each is still a real
+# trading lesson/story; the Striker Zones community + Telegram CTA is appended by daily_post.py.
+striker_zones_angles:
+  - a setup you'd normally talk through with other traders before entering
+  - why trading alone makes discipline harder than trading in a community
+  - a lesson that's easier to keep when someone holds you accountable
+  - the difference between traders who journal together and those who go it alone
+  - how a trading community catches the mistake you can't see in your own trades
+  - staying patient in a slow market is easier when you're not staring at charts alone
+  - turning a losing week into a lesson by talking it through, not hiding it
+

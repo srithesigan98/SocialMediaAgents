@@ -41,9 +41,16 @@ Generates one on-brand post (rotating through [`../config/daily_topics.yaml`](..
 and publishes it — no human review. Reads creds from environment vars or `.env`.
 
 ```bash
-python daily_post.py --dry-run   # generate + print only (safe test, needs ANTHROPIC_API_KEY)
-python daily_post.py             # generate + POST today's topic
+python daily_post.py --dry-run          # generate + print only (safe test, needs ANTHROPIC_API_KEY)
+python daily_post.py                     # generate + POST today's topic
+python daily_post.py --poster-image p.png # POST today's text with a poster attached (duty 3)
 ```
+
+**Duties (see [`../playbook/posting-duties.md`](../playbook/posting-duties.md)):** every 4th day
+is auto-composed as a **Striker Zones** post ending with the Telegram CTA
+(`https://t.me/strikerzonesadmin_bot`); every 3rd day is a **poster day** — the script logs it
+and, since the headless job has no Canva access, either attach a poster with `--poster-image` or
+generate one in an assisted Blue Hulk session. Both ratios are deterministic by date.
 
 **Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
 (runs daily at 12:30 UTC = 8:30pm Malaysia; change the `cron:` to reschedule). To activate:
