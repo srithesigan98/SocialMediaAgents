@@ -16,7 +16,16 @@ on:
     # 12:30 UTC = 8:30pm Malaysia (UTC+8). Cron is always UTC; change this to reschedule.
     # GitHub may start scheduled runs a few minutes late under load — that's normal.
     - cron: "30 12 * * *"
-  workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
+  workflow_dispatch:       # adds a manual "Run workflow" button, with test overrides
+    inputs:
+      force_striker:
+        description: "Force today onto the Striker Zones branch (rule 2)"
+        type: boolean
+        default: false
+      force_poster:
+        description: "Force today onto the poster branch (rule 3)"
+        type: boolean
+        default: false
 
 jobs:
   post:
@@ -36,4 +45,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: python daily_post.py
+          FORCE_STRIKER: ${{ inputs.force_striker }}
+          FORCE_POSTER: ${{ inputs.force_poster }}
+        run: |
+          ARGS=""
+          if [ "$FORCE_STRIKER" = "true" ]; then ARGS="$ARGS --force-striker"; fi
+          if [ "$FORCE_POSTER" = "true" ]; then ARGS="$ARGS --force-poster"; fi
+          python daily_post.py $ARGS
