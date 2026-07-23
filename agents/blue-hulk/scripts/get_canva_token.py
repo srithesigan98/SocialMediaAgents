@@ -29,6 +29,7 @@ import sys
 import threading
 import urllib.parse
 import webbrowser
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -68,11 +69,14 @@ def make_pkce_pair() -> tuple[str, str]:
 
 
 def main() -> None:
-    load_dotenv()
-    client_id = os.environ.get("CANVA_CLIENT_ID") or input("Canva Client ID: ").strip()
-    client_secret = os.environ.get("CANVA_CLIENT_SECRET") or getpass.getpass(
-        "Canva Client Secret (hidden): "
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+    client_id = (os.environ.get("CANVA_CLIENT_ID") or input("Canva Client ID: ")).strip()
+    client_secret = (
+        os.environ.get("CANVA_CLIENT_SECRET") or getpass.getpass("Canva Client Secret (hidden): ")
     ).strip()
+
+    print(f"[canva] Using Client ID: {client_id}  (length {len(client_id)})")
+    print("[canva] Compare that EXACTLY against the Client ID on your integration's Credentials page.\n")
 
     verifier, challenge = make_pkce_pair()
     authorize_url = AUTH_URL + "?" + urllib.parse.urlencode(
