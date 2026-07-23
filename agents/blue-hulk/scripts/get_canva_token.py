@@ -8,7 +8,7 @@ actually stores and uses — it exchanges it for a fresh access token on every r
 You need first (from the Canva Developer Portal -> Your integration -> Credentials/Scopes):
   1. Client ID
   2. Client Secret
-  3. A registered redirect URI matching REDIRECT_URI below (http://localhost:8888/callback)
+  3. A registered redirect URI matching REDIRECT_URI below (http://127.0.0.1:8888/callback)
   4. These scopes enabled: design:content:read design:content:write design:meta:read
      brandtemplate:meta:read brandtemplate:content:read asset:read asset:write
 
@@ -36,7 +36,7 @@ from dotenv import load_dotenv
 
 AUTH_URL = "https://www.canva.com/api/oauth/authorize"
 TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
-REDIRECT_URI = "http://localhost:8888/callback"
+REDIRECT_URI = "http://127.0.0.1:8888/callback"
 SCOPES = (
     "design:content:read design:content:write design:meta:read "
     "brandtemplate:meta:read brandtemplate:content:read asset:read asset:write"
@@ -90,7 +90,7 @@ def main() -> None:
         }
     )
 
-    server = http.server.HTTPServer(("localhost", 8888), _CallbackHandler)
+    server = http.server.HTTPServer(("127.0.0.1", 8888), _CallbackHandler)
     thread = threading.Thread(target=server.handle_request, daemon=True)
     thread.start()
 

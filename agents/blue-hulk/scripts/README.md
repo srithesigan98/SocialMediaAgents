@@ -96,9 +96,9 @@ Because the Page token is non-expiring, this keeps posting indefinitely with no 
    Secret** immediately (shown once).
 3. On **Scopes**, enable: `design:content:read`, `design:content:write`, `design:meta:read`,
    `brandtemplate:meta:read`, `brandtemplate:content:read`, `asset:read`, `asset:write`.
-4. On **Authorized redirects**, add `http://localhost:8888/callback` (must match exactly —
-   it's just a value you type in, not a link to click; nothing is listening on that port until
-   step 5).
+4. On **Authorized redirects**, add `http://127.0.0.1:8888/callback` — Canva rejects the word
+   `localhost` and requires the literal IP `127.0.0.1`. It's just a value you type in and save,
+   not a link to click; nothing is listening on that port until step 5.
 5. Run the one-time OAuth helper locally (needs `CANVA_CLIENT_ID` / `CANVA_CLIENT_SECRET` in
    `.env`, or it'll prompt):
    ```bash
