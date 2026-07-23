@@ -2,6 +2,14 @@ name: Blue Hulk daily post
 
 # Generates one on-brand Facebook post and publishes it, once a day.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+#
+# Daily duty rules (see agents/blue-hulk/scripts/README.md "Daily duty rules"):
+#   1. Posts every day, no matter what.
+#   2. 1 out of every 4 posts is a Striker Zones post with a CTA to
+#      https://t.me/strikerzonesadmin_bot.
+#   3. 1 out of every 3 posts should carry a Canva poster. Not yet automated here — see
+#      "Automating Canva posters (rule 3)" in the same README. CANVA_ACCESS_TOKEN /
+#      CANVA_BRAND_TEMPLATE_ID below are optional and safe to leave unset until then.
 
 on:
   schedule:
@@ -25,4 +33,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          # Optional — enables rule 3 (Canva posters) once set up; safe to leave unset for now.
+          CANVA_ACCESS_TOKEN: ${{ secrets.CANVA_ACCESS_TOKEN }}
+          CANVA_BRAND_TEMPLATE_ID: ${{ secrets.CANVA_BRAND_TEMPLATE_ID }}
         run: python agents/blue-hulk/scripts/daily_post.py
