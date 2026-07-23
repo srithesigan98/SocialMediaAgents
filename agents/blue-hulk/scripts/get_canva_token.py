@@ -9,8 +9,11 @@ You need first (from the Canva Developer Portal -> Your integration -> Credentia
   1. Client ID
   2. Client Secret
   3. A registered redirect URI matching REDIRECT_URI below (http://127.0.0.1:8888/callback)
-  4. These scopes enabled: design:content:read design:content:write design:meta:read
-     brandtemplate:meta:read brandtemplate:content:read asset:read asset:write
+  4. These scopes enabled: design:content:read design:content:write brandtemplate:content:read
+     brandtemplate:meta:read
+     (design:meta:read and asset:read/write are NOT requested — generate_poster() never calls
+     an /v1/assets or design-meta endpoint, and requesting scopes your integration hasn't
+     enabled causes Canva to reject the whole request with invalid_scope.)
 
 Run it:
     python get_canva_token.py
@@ -37,10 +40,7 @@ from dotenv import load_dotenv
 AUTH_URL = "https://www.canva.com/api/oauth/authorize"
 TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
 REDIRECT_URI = "http://127.0.0.1:8888/callback"
-SCOPES = (
-    "design:content:read design:content:write design:meta:read "
-    "brandtemplate:meta:read brandtemplate:content:read asset:read asset:write"
-)
+SCOPES = "design:content:read design:content:write brandtemplate:content:read brandtemplate:meta:read"
 
 _received_code: dict[str, str] = {}
 

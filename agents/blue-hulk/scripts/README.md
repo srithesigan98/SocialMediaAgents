@@ -94,8 +94,11 @@ Because the Page token is non-expiring, this keeps posting indefinitely with no 
    `canva.dev/docs/...` links are documentation only, not where you create anything.
 2. On **Credentials**: copy the **Client ID**, click **Generate secret**, copy the **Client
    Secret** immediately (shown once).
-3. On **Scopes**, enable: `design:content:read`, `design:content:write`, `design:meta:read`,
-   `brandtemplate:meta:read`, `brandtemplate:content:read`, `asset:read`, `asset:write`.
+3. On **Scopes**, enable at least: `design:content:read`, `design:content:write`,
+   `brandtemplate:content:read`, `brandtemplate:meta:read` — these are all `generate_poster()`
+   actually calls. Enabling extra scopes (e.g. `folder:read`, `profile:read`) is harmless, but
+   `get_canva_token.py` only *requests* the four above — requesting a scope your integration
+   hasn't enabled makes Canva reject the whole login with `invalid_scope`.
 4. On **Authorized redirects**, add `http://127.0.0.1:8888/callback` — Canva rejects the word
    `localhost` and requires the literal IP `127.0.0.1`. It's just a value you type in and save,
    not a link to click; nothing is listening on that port until step 5.
