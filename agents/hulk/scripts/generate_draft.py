@@ -26,9 +26,9 @@ MODEL = "claude-sonnet-5"
 
 
 def load_context() -> str:
-    persona = (HULK_DIR / "persona" / "hulk-system-prompt.md").read_text()
-    playbook = (HULK_DIR / "playbook" / "content-playbook.md").read_text()
-    topics = yaml.safe_load((HULK_DIR / "config" / "topics.yaml").read_text())
+    persona = (HULK_DIR / "persona" / "hulk-system-prompt.md").read_text(encoding="utf-8")
+    playbook = (HULK_DIR / "playbook" / "content-playbook.md").read_text(encoding="utf-8")
+    topics = yaml.safe_load((HULK_DIR / "config" / "topics.yaml").read_text(encoding="utf-8"))
     topics_block = (
         "Allowed topics:\n- "
         + "\n- ".join(topics["allowed_topics"])
@@ -55,7 +55,7 @@ def generate(topic: str, framework: str | None) -> str:
         template_path = HULK_DIR / "templates" / f"{framework}.md"
         if not template_path.exists():
             sys.exit(f"Unknown framework '{framework}'. Options: {', '.join(list_frameworks())}")
-        instruction += f"\n\nUse this framework:\n\n{template_path.read_text()}"
+        instruction += f"\n\nUse this framework:\n\n{template_path.read_text(encoding="utf-8")}"
     else:
         instruction += "\n\nPick whichever framework from the playbook best fits this topic."
 

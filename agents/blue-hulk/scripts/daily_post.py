@@ -23,6 +23,12 @@ import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
+# Windows consoles default to cp1252; make emoji/curly-quote output safe.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 HERE = Path(__file__).resolve().parent
 AGENT_DIR = HERE.parent
 GRAPH_API_BASE = "https://graph.facebook.com/v21.0"
@@ -30,10 +36,10 @@ MODEL = "claude-sonnet-5"
 
 
 def load_context() -> str:
-    persona = (AGENT_DIR / "persona" / "blue-hulk-system-prompt.md").read_text()
-    playbook = (AGENT_DIR / "playbook" / "content-playbook.md").read_text()
-    engine = (AGENT_DIR / "playbook" / "copywriting-engine.md").read_text()
-    topics = yaml.safe_load((AGENT_DIR / "config" / "topics.yaml").read_text())
+    persona = (AGENT_DIR / "persona" / "blue-hulk-system-prompt.md").read_text(encoding="utf-8")
+    playbook = (AGENT_DIR / "playbook" / "content-playbook.md").read_text(encoding="utf-8")
+    engine = (AGENT_DIR / "playbook" / "copywriting-engine.md").read_text(encoding="utf-8")
+    topics = yaml.safe_load((AGENT_DIR / "config" / "topics.yaml").read_text(encoding="utf-8"))
     topics_block = (
         "Allowed topics:\n- " + "\n- ".join(topics["allowed_topics"])
         + "\n\nDenied topics (never write about these):\n- " + "\n- ".join(topics["denied_topics"])
@@ -42,7 +48,7 @@ def load_context() -> str:
 
 
 def todays_topic() -> str:
-    pool = yaml.safe_load((AGENT_DIR / "config" / "daily_topics.yaml").read_text())["topics"]
+    pool = yaml.safe_load((AGENT_DIR / "config" / "daily_topics.yaml").read_text(encoding="utf-8"))["topics"]
     # deterministic rotation by date so the whole list cycles before repeating
     idx = datetime.date.today().toordinal() % len(pool)
     return pool[idx]

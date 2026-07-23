@@ -77,7 +77,7 @@ def main() -> None:
                  "and fill it in (see scripts/README.md for how to generate the token).")
 
     if args.file:
-        text = strip_draft_metadata(open(args.file).read())
+        text = strip_draft_metadata(open(args.file, encoding="utf-8").read())
     else:
         text = args.text
 

@@ -86,7 +86,7 @@ def main() -> None:
         sys.exit("THREADS_USER_ID and THREADS_ACCESS_TOKEN must be set. Copy .env.example to .env and fill it in.")
 
     if args.file:
-        text = strip_draft_metadata(open(args.file).read())
+        text = strip_draft_metadata(open(args.file, encoding="utf-8").read())
     else:
         text = args.text
 
