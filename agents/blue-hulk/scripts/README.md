@@ -109,14 +109,29 @@ Because the Page token is non-expiring, this keeps posting indefinitely with no 
    ```
    It opens your browser for a one-time login/approve, catches the redirect, and prints
    `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, and — the one that matters — `CANVA_REFRESH_TOKEN`.
-6. Note the **brand template ID** for the approved "High-Contrast Trading Strategy Poster"
-   (see [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)) — that's
-   `CANVA_BRAND_TEMPLATE_ID`.
-7. Add all four as **repository secrets**: `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`,
+6. Find the **brand template ID** for the approved "High-Contrast Trading Strategy Poster"
+   (see [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)) by listing
+   your templates:
+   ```bash
+   python inspect_canva_template.py
+   ```
+   Copy the `id` matching that template — that's `CANVA_BRAND_TEMPLATE_ID`.
+7. Confirm the template's **real autofill field name(s)** (the current `generate_poster()` code
+   guesses `"post_text"`, which is very likely wrong):
+   ```bash
+   python inspect_canva_template.py <that-id>
+   ```
+   Update the `data=` mapping inside `generate_poster()` in `daily_post.py` to use the field
+   name(s) it prints.
+8. Add all four as **repository secrets**: `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`,
    `CANVA_REFRESH_TOKEN`, `CANVA_BRAND_TEMPLATE_ID`. (Do **not** store a raw access token — it
    expires in ~4 hours; `generate_poster()` derives one from the refresh token every run.)
-8. Before relying on it, confirm the autofill field name matches your template — see the
-   placeholder note above — then test with `python daily_post.py --dry-run --force-poster`.
+9. Test end-to-end (still local, no Facebook post) with:
+   ```bash
+   python daily_post.py --dry-run --force-poster
+   ```
+   This calls the real Canva autofill + export flow and prints the poster image URL, but skips
+   publishing to Facebook.
 
 ## Getting Facebook credentials (`FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`)
 

@@ -161,9 +161,9 @@ def generate_poster(post_text: str) -> str | None:
     "Automating Canva posters (rule 3)". Needs CANVA_CLIENT_ID, CANVA_CLIENT_SECRET,
     CANVA_REFRESH_TOKEN (from get_canva_token.py) and CANVA_BRAND_TEMPLATE_ID.
 
-    TODO: the autofill data fields below are a placeholder ("post_text") — before this works,
-    run a template-inspection call (GET /v1/brand-templates/{id}/dataset) to get this brand
-    template's actual field names, then update the `data=` mapping to match.
+    TODO: the autofill data field below is a placeholder ("post_text") — run
+    `python inspect_canva_template.py <CANVA_BRAND_TEMPLATE_ID>` to get this brand template's
+    actual field name(s), then update the `data=` mapping below to match.
     """
     template_id = os.environ.get("CANVA_BRAND_TEMPLATE_ID")
     access_token = _canva_access_token()
