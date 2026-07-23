@@ -7,9 +7,9 @@ name: Blue Hulk daily post
 #   1. Posts every day, no matter what.
 #   2. 1 out of every 4 posts is a Striker Zones post with a CTA to
 #      https://t.me/strikerzonesadmin_bot.
-#   3. 1 out of every 3 posts should carry a Canva poster. See "Automating Canva posters
-#      (rule 3)" in the same README. The CANVA_* secrets below are optional and safe to leave
-#      unset — poster days fall back to text-only until they're configured.
+#   3. 1 out of every 3 posts carries a poster graphic, rendered locally with Pillow
+#      (render_poster.py) — no Canva account/API needed (Canva's Autofill/Brand Template API
+#      requires a Canva Enterprise plan, which this account doesn't have).
 
 on:
   schedule:
@@ -26,16 +26,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install fonts (for poster rendering)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
       - name: Install dependencies
         run: pip install -r agents/blue-hulk/scripts/requirements.txt
       - name: Generate and post
+        working-directory: agents/blue-hulk/scripts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-          # Optional — enables rule 3 (Canva posters) once set up; safe to leave unset for now.
-          CANVA_CLIENT_ID: ${{ secrets.CANVA_CLIENT_ID }}
-          CANVA_CLIENT_SECRET: ${{ secrets.CANVA_CLIENT_SECRET }}
-          CANVA_REFRESH_TOKEN: ${{ secrets.CANVA_REFRESH_TOKEN }}
-          CANVA_BRAND_TEMPLATE_ID: ${{ secrets.CANVA_BRAND_TEMPLATE_ID }}
-        run: python agents/blue-hulk/scripts/daily_post.py
+        run: python daily_post.py

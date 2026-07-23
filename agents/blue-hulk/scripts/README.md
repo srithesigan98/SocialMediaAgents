@@ -55,25 +55,26 @@ python daily_post.py --dry-run --force-poster    # preview a poster-day post reg
    [`../config/striker_zones_topics.yaml`](../config/striker_zones_topics.yaml), and the post's
    final line is always a CTA linking to **https://t.me/strikerzonesadmin_bot** (verbatim; the
    script appends it as a safety net if the model ever omits it).
-3. **1 out of every 3 posts carries a Canva poster** related to that post's content.
+3. **1 out of every 3 posts carries a poster graphic** related to that post's content.
 
 All three run off one deterministic day counter (`date.today().toordinal()`), so rules 2 and 3
 land on predictable, non-overlapping-by-default days (`% 4 == 0` and `% 3 == 0`) without any
 state file to maintain.
 
-**Rule 3 status — wired, needs credentials + field-name check.** `generate_poster()` in
-`daily_post.py` calls the Canva Connect API (autofill the brand template, poll, export PNG,
-poll) using a refresh token it exchanges for a fresh access token every run — Canva access
-tokens only last ~4 hours, useless to store directly for a daily job. Until the four `CANVA_*`
-secrets below are set, poster days fall back to a text-only post (rule 1 still fires) and print
-a `NOTE:` line in the run log so a missed poster is never silent.
+**Rule 3 status — fully automated, no Canva account needed.** `generate_poster()` in
+`daily_post.py` asks Claude to split the day's post into four slots (top label / headline /
+body / footer), then [`render_poster.py`](./render_poster.py) draws the poster locally with
+Pillow, matching the locked style spec in
+[`../../design/poster-style-guide.md`](../../design/poster-style-guide.md) — dark background,
+accent-color candlestick texture, bold headline. The PNG is uploaded straight to Facebook, no
+image hosting required. If rendering ever fails for any reason, rule 1 always wins: it falls
+back to a text-only post and prints a `NOTE:` line so a missed poster is never silent.
 
-**One placeholder to fix before it will actually work:** the autofill call sends
-`{"post_text": {"type": "text", "text": ...}}` — `post_text` is a guess, not yet confirmed
-against the real field name(s) in the "High-Contrast Trading Strategy Poster" brand template.
-Call `GET /v1/brand-templates/{CANVA_BRAND_TEMPLATE_ID}/dataset` (with a valid access token) to
-see the template's actual field names, then update the `data=` mapping in `generate_poster()`
-to match.
+Preview a poster anytime without touching Facebook:
+```bash
+python render_poster.py "BTC — testing resistance" "Most traders blow up the same way" \
+  "Position size kills more accounts than bad ideas." "What's your leverage lesson?"
+```
 
 **Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
 (runs daily at 12:30 UTC = 8:30pm Malaysia; change the `cron:` to reschedule). To activate:
@@ -87,51 +88,23 @@ to match.
 
 Because the Page token is non-expiring, this keeps posting indefinitely with no maintenance.
 
-### Automating Canva posters (rule 3)
+### Why not Canva? (kept for reference)
 
-1. Create a **Canva Developer** integration at [canva.com/developers](https://www.canva.com/developers/)
-   → **Your integrations → Create an integration**. Note the app's the actual dashboard —
-   `canva.dev/docs/...` links are documentation only, not where you create anything.
-2. On **Credentials**: copy the **Client ID**, click **Generate secret**, copy the **Client
-   Secret** immediately (shown once).
-3. On **Scopes**, enable at least: `design:content:read`, `design:content:write`,
-   `brandtemplate:content:read`, `brandtemplate:meta:read` — these are all `generate_poster()`
-   actually calls. Enabling extra scopes (e.g. `folder:read`, `profile:read`) is harmless, but
-   `get_canva_token.py` only *requests* the four above — requesting a scope your integration
-   hasn't enabled makes Canva reject the whole login with `invalid_scope`.
-4. On **Authorized redirects**, add `http://127.0.0.1:8888/callback` — Canva rejects the word
-   `localhost` and requires the literal IP `127.0.0.1`. It's just a value you type in and save,
-   not a link to click; nothing is listening on that port until step 5.
-5. Run the one-time OAuth helper locally (needs `CANVA_CLIENT_ID` / `CANVA_CLIENT_SECRET` in
-   `.env`, or it'll prompt):
-   ```bash
-   python get_canva_token.py
-   ```
-   It opens your browser for a one-time login/approve, catches the redirect, and prints
-   `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, and — the one that matters — `CANVA_REFRESH_TOKEN`.
-6. Find the **brand template ID** for the approved "High-Contrast Trading Strategy Poster"
-   (see [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)) by listing
-   your templates:
-   ```bash
-   python inspect_canva_template.py
-   ```
-   Copy the `id` matching that template — that's `CANVA_BRAND_TEMPLATE_ID`.
-7. Confirm the template's **real autofill field name(s)** (the current `generate_poster()` code
-   guesses `"post_text"`, which is very likely wrong):
-   ```bash
-   python inspect_canva_template.py <that-id>
-   ```
-   Update the `data=` mapping inside `generate_poster()` in `daily_post.py` to use the field
-   name(s) it prints.
-8. Add all four as **repository secrets**: `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`,
-   `CANVA_REFRESH_TOKEN`, `CANVA_BRAND_TEMPLATE_ID`. (Do **not** store a raw access token — it
-   expires in ~4 hours; `generate_poster()` derives one from the refresh token every run.)
-9. Test end-to-end (still local, no Facebook post) with:
-   ```bash
-   python daily_post.py --dry-run --force-poster
-   ```
-   This calls the real Canva autofill + export flow and prints the poster image URL, but skips
-   publishing to Facebook.
+We initially tried wiring rule 3 to the real Canva Connect API (autofill the approved
+"High-Contrast Trading Strategy Poster" brand template). Two dead ends:
+
+- **Canva's Autofill + Brand Template API requires a Canva Enterprise plan** — Free/Pro/Teams
+  accounts can't use it (`inspect_canva_template.py` returns zero brand templates on a
+  non-Enterprise account). Confirmed independently by
+  [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)'s own note about a
+  Canva "upgrade required" error.
+- Even setting aside the plan issue, **Canva refresh tokens are single-use and rotate on every
+  exchange** — a static secret can't survive a second automated run without extra
+  infrastructure to keep rewriting it.
+
+[`get_canva_token.py`](./get_canva_token.py) and [`inspect_canva_template.py`](./inspect_canva_template.py)
+are left in the repo, untouched, in case this account is ever upgraded to Canva Enterprise —
+they still work, they're just not called by `daily_post.py` anymore.
 
 ## Getting Facebook credentials (`FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`)
 

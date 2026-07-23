@@ -9,11 +9,12 @@ Duty rules (see agents/blue-hulk/README.md "Daily duty rules" for the source of 
     2. 1 out of every 4 posts is a Striker Zones post — drawn from
        config/striker_zones_topics.yaml — and its CTA must link to
        https://t.me/strikerzonesadmin_bot.
-    3. 1 out of every 3 posts should carry a Canva poster related to that post.
-       Canva generation isn't wired for this headless script yet (it needs the Canva Connect
-       API with its own OAuth credentials, set up the same way FB_PAGE_ACCESS_TOKEN was) — see
-       generate_poster() below. Until that's configured, poster days still publish as a text
-       post (rule 1 always wins) and print a NOTE so it's obvious a poster was owed.
+    3. 1 out of every 3 posts carries a poster graphic related to that post — rendered locally
+       with Pillow (see render_poster.py), matching the locked style spec in
+       ../../design/poster-style-guide.md. No Canva account or API involved: Canva's
+       Autofill/Brand Template API requires a Canva Enterprise plan, which this account doesn't
+       have. If poster generation ever fails for any reason, rule 1 always wins — it falls back
+       to a text-only post and prints a NOTE.
 
 All three rules run off ONE deterministic day counter, so which rule applies on a given day is
 reproducible and never drifts:
@@ -23,8 +24,6 @@ reproducible and never drifts:
 
 Credentials come from environment variables (GitHub Actions secrets) or a local .env:
     ANTHROPIC_API_KEY, FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN
-    CANVA_CLIENT_ID, CANVA_CLIENT_SECRET, CANVA_REFRESH_TOKEN, CANVA_BRAND_TEMPLATE_ID
-        (optional — enables rule 3 automation; get the refresh token via get_canva_token.py)
 
 Run manually to test:
     python daily_post.py                    # generate + post today's topic/rules
@@ -34,15 +33,17 @@ Run manually to test:
 """
 import argparse
 import datetime
+import json
 import os
 import sys
-import time
 from pathlib import Path
 
 import requests
 import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
+
+from render_poster import render_poster
 
 # Windows consoles default to cp1252; make emoji/curly-quote output safe.
 try:
@@ -127,134 +128,55 @@ def generate_post(topic: str, striker_zone_day: bool) -> str:
     return "".join(b.text for b in resp.content if b.type == "text").strip()
 
 
-CANVA_TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
-CANVA_API_BASE = "https://api.canva.com/rest/v1"
-
-
-def _persist_local_refresh_token(new_value: str) -> None:
-    """Local convenience only (GitHub Actions has no persistent .env to write back to)."""
-    env_path = HERE / ".env"
-    if not env_path.exists():
-        return
-    lines = env_path.read_text(encoding="utf-8").splitlines()
-    out, replaced = [], False
-    for line in lines:
-        if line.startswith("CANVA_REFRESH_TOKEN="):
-            out.append(f"CANVA_REFRESH_TOKEN={new_value}")
-            replaced = True
-        else:
-            out.append(line)
-    if not replaced:
-        out.append(f"CANVA_REFRESH_TOKEN={new_value}")
-    env_path.write_text("\n".join(out) + "\n", encoding="utf-8")
-
-
-def _canva_access_token() -> str | None:
-    """Exchange the stored refresh token for a short-lived access token (Canva tokens ~4h).
-
-    IMPORTANT: Canva refresh tokens are single-use and ROTATE on every exchange — the response
-    always contains a NEW refresh token, and the old one is immediately revoked. Locally this
-    function rewrites .env so the next run doesn't reuse a dead value. In GitHub Actions there
-    is no persistent .env, so the run prints the new value and the CANVA_REFRESH_TOKEN secret
-    must be updated to it manually before the next scheduled run — see scripts/README.md
-    "Canva refresh tokens rotate" for the tradeoffs and an auto-rotation option.
-    """
-    import base64
-
-    client_id = os.environ.get("CANVA_CLIENT_ID")
-    client_secret = os.environ.get("CANVA_CLIENT_SECRET")
-    refresh_token = os.environ.get("CANVA_REFRESH_TOKEN")
-    if not (client_id and client_secret and refresh_token):
-        return None
-
-    basic = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
-    r = requests.post(
-        CANVA_TOKEN_URL,
-        headers={"Authorization": f"Basic {basic}", "Content-Type": "application/x-www-form-urlencoded"},
-        data={"grant_type": "refresh_token", "refresh_token": refresh_token},
-        timeout=30,
+def generate_poster_slots(topic: str, post_text: str) -> dict:
+    """Ask Claude to split the already-written post into the poster's four text slots, per the
+    locked style spec in ../../design/poster-style-guide.md."""
+    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    instruction = (
+        f'This Facebook post (topic: "{topic}") needs a companion poster graphic. Extract these '
+        "four slots from it and respond with ONLY a JSON object, no other text:\n\n"
+        f'"""\n{post_text}\n"""\n\n'
+        '{\n'
+        '  "top_label": "a short one-line context tag, <=40 chars",\n'
+        '  "headline": "the hook line, punchy, <=70 chars",\n'
+        '  "body_lines": ["1-2 short supporting lines, each <=90 chars"],\n'
+        '  "footer": "the closing CTA/question line, <=90 chars"\n'
+        "}"
     )
-    if not r.ok:
-        print(f"[blue-hulk] Canva token refresh failed: {r.status_code} {r.text}")
-        return None
-    payload = r.json()
-    new_refresh = payload.get("refresh_token")
-    if new_refresh:
-        _persist_local_refresh_token(new_refresh)
-        print(f"[blue-hulk] Canva refresh token rotated. NEW CANVA_REFRESH_TOKEN={new_refresh}")
-        print("[blue-hulk] Update the GitHub secret CANVA_REFRESH_TOKEN to this value before the next scheduled run.")
-    return payload.get("access_token")
-
-
-def generate_poster(post_text: str) -> str | None:
-    """Rule 3 hook: render a Canva poster for this post and return a publicly reachable image URL.
-
-    Returns None (graceful no-op) until Canva automation is fully wired — see scripts/README.md
-    "Automating Canva posters (rule 3)". Needs CANVA_CLIENT_ID, CANVA_CLIENT_SECRET,
-    CANVA_REFRESH_TOKEN (from get_canva_token.py) and CANVA_BRAND_TEMPLATE_ID.
-
-    TODO: the autofill data field below is a placeholder ("post_text") — run
-    `python inspect_canva_template.py <CANVA_BRAND_TEMPLATE_ID>` to get this brand template's
-    actual field name(s), then update the `data=` mapping below to match.
-    """
-    template_id = os.environ.get("CANVA_BRAND_TEMPLATE_ID")
-    access_token = _canva_access_token()
-    if not access_token or not template_id:
-        return None
-
-    headers = {"Authorization": f"Bearer {access_token}"}
-
-    job = requests.post(
-        f"{CANVA_API_BASE}/autofills",
-        headers=headers,
-        json={
-            "brand_template_id": template_id,
-            "data": {"post_text": {"type": "text", "text": post_text[:280]}},
-        },
-        timeout=30,
+    resp = client.messages.create(
+        model=MODEL,
+        max_tokens=400,
+        messages=[{"role": "user", "content": instruction}],
     )
-    if not job.ok:
-        print(f"[blue-hulk] Canva autofill request failed: {job.status_code} {job.text}")
-        return None
-    job_id = job.json()["job"]["id"]
+    raw = "".join(b.text for b in resp.content if b.type == "text").strip()
+    raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    return json.loads(raw)
 
-    for _ in range(20):  # poll up to ~40s
-        time.sleep(2)
-        status = requests.get(f"{CANVA_API_BASE}/autofills/{job_id}", headers=headers, timeout=30)
-        result = status.json().get("job", {})
-        if result.get("status") == "success":
-            design_id = result["result"]["design"]["id"]
-            break
-        if result.get("status") == "failed":
-            print(f"[blue-hulk] Canva autofill job failed: {result}")
-            return None
-    else:
-        print("[blue-hulk] Canva autofill job timed out.")
+
+def generate_poster(topic: str, post_text: str) -> Path | None:
+    """Rule 3: render a poster locally with Pillow (see render_poster.py) and return its file
+    path. No Canva account/API involved — Canva's Autofill/Brand Template API requires a Canva
+    Enterprise plan, which this account doesn't have (see agents/design/poster-style-guide.md)."""
+    try:
+        slots = generate_poster_slots(topic, post_text)
+    except Exception as e:  # malformed JSON from the model, etc. — never let a poster kill the post
+        print(f"[blue-hulk] Could not derive poster slots, skipping poster: {e}")
         return None
 
-    export = requests.post(
-        f"{CANVA_API_BASE}/exports",
-        headers=headers,
-        json={"design_id": design_id, "format": {"type": "png"}},
-        timeout=30,
-    )
-    if not export.ok:
-        print(f"[blue-hulk] Canva export request failed: {export.status_code} {export.text}")
+    out_path = HERE / "drafts" / f"poster-{day_index()}.png"
+    try:
+        render_poster(
+            slots["top_label"],
+            slots["headline"],
+            slots.get("body_lines", []),
+            slots["footer"],
+            out_path,
+            seed=day_index(),
+        )
+    except Exception as e:
+        print(f"[blue-hulk] Poster render failed, skipping poster: {e}")
         return None
-    export_job_id = export.json()["job"]["id"]
-
-    for _ in range(20):
-        time.sleep(2)
-        status = requests.get(f"{CANVA_API_BASE}/exports/{export_job_id}", headers=headers, timeout=30)
-        result = status.json().get("job", {})
-        if result.get("status") == "success":
-            return result["urls"][0]
-        if result.get("status") == "failed":
-            print(f"[blue-hulk] Canva export job failed: {result}")
-            return None
-
-    print("[blue-hulk] Canva export job timed out.")
-    return None
+    return out_path
 
 
 def publish_text(text: str) -> str:
@@ -270,14 +192,16 @@ def publish_text(text: str) -> str:
     return r.json()["id"]
 
 
-def publish_photo(text: str, image_url: str) -> str:
+def publish_photo(text: str, image_path: Path) -> str:
     page_id = os.environ["FB_PAGE_ID"]
     token = os.environ["FB_PAGE_ACCESS_TOKEN"]
-    r = requests.post(
-        f"{GRAPH_API_BASE}/{page_id}/photos",
-        data={"caption": text, "url": image_url, "access_token": token},
-        timeout=60,
-    )
+    with open(image_path, "rb") as f:
+        r = requests.post(
+            f"{GRAPH_API_BASE}/{page_id}/photos",
+            data={"caption": text, "access_token": token},
+            files={"source": f},
+            timeout=60,
+        )
     if not r.ok:
         sys.exit(f"Publish (photo) failed: {r.status_code} {r.text}")
     return r.json()["id"]
@@ -315,22 +239,20 @@ def main() -> None:
         text = text.rstrip() + f"\n\nJoin Striker Zones: {STRIKER_ZONES_CTA_LINK}"
         print("[blue-hulk] NOTE: CTA link was missing from the generated text; appended it.")
 
-    image_url = None
+    image_path = None
     if poster:
-        image_url = generate_poster(text)
-        if not image_url:
-            print(
-                "[blue-hulk] NOTE: today is a poster day (1-in-3) but Canva automation isn't "
-                "wired yet — posting text-only. See scripts/README.md 'Automating Canva posters "
-                "(rule 3)' to enable it."
-            )
+        image_path = generate_poster(topic, text)
+        if not image_path:
+            print("[blue-hulk] NOTE: today is a poster day (1-in-3) but poster generation failed — posting text-only.")
 
     if args.dry_run:
-        print(f"[blue-hulk] --dry-run: not posting. would_attach_poster={bool(image_url)}")
+        print(f"[blue-hulk] --dry-run: not posting. would_attach_poster={bool(image_path)}")
+        if image_path:
+            print(f"[blue-hulk] poster saved at: {image_path.resolve()}")
         return
 
-    post_id = publish_photo(text, image_url) if image_url else publish_text(text)
-    print(f"[blue-hulk] published{' (with poster)' if image_url else ''}. post id: {post_id}")
+    post_id = publish_photo(text, image_path) if image_path else publish_text(text)
+    print(f"[blue-hulk] published{' (with poster)' if image_path else ''}. post id: {post_id}")
 
 
 if __name__ == "__main__":
