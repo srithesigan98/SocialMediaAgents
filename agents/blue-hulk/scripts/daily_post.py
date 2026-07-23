@@ -131,8 +131,34 @@ CANVA_TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
 CANVA_API_BASE = "https://api.canva.com/rest/v1"
 
 
+def _persist_local_refresh_token(new_value: str) -> None:
+    """Local convenience only (GitHub Actions has no persistent .env to write back to)."""
+    env_path = HERE / ".env"
+    if not env_path.exists():
+        return
+    lines = env_path.read_text(encoding="utf-8").splitlines()
+    out, replaced = [], False
+    for line in lines:
+        if line.startswith("CANVA_REFRESH_TOKEN="):
+            out.append(f"CANVA_REFRESH_TOKEN={new_value}")
+            replaced = True
+        else:
+            out.append(line)
+    if not replaced:
+        out.append(f"CANVA_REFRESH_TOKEN={new_value}")
+    env_path.write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
 def _canva_access_token() -> str | None:
-    """Exchange the stored refresh token for a short-lived access token (Canva tokens ~4h)."""
+    """Exchange the stored refresh token for a short-lived access token (Canva tokens ~4h).
+
+    IMPORTANT: Canva refresh tokens are single-use and ROTATE on every exchange — the response
+    always contains a NEW refresh token, and the old one is immediately revoked. Locally this
+    function rewrites .env so the next run doesn't reuse a dead value. In GitHub Actions there
+    is no persistent .env, so the run prints the new value and the CANVA_REFRESH_TOKEN secret
+    must be updated to it manually before the next scheduled run — see scripts/README.md
+    "Canva refresh tokens rotate" for the tradeoffs and an auto-rotation option.
+    """
     import base64
 
     client_id = os.environ.get("CANVA_CLIENT_ID")
@@ -151,7 +177,13 @@ def _canva_access_token() -> str | None:
     if not r.ok:
         print(f"[blue-hulk] Canva token refresh failed: {r.status_code} {r.text}")
         return None
-    return r.json().get("access_token")
+    payload = r.json()
+    new_refresh = payload.get("refresh_token")
+    if new_refresh:
+        _persist_local_refresh_token(new_refresh)
+        print(f"[blue-hulk] Canva refresh token rotated. NEW CANVA_REFRESH_TOKEN={new_refresh}")
+        print("[blue-hulk] Update the GitHub secret CANVA_REFRESH_TOKEN to this value before the next scheduled run.")
+    return payload.get("access_token")
 
 
 def generate_poster(post_text: str) -> str | None:

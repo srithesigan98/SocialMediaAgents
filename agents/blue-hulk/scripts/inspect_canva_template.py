@@ -23,6 +23,28 @@ from dotenv import load_dotenv
 
 TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token"
 API_BASE = "https://api.canva.com/rest/v1"
+ENV_PATH = Path(__file__).resolve().parent / ".env"
+
+
+def _persist_refresh_token(new_value: str) -> None:
+    """Canva refresh tokens are single-use and ROTATE on every exchange — the old one is dead
+    the instant this call succeeds. Overwrite .env immediately so the next script run (or a
+    second run of this one) doesn't try the now-revoked value and get invalid_grant."""
+    if not ENV_PATH.exists():
+        return
+    lines = ENV_PATH.read_text(encoding="utf-8").splitlines()
+    out, replaced = [], False
+    for line in lines:
+        if line.startswith("CANVA_REFRESH_TOKEN="):
+            out.append(f"CANVA_REFRESH_TOKEN={new_value}")
+            replaced = True
+        else:
+            out.append(line)
+    if not replaced:
+        out.append(f"CANVA_REFRESH_TOKEN={new_value}")
+    ENV_PATH.write_text("\n".join(out) + "\n", encoding="utf-8")
+    print(f"[canva] Refresh token rotated — .env updated automatically.\n[canva] New CANVA_REFRESH_TOKEN={new_value}\n"
+          "[canva] IMPORTANT: update the GitHub repository secret CANVA_REFRESH_TOKEN to this same value.\n")
 
 
 def get_access_token() -> str:
@@ -37,8 +59,16 @@ def get_access_token() -> str:
         timeout=30,
     )
     if not r.ok:
-        sys.exit(f"Token refresh failed: {r.status_code} {r.text}")
-    return r.json()["access_token"]
+        sys.exit(
+            f"Token refresh failed: {r.status_code} {r.text}\n\n"
+            "If this says invalid_grant / 'used twice', your refresh token was already consumed "
+            "by another script run (Canva rotates it every exchange) — re-run get_canva_token.py "
+            "to mint a fresh one."
+        )
+    payload = r.json()
+    if payload.get("refresh_token"):
+        _persist_refresh_token(payload["refresh_token"])
+    return payload["access_token"]
 
 
 def list_templates(token: str) -> None:
