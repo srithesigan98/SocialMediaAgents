@@ -1,4 +1,5 @@
 import { CalculateMetadataFunction, Composition } from "remotion";
+import { HiSri } from "./HiSri";
 
 type Props = {};
 
@@ -16,6 +17,19 @@ export const MyComposition = () => {
       width={1280}
       height={720}
       calculateMetadata={calculateMetadata}
+    />
+  );
+};
+
+export const HiSriComposition = () => {
+  return (
+    <Composition
+      id="HiSri"
+      component={HiSri}
+      durationInFrames={90}
+      fps={30}
+      width={1080}
+      height={1920}
     />
   );
 };
