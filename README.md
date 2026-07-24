@@ -23,6 +23,20 @@ gaps, a build roadmap, and filled forex/gold audience research.
 
 ---
 
+## Video generation (Remotion)
+
+[`video/`](video) is a [Remotion](https://www.remotion.dev) project (React/TS
+video compositions rendered to MP4 with a headless browser + FFmpeg),
+scaffolded with `npx create-video@latest`. Use it to programmatically build
+video assets for the agents above (e.g. Repurposer cuts, Black Panther
+Reels/TikToks).
+
+The matching Claude Code Agent Skills are vendored under
+`.claude/skills/remotion-*` and `.claude/skills/mediabunny` — see
+[`video/README.md`](video/README.md) for setup and rendering notes.
+
+---
+
 ## The Watcher
 
 Watches a social video (TikTok, Instagram Reels, Facebook, YouTube Shorts, or a
