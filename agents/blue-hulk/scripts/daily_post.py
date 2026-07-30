@@ -43,7 +43,7 @@ import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-from render_poster import render_poster
+from render_poster import compute_illustrative_levels, render_poster, render_striker_poster
 
 # Windows consoles default to cp1252; make emoji/curly-quote output safe.
 try:
@@ -179,6 +179,26 @@ def generate_poster(topic: str, post_text: str) -> Path | None:
     return out_path
 
 
+def generate_striker_zone_poster() -> Path | None:
+    """When a poster day (rule 3) coincides with a Striker Zones day (rule 2), use the
+    dedicated poster style that mirrors the real Striker Zones 2.1 Pro TradingView indicator
+    (light theme, teal entry/SL risk box, orange/green TP labels) instead of the generic dark
+    poster. Levels are always synthetic/illustrative (compute_illustrative_levels) — never a
+    real live price."""
+    levels = compute_illustrative_levels(day_index())
+    out_path = HERE / "drafts" / f"poster-{day_index()}.png"
+    try:
+        render_striker_poster(
+            levels["symbol_label"], levels["entry"], levels["sl"],
+            levels["tp1"], levels["tp2"], levels["tp3"], levels["decimals"],
+            out_path, seed=day_index(),
+        )
+    except Exception as e:
+        print(f"[blue-hulk] Striker Zones poster render failed, skipping poster: {e}")
+        return None
+    return out_path
+
+
 def publish_text(text: str) -> str:
     page_id = os.environ["FB_PAGE_ID"]
     token = os.environ["FB_PAGE_ACCESS_TOKEN"]
@@ -241,7 +261,7 @@ def main() -> None:
 
     image_path = None
     if poster:
-        image_path = generate_poster(topic, text)
+        image_path = generate_striker_zone_poster() if striker else generate_poster(topic, text)
         if not image_path:
             print("[blue-hulk] NOTE: today is a poster day (1-in-3) but poster generation failed — posting text-only.")
 

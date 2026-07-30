@@ -48,7 +48,7 @@ import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-from render_poster import render_poster
+from render_poster import compute_illustrative_levels, render_poster, render_striker_poster
 
 # Windows consoles default to cp1252; make emoji/curly-quote output safe.
 try:
@@ -230,6 +230,27 @@ def generate_poster(post_text: str, slot_index: int) -> str | None:
     return push_poster_and_get_url(out_path)
 
 
+def generate_striker_zone_poster(slot_index: int) -> str | None:
+    """On the Striker Zones slot, use the dedicated poster style that mirrors the real
+    Striker Zones 2.1 Pro TradingView indicator (light theme, teal entry/SL risk box,
+    orange/green TP labels) instead of the generic dark poster. Levels are always
+    synthetic/illustrative (compute_illustrative_levels) — never a real live price."""
+    seed = day_index() * len(SLOT_HOURS_UTC) + slot_index
+    levels = compute_illustrative_levels(seed)
+    out_path = HERE / "posted_assets" / f"hulk-poster-slot{slot_index}.png"
+    try:
+        render_striker_poster(
+            levels["symbol_label"], levels["entry"], levels["sl"],
+            levels["tp1"], levels["tp2"], levels["tp3"], levels["decimals"],
+            out_path, seed=seed,
+        )
+    except Exception as e:
+        print(f"[hulk] Striker Zones poster render failed, skipping poster: {e}")
+        return None
+
+    return push_poster_and_get_url(out_path)
+
+
 def publish(text: str, image_url: str | None = None) -> str:
     user_id = os.environ["THREADS_USER_ID"]
     token = os.environ["THREADS_ACCESS_TOKEN"]
@@ -301,7 +322,10 @@ def main() -> None:
     if args.dry_run:
         print("[hulk] --dry-run: skipping poster render/push (every post normally gets one).")
     else:
-        image_url = generate_poster(text, args.slot)
+        image_url = (
+            generate_striker_zone_poster(args.slot) if striker_zone_slot
+            else generate_poster(text, args.slot)
+        )
         if not image_url:
             print("[hulk] NOTE: poster generation failed for this post — posting text-only.")
 
