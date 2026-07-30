@@ -100,7 +100,8 @@ activate:
 
 1. This workflow only runs the schedule from the repo's **default branch** — merge this branch into `main` first.
 2. Add three **repository secrets** (GitHub → Settings → Secrets and variables → Actions → New repository secret):
-   - `ANTHROPIC_API_KEY` — same key used by Blue Hulk's workflow, for drafting
+   - `ANTHROPIC_API_KEY_2` — a separate Anthropic key dedicated to Hulk (kept distinct from Blue
+     Hulk's `ANTHROPIC_API_KEY` secret so usage/billing can be told apart between the two agents)
    - `THREADS_USER_ID` — `28866026592987310`
    - `THREADS_ACCESS_TOKEN` — your current 60-day long-lived Threads token (see below for how to get one)
 3. The workflow needs `contents: write` permission to commit each post's poster PNG — already set
