@@ -2,13 +2,30 @@ name: Blue Hulk daily post
 
 # Generates one on-brand Facebook post and publishes it, once a day.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+#
+# Daily duty rules (see agents/blue-hulk/scripts/README.md "Daily duty rules"):
+#   1. Posts every day, no matter what.
+#   2. 1 out of every 4 posts is a Striker Zones post with a CTA to
+#      https://t.me/strikerzonesadmin_bot.
+#   3. 1 out of every 3 posts carries a poster graphic, rendered locally with Pillow
+#      (render_poster.py) — no Canva account/API needed (Canva's Autofill/Brand Template API
+#      requires a Canva Enterprise plan, which this account doesn't have).
 
 on:
   schedule:
     # 12:30 UTC = 8:30pm Malaysia (UTC+8). Cron is always UTC; change this to reschedule.
     # GitHub may start scheduled runs a few minutes late under load — that's normal.
     - cron: "30 12 * * *"
-  workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
+  workflow_dispatch:       # adds a manual "Run workflow" button, with test overrides
+    inputs:
+      force_striker:
+        description: "Force today onto the Striker Zones branch (rule 2)"
+        type: boolean
+        default: false
+      force_poster:
+        description: "Force today onto the poster branch (rule 3)"
+        type: boolean
+        default: false
 
 jobs:
   post:
@@ -18,11 +35,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install fonts (for poster rendering)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
       - name: Install dependencies
         run: pip install -r agents/blue-hulk/scripts/requirements.txt
       - name: Generate and post
+        working-directory: agents/blue-hulk/scripts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: python agents/blue-hulk/scripts/daily_post.py
+          FORCE_STRIKER: ${{ inputs.force_striker }}
+          FORCE_POSTER: ${{ inputs.force_poster }}
+        run: |
+          ARGS=""
+          if [ "$FORCE_STRIKER" = "true" ]; then ARGS="$ARGS --force-striker"; fi
+          if [ "$FORCE_POSTER" = "true" ]; then ARGS="$ARGS --force-poster"; fi
+          python daily_post.py $ARGS

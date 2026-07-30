@@ -37,12 +37,43 @@ first.
 
 ## `daily_post.py` — fully automatic daily posting (GitHub Actions)
 
-Generates one on-brand post (rotating through [`../config/daily_topics.yaml`](../config/daily_topics.yaml))
-and publishes it — no human review. Reads creds from environment vars or `.env`.
+Generates one on-brand post and publishes it — no human review. Reads creds from environment
+vars or `.env`.
 
 ```bash
-python daily_post.py --dry-run   # generate + print only (safe test, needs ANTHROPIC_API_KEY)
-python daily_post.py             # generate + POST today's topic
+python daily_post.py --dry-run          # generate + print only (safe test, needs ANTHROPIC_API_KEY)
+python daily_post.py                    # generate + POST today's topic per the duty rules below
+python daily_post.py --dry-run --force-striker   # preview a Striker Zones post regardless of date
+python daily_post.py --dry-run --force-poster    # preview a poster-day post regardless of date
+```
+
+### Daily duty rules
+
+1. **Post every day.** The scheduled workflow always publishes something — this rule never yields
+   to the other two.
+2. **1 out of every 4 posts is a Striker Zones post** — topic drawn from
+   [`../config/striker_zones_topics.yaml`](../config/striker_zones_topics.yaml), and the post's
+   final line is always a CTA linking to **https://t.me/strikerzonesadmin_bot** (verbatim; the
+   script appends it as a safety net if the model ever omits it).
+3. **1 out of every 3 posts carries a poster graphic** related to that post's content.
+
+All three run off one deterministic day counter (`date.today().toordinal()`), so rules 2 and 3
+land on predictable, non-overlapping-by-default days (`% 4 == 0` and `% 3 == 0`) without any
+state file to maintain.
+
+**Rule 3 status — fully automated, no Canva account needed.** `generate_poster()` in
+`daily_post.py` asks Claude to split the day's post into four slots (top label / headline /
+body / footer), then [`render_poster.py`](./render_poster.py) draws the poster locally with
+Pillow, matching the locked style spec in
+[`../../design/poster-style-guide.md`](../../design/poster-style-guide.md) — dark background,
+accent-color candlestick texture, bold headline. The PNG is uploaded straight to Facebook, no
+image hosting required. If rendering ever fails for any reason, rule 1 always wins: it falls
+back to a text-only post and prints a `NOTE:` line so a missed poster is never silent.
+
+Preview a poster anytime without touching Facebook:
+```bash
+python render_poster.py "BTC — testing resistance" "Most traders blow up the same way" \
+  "Position size kills more accounts than bad ideas." "What's your leverage lesson?"
 ```
 
 **Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
@@ -56,6 +87,24 @@ python daily_post.py             # generate + POST today's topic
 3. Test it immediately via **Actions tab → Blue Hulk daily post → Run workflow** (the `workflow_dispatch` button), then check your Page.
 
 Because the Page token is non-expiring, this keeps posting indefinitely with no maintenance.
+
+### Why not Canva? (kept for reference)
+
+We initially tried wiring rule 3 to the real Canva Connect API (autofill the approved
+"High-Contrast Trading Strategy Poster" brand template). Two dead ends:
+
+- **Canva's Autofill + Brand Template API requires a Canva Enterprise plan** — Free/Pro/Teams
+  accounts can't use it (`inspect_canva_template.py` returns zero brand templates on a
+  non-Enterprise account). Confirmed independently by
+  [`../../design/poster-style-guide.md`](../../design/poster-style-guide.md)'s own note about a
+  Canva "upgrade required" error.
+- Even setting aside the plan issue, **Canva refresh tokens are single-use and rotate on every
+  exchange** — a static secret can't survive a second automated run without extra
+  infrastructure to keep rewriting it.
+
+[`get_canva_token.py`](./get_canva_token.py) and [`inspect_canva_template.py`](./inspect_canva_template.py)
+are left in the repo, untouched, in case this account is ever upgraded to Canva Enterprise —
+they still work, they're just not called by `daily_post.py` anymore.
 
 ## Getting Facebook credentials (`FB_PAGE_ID`, `FB_PAGE_ACCESS_TOKEN`)
 

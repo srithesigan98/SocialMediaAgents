@@ -39,6 +39,88 @@ Always asks for a `y/N` confirmation before publishing, and prints the exact tex
 `../../design/poster-style-guide.md`) — must be a publicly reachable URL, since the Threads API
 doesn't accept local file uploads.
 
+## `daily_post.py` — fully automatic daily posting (GitHub Actions)
+
+Generates one on-brand post per slot and publishes it — no human review. Reads creds from
+environment vars or `.env`.
+
+```bash
+python daily_post.py --slot 0 --dry-run          # generate + print only (safe test, needs ANTHROPIC_API_KEY)
+python daily_post.py --slot 0                    # generate + POST that slot's content per the duty rules below
+python daily_post.py --slot 1 --dry-run --force-framework listicle_breakdown   # preview a specific framework
+python daily_post.py --slot 0 --dry-run --force-striker                       # preview the Striker Zones branch
+```
+
+### Daily duty rules
+
+1. **Post 3 times a day, no matter what.** Slots 0/1/2 correspond to 9am / 2pm / 8pm Malaysia
+   (`SLOT_HOURS_UTC` in `daily_post.py`) — the scheduled workflow fires one run per slot and
+   always publishes something. This rule never yields to the other two.
+2. **Every post carries a poster graphic.** No selective gating by framework anymore — all three
+   daily posts get one.
+3. **1 out of every 3 days is a Striker Zones day** — on that day, the **first post (slot 0)** is
+   drawn from [`../config/striker_zones_topics.yaml`](../config/striker_zones_topics.yaml), and
+   its final line is always a CTA linking to **https://t.me/strikerzonesadmin_bot** (verbatim; the
+   script appends it as a safety net if the model ever omits it). Slots 1 and 2 that day still run
+   the normal framework rotation.
+
+Non-Striker slots rotate deterministically through the 8 content frameworks in
+[`../templates/`](../templates) (`audience_question`, `call_reasoning_risk`, `confession_lesson`,
+`contrarian_reframe`, `historical_compounding_reveal`, `listicle_breakdown`, `progress_reveal`,
+`standalone_aphorism`), keyed off a global counter (`day_index * 3 + slot_index`) so the feed
+doesn't repeat the same shape run after run. The topic itself is chosen by Claude from the allowed
+topic pillars in `../config/topics.yaml` — there's no fixed topic pool for these slots, since
+Hulk's scope is broader than Striker Zones (any in-lane finance/trading/crypto angle). Everything
+runs off ONE deterministic day counter (`date.today().toordinal()`), so which framework applies to
+a given day+slot, and which day is a Striker Zones day, is reproducible and never drifts.
+
+**Poster generation — fully automated, no Canva account needed, but with one extra step Blue Hulk
+doesn't need.** `generate_poster()` in `daily_post.py` asks Claude to split each post into four
+slots (top label / headline / body / footer), then [`render_poster.py`](./render_poster.py) draws
+the poster locally with Pillow, matching the locked style spec in
+[`../../design/poster-style-guide.md`](../../design/poster-style-guide.md).
+**Unlike Facebook, the Threads API requires a publicly reachable image URL — it won't accept a
+local file upload** — so the rendered PNG (`posted_assets/hulk-poster-slot{N}.png`, overwritten
+each time that slot posts) is committed and pushed to this repo, and its
+`raw.githubusercontent.com` URL is what actually gets posted. If rendering or the git push ever
+fails for any reason, rule 1 always wins: it falls back to a text-only post and prints a `NOTE:`
+line so a missed poster is never silent.
+
+Preview a poster anytime without touching Threads or git:
+```bash
+python render_poster.py "BTC — testing resistance" "Most traders blow up the same way" \
+  "Position size kills more accounts than bad ideas." "What's your leverage lesson?"
+```
+
+**Scheduled in the cloud** via [`.github/workflows/hulk-daily.yml`](../../../.github/workflows/hulk-daily.yml)
+— 3 cron entries (01:00 / 06:00 / 12:00 UTC = 9am / 2pm / 8pm Malaysia), each mapped back to its
+slot number via `github.event.schedule` in the workflow's "Determine slot" step. Change the
+`cron:` lines to reschedule, but keep `SLOT_HOURS_UTC` in `daily_post.py` in sync with them. To
+activate:
+
+1. This workflow only runs the schedule from the repo's **default branch** — merge this branch into `main` first.
+2. Add three **repository secrets** (GitHub → Settings → Secrets and variables → Actions → New repository secret):
+   - `ANTHROPIC_API_KEY` — same key used by Blue Hulk's workflow, for drafting
+   - `THREADS_USER_ID` — `28866026592987310`
+   - `THREADS_ACCESS_TOKEN` — your current 60-day long-lived Threads token (see below for how to get one)
+3. The workflow needs `contents: write` permission to commit each post's poster PNG — already set
+   in the workflow file, but double-check under Settings → Actions → General → Workflow
+   permissions that "Read and write permissions" isn't overridden to read-only at the repo level.
+4. Test it immediately via **Actions tab → Hulk daily post → Run workflow** (the `workflow_dispatch` button — pick a slot, and optionally force Striker/a framework), then check your Threads profile.
+
+**Token expiry — the one thing this needs that Blue Hulk doesn't:** Threads long-lived tokens
+expire after 60 days (Facebook Page tokens don't). Roughly every ~50 days, refresh it:
+
+```
+GET https://graph.threads.net/refresh_access_token
+  ?grant_type=th_refresh_token
+  &access_token={CURRENT_LONG_LIVED_TOKEN}
+```
+
+Take the new `access_token` from the response and update the `THREADS_ACCESS_TOKEN` repository
+secret with it (Settings → Secrets and variables → Actions → click the secret → Update). This step
+isn't automated — there's no secret-rotation script in this repo yet.
+
 ## Getting Threads credentials (`THREADS_USER_ID`, `THREADS_ACCESS_TOKEN`)
 
 One-time setup at [developers.facebook.com](https://developers.facebook.com). The Threads API is
@@ -99,6 +181,6 @@ dashboard and regenerate.
 
 ## Notes
 
-- Nothing here auto-posts on a schedule. If you want scheduled posting later, wrap
-  `post_to_threads.py` in a cron job / scheduler once you're comfortable with the review flow.
 - `drafts/` is gitignored so review notes and generated text don't clutter the repo.
+- `posted_assets/hulk-poster-slot{0,1,2}.png` are **not** gitignored — `daily_post.py` commits
+  them deliberately so the Threads API has a public URL to fetch each image from.

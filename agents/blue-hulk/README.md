@@ -55,3 +55,21 @@ Chick).
 Blue Hulk can turn a post into a branded poster via Canva — see
 [`../design/poster-style-guide.md`](../design/poster-style-guide.md). Reference design approved and
 saved in the connected Canva account ("High-Contrast Trading Strategy Poster").
+
+## Daily duty rules (automated)
+
+Blue Hulk posts to Facebook automatically every day via
+[`scripts/daily_post.py`](./scripts/daily_post.py), scheduled by
+[`.github/workflows/blue-hulk-daily.yml`](../../.github/workflows/blue-hulk-daily.yml). Three
+standing rules, all deterministic by date (no state file needed):
+
+1. **Post every day** — non-negotiable; the other two rules never cause a day to be skipped.
+2. **1 in every 4 posts is a Striker Zones post** — topic from
+   [`config/striker_zones_topics.yaml`](./config/striker_zones_topics.yaml), CTA always linking
+   to `https://t.me/strikerzonesadmin_bot`.
+3. **1 in every 3 posts carries a Canva poster** related to the post. Not yet automated for the
+   headless daily job — see `scripts/README.md` → "Automating Canva posters (rule 3)" for what's
+   needed to wire it up; until then those days post text-only with a note in the run log.
+
+See [`scripts/README.md`](./scripts/README.md) for setup, activation, and the manual test flags
+(`--force-striker`, `--force-poster`).

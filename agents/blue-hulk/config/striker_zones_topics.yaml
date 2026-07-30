@@ -1,0 +1,16 @@
+# Blue Hulk "Striker Zones" topic pool — used on every 4th daily post (see daily_post.py
+# ROTATION_RULES). Each post from this pool must promote Striker Zones and end with a CTA
+# pointing to https://t.me/strikerzonesadmin_bot.
+#
+# Keep these tied to trading value (setups/zones/signals-adjacent education), not a bare ad —
+# the copywriting engine's "no hard sales pitch" rule still applies to the BODY of the post;
+# only the CTA line is the exception, and it must use the Telegram link verbatim.
+topics:
+  - what a "striker zone" is and why reacting at the right zone beats predicting direction
+  - a recent example of price reacting exactly at a key zone (illustrative, not a real call)
+  - why most traders miss their zone because they're staring at the wrong timeframe
+  - the difference between a random support/resistance line and a real striker zone
+  - how waiting for price to tag a zone removes the guesswork from entries
+  - why zone-based trading reduces the emotional decisions that blow accounts
+  - a walkthrough of how Striker Zones are identified before the market gets there
+  - the cost of chasing price vs letting it come to your zone
