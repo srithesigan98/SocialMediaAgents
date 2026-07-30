@@ -1,26 +1,37 @@
 name: Hulk daily post
 
-# Generates one on-brand Threads post and publishes it, once a day.
+# Generates Threads posts and publishes them, three times a day.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
 #
 # Daily duty rules (see agents/hulk/scripts/README.md "Daily duty rules"):
-#   1. Posts every day, no matter what.
-#   2. Rotates deterministically through the 8 content frameworks in agents/hulk/templates/.
-#   3. On poster-worthy framework days (listicle_breakdown, standalone_aphorism,
-#      historical_compounding_reveal), renders a poster locally with Pillow (render_poster.py),
-#      commits it to the repo, and posts its raw.githubusercontent.com URL — the Threads API
-#      requires a publicly reachable image URL and doesn't accept local file uploads.
+#   1. Posts 3 times a day, no matter what — one run per cron entry below (slots 0/1/2).
+#   2. Every post carries a poster, rendered locally with Pillow (render_poster.py), committed to
+#      this repo, and posted via its raw.githubusercontent.com URL — the Threads API requires a
+#      publicly reachable image URL and doesn't accept local file uploads.
+#   3. 1 out of every 3 days, the FIRST post of the day (slot 0) is a Striker Zones post with a
+#      CTA to https://t.me/strikerzonesadmin_bot.
+#
+# The 3 cron entries below are matched back to a slot index (0/1/2) via `github.event.schedule`
+# in the "Determine slot" step — keep their order in sync with SLOT_HOURS_UTC in daily_post.py.
 
 on:
   schedule:
-    # 12:45 UTC = 8:45pm Malaysia (UTC+8), 15 min after Blue Hulk's Facebook post.
-    # Cron is always UTC; change this to reschedule. GitHub may start scheduled runs a few
-    # minutes late under load — that's normal.
-    - cron: "45 12 * * *"
-  workflow_dispatch:       # adds a manual "Run workflow" button, with a test override
+    - cron: "0 1 * * *"   # slot 0 — 9:00am Malaysia (UTC+8)
+    - cron: "0 6 * * *"   # slot 1 — 2:00pm Malaysia
+    - cron: "0 12 * * *"  # slot 2 — 8:00pm Malaysia
+  workflow_dispatch:       # adds a manual "Run workflow" button, with test overrides
     inputs:
+      slot:
+        description: "Which of the 3 daily slots to run (0, 1, or 2)"
+        type: choice
+        default: "0"
+        options: ["0", "1", "2"]
+      force_striker:
+        description: "Force this slot onto the Striker Zones branch (rule 3)"
+        type: boolean
+        default: false
       force_framework:
-        description: "Force today's post onto a specific framework (leave blank for the day's normal rotation)"
+        description: "Force a specific content framework (leave blank for the day's normal rotation; ignored if force_striker is checked)"
         type: choice
         default: ""
         options:
@@ -35,13 +46,22 @@ on:
           - standalone_aphorism
 
 permissions:
-  contents: write   # needed to commit/push the poster PNG on poster-worthy days
+  contents: write   # needed to commit/push each post's poster PNG
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Determine slot from cron schedule
+        id: slot
+        run: |
+          case "${{ github.event.schedule }}" in
+            "0 1 * * *")  echo "slot=0" >> "$GITHUB_OUTPUT" ;;
+            "0 6 * * *")  echo "slot=1" >> "$GITHUB_OUTPUT" ;;
+            "0 12 * * *") echo "slot=2" >> "$GITHUB_OUTPUT" ;;
+            *)            echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT" ;;  # workflow_dispatch
+          esac
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -59,8 +79,11 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          SLOT: ${{ steps.slot.outputs.slot }}
+          FORCE_STRIKER: ${{ inputs.force_striker }}
           FORCE_FRAMEWORK: ${{ inputs.force_framework }}
         run: |
-          ARGS=""
+          ARGS="--slot $SLOT"
+          if [ "$FORCE_STRIKER" = "true" ]; then ARGS="$ARGS --force-striker"; fi
           if [ -n "$FORCE_FRAMEWORK" ]; then ARGS="$ARGS --force-framework $FORCE_FRAMEWORK"; fi
           python daily_post.py $ARGS
