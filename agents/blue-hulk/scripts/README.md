@@ -76,6 +76,16 @@ python render_poster.py "BTC — testing resistance" "Most traders blow up the s
   "Position size kills more accounts than bad ideas." "What's your leverage lesson?"
 ```
 
+**When a poster day coincides with a Striker Zones day, it uses a different poster style.**
+`render_poster.py` also has `render_striker_poster()`, which mirrors the real
+[Striker Zones 2.1 Pro TradingView indicator](https://www.tradingview.com/script/txqFnkJH-Striker-Zones-2-1-Pro-Scalp-Intraday/)'s
+look — light background, a teal shaded entry→SL risk box, and orange/mint/dark-green TP1/TP2/TP3
+pill labels — instead of the generic dark candlestick poster. `compute_illustrative_levels()`
+generates the price levels; they are **always synthetic** (seeded by day, rotating through
+XAU/USD, BTC/USD, EUR/USD, US30) and the poster prints "Illustrative example — not a live signal"
+twice, since this automation has no live market feed and must never present fabricated numbers as
+a real signal.
+
 **Scheduled in the cloud** via [`.github/workflows/blue-hulk-daily.yml`](../../../.github/workflows/blue-hulk-daily.yml)
 (runs daily at 12:30 UTC = 8:30pm Malaysia; change the `cron:` to reschedule). To activate:
 

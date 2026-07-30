@@ -92,6 +92,24 @@ python render_poster.py "BTC — testing resistance" "Most traders blow up the s
   "Position size kills more accounts than bad ideas." "What's your leverage lesson?"
 ```
 
+**The Striker Zones slot gets a different poster style.** `render_poster.py` also has
+`render_striker_poster()`, which mirrors the real
+[Striker Zones 2.1 Pro TradingView indicator](https://www.tradingview.com/script/txqFnkJH-Striker-Zones-2-1-Pro-Scalp-Intraday/)'s
+look — light background, a teal shaded entry→SL risk box, and orange/mint/dark-green TP1/TP2/TP3
+pill labels — instead of the generic dark candlestick poster used everywhere else.
+`compute_illustrative_levels()` generates the price levels; they are **always synthetic**
+(seeded by day+slot, rotating through XAU/USD, BTC/USD, EUR/USD, US30) and the poster prints
+"Illustrative example — not a live signal" twice, since this automation has no live market feed
+and must never present fabricated numbers as a real signal. Preview it directly:
+```bash
+python -c "
+from pathlib import Path
+from render_poster import render_striker_poster, compute_illustrative_levels
+l = compute_illustrative_levels(seed=0)
+render_striker_poster(l['symbol_label'], l['entry'], l['sl'], l['tp1'], l['tp2'], l['tp3'], l['decimals'], Path('drafts/striker-preview.png'), seed=0)
+"
+```
+
 **Scheduled in the cloud** via [`.github/workflows/hulk-daily.yml`](../../../.github/workflows/hulk-daily.yml)
 — 3 cron entries (01:00 / 06:00 / 12:00 UTC = 9am / 2pm / 8pm Malaysia), each mapped back to its
 slot number via `github.event.schedule` in the workflow's "Determine slot" step. Change the
