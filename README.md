@@ -35,6 +35,16 @@ The matching Claude Code Agent Skills are vendored under
 `.claude/skills/remotion-*` and `.claude/skills/mediabunny` — see
 [`video/README.md`](video/README.md) for setup and rendering notes.
 
+### HyperFrames (HTML → video)
+
+[HyperFrames](https://github.com/heygen-com/hyperframes) is an alternative,
+skill-driven video framework — write HTML/CSS/seekable animations and render
+to deterministic MP4 via the `npx hyperframes` CLI, instead of React/Remotion.
+The core Claude Code Agent Skills are vendored under `.claude/skills/hyperframes*`
+and `.claude/skills/media-use`; start any video request with `/hyperframes`.
+Run `npx hyperframes doctor` once per fresh environment to check FFmpeg/Chrome,
+and `npx hyperframes browser ensure` to fetch its headless Chrome if missing.
+
 ---
 
 ## The Watcher
