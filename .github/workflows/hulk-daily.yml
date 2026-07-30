@@ -1,0 +1,66 @@
+name: Hulk daily post
+
+# Generates one on-brand Threads post and publishes it, once a day.
+# Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+#
+# Daily duty rules (see agents/hulk/scripts/README.md "Daily duty rules"):
+#   1. Posts every day, no matter what.
+#   2. Rotates deterministically through the 8 content frameworks in agents/hulk/templates/.
+#   3. On poster-worthy framework days (listicle_breakdown, standalone_aphorism,
+#      historical_compounding_reveal), renders a poster locally with Pillow (render_poster.py),
+#      commits it to the repo, and posts its raw.githubusercontent.com URL — the Threads API
+#      requires a publicly reachable image URL and doesn't accept local file uploads.
+
+on:
+  schedule:
+    # 12:45 UTC = 8:45pm Malaysia (UTC+8), 15 min after Blue Hulk's Facebook post.
+    # Cron is always UTC; change this to reschedule. GitHub may start scheduled runs a few
+    # minutes late under load — that's normal.
+    - cron: "45 12 * * *"
+  workflow_dispatch:       # adds a manual "Run workflow" button, with a test override
+    inputs:
+      force_framework:
+        description: "Force today's post onto a specific framework (leave blank for the day's normal rotation)"
+        type: choice
+        default: ""
+        options:
+          - ""
+          - audience_question
+          - call_reasoning_risk
+          - confession_lesson
+          - contrarian_reframe
+          - historical_compounding_reveal
+          - listicle_breakdown
+          - progress_reveal
+          - standalone_aphorism
+
+permissions:
+  contents: write   # needed to commit/push the poster PNG on poster-worthy days
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install fonts (for poster rendering)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
+      - name: Install dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Configure git identity (for poster commits)
+        run: |
+          git config user.name "hulk-bot"
+          git config user.email "hulk-bot@users.noreply.github.com"
+      - name: Generate and post
+        working-directory: agents/hulk/scripts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          FORCE_FRAMEWORK: ${{ inputs.force_framework }}
+        run: |
+          ARGS=""
+          if [ -n "$FORCE_FRAMEWORK" ]; then ARGS="$ARGS --force-framework $FORCE_FRAMEWORK"; fi
+          python daily_post.py $ARGS
