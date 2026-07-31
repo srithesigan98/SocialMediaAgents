@@ -9,7 +9,7 @@ here and keep their runnable skill under `.claude/skills/<name>/`.
 |---|---|---|---|---|---|
 | 🟢 Hulk | [`hulk/`](hulk) | — (scripts in folder) | Content + posting | Threads | ✅ Built |
 | 🔵 Blue Hulk | [`blue-hulk/`](blue-hulk) | — (scripts in folder) | Content + posting | Facebook | ✅ Built |
-| 🐾 Black Panther | [`black-panther/`](black-panther) | `.claude/skills/black-panther` | Posting | Instagram · TikTok | 🟡 Stub |
+| 🐾 Black Panther | [`black-panther/`](black-panther) | `.claude/skills/black-panther` (TikTok/manual) | Posting | Instagram (self-hosted) · TikTok (Buffer) | ✅ Instagram built · 🟡 TikTok stub |
 | ♻️ Repurposer | [`repurposer/`](repurposer) | `.claude/skills/repurposer` | 1 → many | All | 🟡 Stub |
 | 👁️ The Watcher | [`the-watcher/`](the-watcher) | `.claude/skills/the-watcher` | Video review | TikTok · IG · FB · YT | ✅ Built |
 
