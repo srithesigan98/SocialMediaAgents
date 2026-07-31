@@ -56,7 +56,8 @@ def fetch_engagement(post_id: str, token: str) -> dict:
         params={"fields": "likes.summary(true),comments.summary(true),shares", "access_token": token},
         timeout=30,
     )
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"{r.status_code} {r.text}")
     data = r.json()
     return {
         "likes": data.get("likes", {}).get("summary", {}).get("total_count"),
