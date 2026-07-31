@@ -24,3 +24,9 @@ agents/blue-hulk/scripts/venv/
 agents/blue-hulk/scripts/.env
 agents/blue-hulk/scripts/drafts/*
 !agents/blue-hulk/scripts/drafts/.gitkeep
+
+# Black Panther scripts
+agents/black-panther/scripts/venv/
+agents/black-panther/scripts/.env
+agents/black-panther/scripts/drafts/*
+!agents/black-panther/scripts/drafts/.gitkeep

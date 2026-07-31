@@ -1,12 +1,13 @@
 name: Collect post metrics
 
 # Pulls engagement metrics (likes/comments/shares for Blue Hulk, views/likes/replies/reposts/
-# quotes for Hulk) for every post logged in metrics/post_log.jsonl, and appends a timestamped
-# snapshot to metrics/history.jsonl for each agent. The dashboard reads these history files.
+# quotes for Hulk, likes/comments/impressions/reach/saved for Black Panther) for every post
+# logged in metrics/post_log.jsonl, and appends a timestamped snapshot to metrics/history.jsonl
+# for each agent. The dashboard reads these history files.
 #
-# Reuses the same FB_PAGE_ACCESS_TOKEN / THREADS_ACCESS_TOKEN secrets the daily-post workflows
-# already use — no new secrets needed. Runs once daily, after all of the day's posts have had a
-# few hours to accrue engagement.
+# Reuses the same FB_PAGE_ACCESS_TOKEN / THREADS_ACCESS_TOKEN / IG_ACCESS_TOKEN secrets the
+# daily-post workflows already use — no new secrets needed. Runs once daily, after all of the
+# day's posts have had a few hours to accrue engagement.
 
 on:
   schedule:
@@ -41,4 +42,11 @@ jobs:
         working-directory: agents/hulk/scripts
         env:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: python collect_metrics.py
+      - name: Install Black Panther dependencies
+        run: pip install -r agents/black-panther/scripts/requirements.txt
+      - name: Collect Black Panther (Instagram) metrics
+        working-directory: agents/black-panther/scripts
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: python collect_metrics.py
