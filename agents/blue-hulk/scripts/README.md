@@ -154,3 +154,20 @@ users' Pages would use the app.
 **Security:** the App Secret and Page token are credentials — keep them only in `.env` (which
 is gitignored), never in committed files or chat logs. If a token leaks, invalidate it in the
 app dashboard and regenerate.
+
+## `collect_metrics.py` — performance dashboard data
+
+Every `daily_post.py` publish is logged to `metrics/post_log.jsonl` (post id, date, striker/
+poster flags, topic). `collect_metrics.py` reads that log, calls the Graph API for each post's
+current likes/comments/shares (plus best-effort impressions/engaged-users via Insights, which
+needs `read_insights` on the Page token — silently degrades to `null` if that scope is missing),
+and appends a timestamped snapshot per post to `metrics/history.jsonl`, then commits and pushes
+both files. This is what the performance dashboard reads.
+
+```bash
+python collect_metrics.py   # needs FB_PAGE_ACCESS_TOKEN in .env
+```
+
+Scheduled in the cloud via [`.github/workflows/metrics-collect.yml`](../../../.github/workflows/metrics-collect.yml)
+(runs once daily, after the day's post has had a few hours to accrue engagement) — reuses the
+same `FB_PAGE_ACCESS_TOKEN` secret already wired for `daily_post.py`, no new secrets needed.

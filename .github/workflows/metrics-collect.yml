@@ -1,0 +1,44 @@
+name: Collect post metrics
+
+# Pulls engagement metrics (likes/comments/shares for Blue Hulk, views/likes/replies/reposts/
+# quotes for Hulk) for every post logged in metrics/post_log.jsonl, and appends a timestamped
+# snapshot to metrics/history.jsonl for each agent. The dashboard reads these history files.
+#
+# Reuses the same FB_PAGE_ACCESS_TOKEN / THREADS_ACCESS_TOKEN secrets the daily-post workflows
+# already use — no new secrets needed. Runs once daily, after all of the day's posts have had a
+# few hours to accrue engagement.
+
+on:
+  schedule:
+    - cron: "30 18 * * *"  # 18:30 UTC = 2:30am Malaysia (after all of the day's posting slots)
+  workflow_dispatch: {}    # manual "Run workflow" button, for testing
+
+permissions:
+  contents: write   # needed to commit/push the metrics history files
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure git identity (for metrics commits)
+        run: |
+          git config user.name "metrics-bot"
+          git config user.email "metrics-bot@users.noreply.github.com"
+      - name: Install Blue Hulk dependencies
+        run: pip install -r agents/blue-hulk/scripts/requirements.txt
+      - name: Collect Blue Hulk (Facebook) metrics
+        working-directory: agents/blue-hulk/scripts
+        env:
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: python collect_metrics.py
+      - name: Install Hulk dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Collect Hulk (Threads) metrics
+        working-directory: agents/hulk/scripts
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: python collect_metrics.py

@@ -198,6 +198,25 @@ so rely on those if the UI differs.
 gitignored), never in committed files or chat. If a token leaks, invalidate it in the app
 dashboard and regenerate.
 
+## `collect_metrics.py` — performance dashboard data
+
+Every `daily_post.py` publish is logged to `metrics/post_log.jsonl` (post id, date, slot,
+Striker/framework flags). `collect_metrics.py` reads that log, calls the Threads Insights API for
+each post's current views/likes/replies/reposts/quotes, and appends a timestamped snapshot per
+post to `metrics/history.jsonl`, then commits and pushes both files. This is what the performance
+dashboard reads.
+
+```bash
+python collect_metrics.py   # needs THREADS_ACCESS_TOKEN in .env
+```
+
+Insights requires the `threads_manage_insights` permission on the token — if that scope wasn't
+granted when the token was generated, every snapshot will just carry `null` values instead of
+failing the run. Scheduled in the cloud via
+[`.github/workflows/metrics-collect.yml`](../../../.github/workflows/metrics-collect.yml) (runs
+once daily, after all 3 of the day's posting slots) — reuses the same `THREADS_ACCESS_TOKEN`
+secret already wired for `daily_post.py`, no new secrets needed.
+
 ## Notes
 
 - `drafts/` is gitignored so review notes and generated text don't clutter the repo.
