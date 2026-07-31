@@ -35,6 +35,7 @@ import argparse
 import datetime
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -53,6 +54,8 @@ except Exception:
 
 HERE = Path(__file__).resolve().parent
 AGENT_DIR = HERE.parent
+REPO_ROOT = AGENT_DIR.parent.parent
+POST_LOG_PATH = HERE / "metrics" / "post_log.jsonl"
 GRAPH_API_BASE = "https://graph.facebook.com/v21.0"
 MODEL = "claude-sonnet-5"
 
@@ -227,6 +230,41 @@ def publish_photo(text: str, image_path: Path) -> str:
     return r.json()["id"]
 
 
+def log_publish(post_id: str, striker: bool, poster: bool, topic: str) -> None:
+    """Append this publish to metrics/post_log.jsonl and push it — the metrics-collect
+    workflow reads this log to know which post IDs to fetch engagement numbers for. A logging
+    failure must never fail the run; the post already went out successfully."""
+    entry = {
+        "date": datetime.date.today().isoformat(),
+        "day_index": day_index(),
+        "post_id": post_id,
+        "platform": "facebook",
+        "striker": striker,
+        "poster": poster,
+        "topic": topic,
+    }
+    try:
+        POST_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(POST_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+
+        branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        subprocess.run(["git", "add", str(POST_LOG_PATH)], cwd=REPO_ROOT, check=True)
+        commit = subprocess.run(
+            ["git", "commit", "-m", f"blue-hulk: log post {post_id} (day {day_index()})"],
+            cwd=REPO_ROOT, capture_output=True, text=True,
+        )
+        if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
+            raise RuntimeError(f"git commit failed: {commit.stdout}\n{commit.stderr}")
+        if commit.returncode == 0:
+            subprocess.run(["git", "push", "origin", branch], cwd=REPO_ROOT, check=True)
+    except Exception as e:
+        print(f"[blue-hulk] NOTE: could not log post to metrics/post_log.jsonl: {e}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="Generate and print, do not post")
@@ -273,6 +311,7 @@ def main() -> None:
 
     post_id = publish_photo(text, image_path) if image_path else publish_text(text)
     print(f"[blue-hulk] published{' (with poster)' if image_path else ''}. post id: {post_id}")
+    log_publish(post_id, striker, bool(image_path), topic)
 
 
 if __name__ == "__main__":
