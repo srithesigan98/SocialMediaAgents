@@ -27,6 +27,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write   # needed to commit/push post_log.jsonl (and the poster PNG on poster days)
+
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -39,6 +42,10 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
       - name: Install dependencies
         run: pip install -r agents/blue-hulk/scripts/requirements.txt
+      - name: Configure git identity (for post_log.jsonl commits)
+        run: |
+          git config user.name "blue-hulk-bot"
+          git config user.email "blue-hulk-bot@users.noreply.github.com"
       - name: Generate and post
         working-directory: agents/blue-hulk/scripts
         env:
