@@ -177,6 +177,22 @@ def generate_poster_slots(post_text: str) -> dict:
     return json.loads(raw)
 
 
+def _wait_until_fetchable(url: str, attempts: int = 8, delay_seconds: float = 2.0) -> bool:
+    """raw.githubusercontent.com can lag a few seconds behind a fresh push. Threads fetches the
+    image_url almost immediately after container creation, and degrades silently to a text-only
+    post if that fetch fails — it does NOT raise an API error, so this must be checked here."""
+    for attempt in range(1, attempts + 1):
+        try:
+            r = requests.get(url, timeout=10)
+            if r.ok:
+                return True
+        except requests.RequestException:
+            pass
+        if attempt < attempts:
+            time.sleep(delay_seconds)
+    return False
+
+
 def push_poster_and_get_url(image_path: Path) -> str | None:
     """Commit the rendered poster to the repo and return its raw.githubusercontent.com URL —
     the Threads API requires a publicly reachable image URL and won't accept a local upload."""
@@ -197,7 +213,11 @@ def push_poster_and_get_url(image_path: Path) -> str | None:
         if commit.returncode == 0:
             subprocess.run(["git", "push", "origin", branch], cwd=REPO_ROOT, check=True)
 
-        return f"https://raw.githubusercontent.com/{GITHUB_OWNER_REPO}/{branch}/{rel_path}"
+        url = f"https://raw.githubusercontent.com/{GITHUB_OWNER_REPO}/{branch}/{rel_path}"
+        if not _wait_until_fetchable(url):
+            print(f"[hulk] NOTE: poster pushed but not yet fetchable at {url} — skipping poster this run.")
+            return None
+        return url
     except Exception as e:
         print(f"[hulk] Could not commit/push poster, skipping poster: {e}")
         return None
