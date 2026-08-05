@@ -154,7 +154,7 @@ engagement driver (invites comparison/reply), though this is inferred, not obser
 
 ---
 
-## 5. @movanniish — identity VERIFIED; specific Threads post content UNKNOWN
+## 5. @movanniish — identity VERIFIED; some cross-posted quotes now VERIFIED (via web search, Aug 2026)
 
 **Identity (VERIFIED via LinkedIn/Facebook/interview sources):** Movanniish Singh, Kuala Lumpur —
 crypto trader, internet marketer, digital entrepreneur. Co-founder of Wolf Street Academy,
@@ -162,13 +162,35 @@ founder-associated with Digital Billionaire Academy (crypto education, 1,500+ st
 Bybit ambassador, "Certified Bitcoin Expert" (Cryptocurrency Certification Consortium),
 self-described "Crypto Educator, Community Builder, Space Host, and KOL Trader."
 
+**Threads profile stats (VERIFIED, Aug 2026):** 1.3K followers, 204 threads, bio: "Keeping it
+real." Direct Threads fetch is blocked (403 — Threads blocks non-browser/unauthenticated
+requests); the quotes below were recovered via his cross-posted X account (`@MovanniishSingh`),
+which appears to mirror the same voice/content he runs on Threads.
+
 **Content focus (VERIFIED via an MGBX Exchange guest-interview description):** Market structure
 (liquidity zones, highs/lows, volume alignment) and trader psychology (why a defined trading plan
 prevents emotional trading), plus on-chain signals and risk management.
 
-**Format/hooks/frameworks:** UNKNOWN for Threads specifically — no post text was recoverable.
-Given his role as an X/Twitter Spaces host and educator, content is INFERRED to include
-educational/tip posts and possibly promotional posts for his academy — not verified.
+**Verbatim examples (VERIFIED via X, likely cross-posted to Threads):**
+- *"DUMP GOLD NOW!!!!"* — a bare, all-caps, unhedged directive-style hook. No reasoning attached
+  in the surfaced excerpt; the shock-value bluntness IS the hook.
+- *"When I lost money: 'dude, you're just gambling...' When I made some money: 'damn, you got
+  really lucky.' When I became a millionaire: 'I have $500 to invest, can you help me?' Funny how
+  that works."* — a **hypocrisy-callout escalation**: three beats showing how the same critics'
+  framing shifts with the outcome, closed with a wry, dismissive one-liner.
+- *"Your investments purchase time. Do not confuse earning money with building wealth."* —
+  standalone aphorism, same shape as the aphorism hook already in `content-playbook.md`.
+
+**Character read (NEW, informs the "ragebait" voice register in `content-playbook.md`):** Blunt,
+unhedged, willing to drop reasoning entirely in favor of a shock-value command; the
+hypocrisy-callout format is his most distinctive structural contribution — it's built to provoke
+replies/quote-posts from people recognizing themselves in it. "Keeping it real" as a bio reads as
+the thesis of the whole account: zero-hedge directness as the brand.
+
+**Format/hooks/frameworks:** Beyond the above, still UNKNOWN for Threads specifically — the
+403 block means the full feed (and true post frequency/mix) is still unverified. Given his role as
+an X/Twitter Spaces host and educator, content is INFERRED to also include educational/tip posts
+and possibly promotional posts for his academy — not verified.
 
 **Video:** VERIFIED presence on YouTube, TikTok (`@.wickshunter`), Instagram, Facebook. One
 Instagram Reel title surfaced: *"Trading is the hardest way to make easy..."* (money, presumably)
@@ -178,8 +200,9 @@ style common in trading-education content.
 **CTA:** UNKNOWN exact wording; given the academy/coaching business model, INFERRED to likely
 drive toward "join my community/academy" or live-event invitations.
 
-**Note:** Weakest-coverage creator after @zerobull. If deeper hook/format detail is needed, pull
-his Threads feed directly (logged-in device) or supply example posts.
+**Note:** Second-weakest direct coverage after @zerobull — this is X-sourced, not a direct Threads
+pull. If a full Threads-native sample is needed, someone will need to pull his feed from a
+logged-in device or supply screenshots.
 
 ---
 

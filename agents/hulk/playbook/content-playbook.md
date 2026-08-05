@@ -22,6 +22,8 @@ Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
 | **Ritual/cadence hook** | Opens by naming a recurring content ritual, trading on habit/anticipation rather than a one-off payload | hyperstocks | "Our favorite time of the week — the watchlist 👇" |
 | **Audience question / poll** | Pure engagement-bait question, offers no information, asks the audience to supply the content | investments | "What 'hype' trade are you avoiding right now?" |
 | **Historical-proof reveal** | Walks a real, dated historical chronology (splits, cycles, price history) to a jaw-dropping terminal number — credibility from documented fact, not personal risk | 13finance | "₹100 became ₹14.1 crore. Here's the exact 44-year timeline." |
+| **Hypocrisy-callout escalation** | Three beats showing how the same critic's framing of you/a behavior shifts as the outcome changes, closed with a wry, dismissive one-liner. Built to make people recognize themselves and reply/quote. | movanniish | "When I lost money: 'you're gambling.' When I made some: 'lucky.' When I 10x'd: 'can you teach me?' Funny how that works." |
+| **Blunt unhedged command** | A flat, often all-caps, zero-reasoning directive-shaped opinion — the bluntness itself is the hook, not the argument behind it. Reserve for behavior/psychology takes, never a real buy/sell call (see guardrail below). | movanniish | "STOP AVERAGING DOWN ON A STOCK YOU HAVEN'T RESEARCHED IN SIX MONTHS." |
 
 ## Content frameworks
 
@@ -44,6 +46,19 @@ Scope reminder: finance, trading, stock market, and cryptocurrency **only**. See
 7. **Track-record / proof-of-performance** — self vs. benchmark comparison stated as a hard
    number ("+30.7% vs. the S&P 500's +16.4%"). Use only with real, verifiable figures — never
    fabricate a performance claim.
+8. **Ragebait / hypocrisy callout** (from @movanniish, see `creator-research.md` §5) — deliberately
+   provocative, built to trigger a reply/quote-post reaction rather than agreement. Two shapes:
+   (a) the 3-beat hypocrisy escalation above, or (b) a blunt unhedged command aimed at a *behavior*
+   ("stop revenge trading," "close the app," "unfollow the guy who called the top") — never at a
+   specific real asset ("dump gold now" stays out of scope; see guardrail below). Use sparingly —
+   this is a spice, not the default register; overuse reads as ragebait-for-its-own-sake and burns
+   the credibility the rest of the playbook is built on.
+
+   **Guardrail (do not relax):** ragebait still has to clear every existing operating rule —
+   no fabricated claims, no specific buy/sell directive on a real ticker/asset, no urgency/scarcity
+   sales mechanics, nothing outside `config/topics.yaml`'s allowed scope. The bluntness is a
+   *delivery* choice, not a license to give actual financial instructions or invent stakes that
+   aren't there.
 
 ## Tone/voice device: short-declarative closing rhythm
 
