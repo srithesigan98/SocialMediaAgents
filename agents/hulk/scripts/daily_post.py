@@ -22,8 +22,10 @@ The framework rotation (for non-Striker slots) runs off ONE deterministic global
 which framework applies on a given day+slot is reproducible and never drifts:
     day_index = date.today().toordinal()
     global_slot = day_index * len(SLOT_HOURS_UTC) + slot_index
-    framework = FRAMEWORKS[global_slot % len(FRAMEWORKS)]
+    framework = ROTATION[global_slot % len(ROTATION)]
     is_striker_zone_day = day_index % STRIKER_ZONE_EVERY_N_DAYS == 0
+ROTATION is a weighted, hand-interleaved expansion of FRAMEWORKS (see FRAMEWORK_WEIGHTS below) —
+reach/engagement leaders repeat more often per cycle, but never back-to-back.
 
 Credentials come from environment variables (GitHub Actions secrets) or a local .env:
     ANTHROPIC_API_KEY, THREADS_USER_ID, THREADS_ACCESS_TOKEN
@@ -41,6 +43,7 @@ import os
 import subprocess
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 
 import requests
@@ -64,6 +67,45 @@ MODEL = "claude-sonnet-5"
 MAX_LEN = 500  # Threads text post character limit
 
 FRAMEWORKS = sorted(p.stem for p in (AGENT_DIR / "templates").glob("*.md"))
+
+# Weighted rotation — reviewed 2026-08-10 against the first ~11 days of real metrics
+# (see playbook/content-playbook.md "Performance review" for the full data and reasoning).
+# historical_compounding_reveal reaches far more people (262 avg views vs. an 24-81 range for
+# everything else) but drew zero likes/replies across all 3 instances — pure impressions, no
+# interaction. progress_reveal, contrarian_reframe, and call_reasoning_risk are the actual
+# engagement drivers (best like/reply rate). This weighting leans into reach without abandoning
+# the frameworks that build interaction, rather than collapsing onto the single biggest number.
+# Uses a weighted list (not raw FRAMEWORKS) so the day/slot -> framework mapping stays fully
+# deterministic — same reproducibility property as before, just a longer, uneven cycle.
+FRAMEWORK_WEIGHTS = {
+    "historical_compounding_reveal": 3,
+    "contrarian_reframe": 2,
+    "call_reasoning_risk": 2,
+    "progress_reveal": 2,
+    "standalone_aphorism": 1,
+    "listicle_breakdown": 1,
+    "audience_question": 1,
+    "confession_lesson": 1,
+}
+# Hand-interleaved (not grouped) so no framework repeats back-to-back, including across the
+# cycle's wrap point — sum of FRAMEWORK_WEIGHTS above, spread evenly rather than blocked.
+ROTATION = [
+    "historical_compounding_reveal",
+    "contrarian_reframe",
+    "call_reasoning_risk",
+    "progress_reveal",
+    "standalone_aphorism",
+    "historical_compounding_reveal",
+    "listicle_breakdown",
+    "audience_question",
+    "call_reasoning_risk",
+    "confession_lesson",
+    "historical_compounding_reveal",
+    "contrarian_reframe",
+    "progress_reveal",
+]
+assert Counter(ROTATION) == Counter({fw: FRAMEWORK_WEIGHTS.get(fw, 1) for fw in FRAMEWORKS}), \
+    "ROTATION must contain exactly FRAMEWORK_WEIGHTS copies of each framework in FRAMEWORKS"
 
 # 3 daily posting times, in UTC: 01:00 / 06:00 / 12:00 = 9am / 2pm / 8pm Malaysia (UTC+8).
 # Must match the `cron:` entries in ../../../.github/workflows/hulk-daily.yml, in order.
@@ -107,7 +149,7 @@ def todays_framework(slot_index: int, force: str | None = None) -> str:
             sys.exit(f"Unknown framework '{force}'. Options: {', '.join(FRAMEWORKS)}")
         return force
     global_slot = day_index() * len(SLOT_HOURS_UTC) + slot_index
-    return FRAMEWORKS[global_slot % len(FRAMEWORKS)]
+    return ROTATION[global_slot % len(ROTATION)]
 
 
 def generate_post(framework: str | None, striker_zone_slot: bool) -> str:

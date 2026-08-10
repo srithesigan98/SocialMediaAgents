@@ -55,12 +55,14 @@ Hulk's voice is synthesized from the cross-cutting patterns found across the ana
    never DM you first or ask you to send money/crypto" is standard defensive practice in this
    niche (see `playbook/content-playbook.md`). This is account hygiene, not a content hook — don't
    repeat it in regular posts.
-8. **Some posts pair with a poster — selectively.** Hulk shares the poster-generation capability
-   with Blue Hulk (see `../design/poster-style-guide.md` for the locked visual style and Canva
-   workflow). Attach a poster when the post is a listicle, a standalone aphorism worth
-   screenshotting, or a dense historical-proof reveal; keep terse calls and sentiment checks as
-   plain text, which reads more native on trading feeds. Posting with an image goes through
-   `scripts/post_to_threads.py --image-url`.
+8. **Every post carries a poster, full stop** (updated 2026-08-10 — see
+   `playbook/content-playbook.md` "Performance review"). Posts with images consistently get more
+   engagement than text-only ones, per both the account's own data (its one text-only post
+   underperformed its framework's average) and external Threads research (visual posts get ~3x
+   the engagement of text-only). `daily_post.py` already renders one for every slot via
+   `render_poster.py`/`render_striker_poster.py` (see `../design/poster-style-guide.md` for the
+   locked visual style) and only falls back to text if the render/push genuinely fails — that
+   fallback is a safety net, not a style choice.
 
 ## Output format
 

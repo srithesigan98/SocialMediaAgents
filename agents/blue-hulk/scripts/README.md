@@ -55,10 +55,11 @@ python daily_post.py --dry-run --force-poster    # preview a poster-day post reg
    [`../config/striker_zones_topics.yaml`](../config/striker_zones_topics.yaml), and the post's
    final line is always a CTA linking to **https://t.me/strikerzonesadmin_bot** (verbatim; the
    script appends it as a safety net if the model ever omits it).
-3. **1 out of every 3 posts carries a poster graphic** related to that post's content.
+3. **1 out of every 2 posts carries a poster graphic** related to that post's content (bumped
+   from 1-in-3 on 2026-08-10 — see `../playbook/content-playbook.md` "Performance review").
 
 All three run off one deterministic day counter (`date.today().toordinal()`), so rules 2 and 3
-land on predictable, non-overlapping-by-default days (`% 4 == 0` and `% 3 == 0`) without any
+land on predictable, non-overlapping-by-default days (`% 4 == 0` and `% 2 == 0`) without any
 state file to maintain.
 
 **Rule 3 status — fully automated, no Canva account needed.** `generate_poster()` in

@@ -9,18 +9,24 @@ Duty rules (see agents/blue-hulk/README.md "Daily duty rules" for the source of 
     2. 1 out of every 4 posts is a Striker Zones post — drawn from
        config/striker_zones_topics.yaml — and its CTA must link to
        https://t.me/strikerzonesadmin_bot.
-    3. 1 out of every 3 posts carries a poster graphic related to that post — rendered locally
+    3. 1 out of every 2 posts carries a poster graphic related to that post — rendered locally
        with Pillow (see render_poster.py), matching the locked style spec in
        ../../design/poster-style-guide.md. No Canva account or API involved: Canva's
        Autofill/Brand Template API requires a Canva Enterprise plan, which this account doesn't
        have. If poster generation ever fails for any reason, rule 1 always wins — it falls back
        to a text-only post and prints a NOTE.
+       (Bumped from 1-in-3 to 1-in-2 on 2026-08-10 — see ../playbook/content-playbook.md
+       "Performance review": external 2026 Facebook algorithm research shows text-only/static
+       posts losing distribution priority against visual/carousel formats industry-wide. Blue
+       Hulk has no on-platform engagement data of its own yet to confirm this locally — see the
+       FB_PAGE_ACCESS_TOKEN pages_read_engagement gap — so this is an evidence-based bet to
+       revisit once that data exists, not a locally-validated result.)
 
 All three rules run off ONE deterministic day counter, so which rule applies on a given day is
 reproducible and never drifts:
     day_index = date.today().toordinal()
     is_striker_zone_day = day_index % 4 == 0   (rule 2 — exactly 1 in 4 days)
-    is_poster_day       = day_index % 3 == 0   (rule 3 — exactly 1 in 3 days)
+    is_poster_day       = day_index % 2 == 0   (rule 3 — exactly 1 in 2 days)
 
 Credentials come from environment variables (GitHub Actions secrets) or a local .env:
     ANTHROPIC_API_KEY, FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN
@@ -61,7 +67,7 @@ MODEL = "claude-sonnet-5"
 
 STRIKER_ZONES_CTA_LINK = "https://t.me/strikerzonesadmin_bot"
 STRIKER_ZONE_EVERY_N_DAYS = 4   # rule 2: 1 out of every 4 posts
-POSTER_EVERY_N_DAYS = 3        # rule 3: 1 out of every 3 posts
+POSTER_EVERY_N_DAYS = 2        # rule 3: 1 out of every 2 posts (bumped from 3, see docstring)
 
 
 def load_context() -> str:
