@@ -86,9 +86,9 @@ growth signal found).
 
 - **Charts/screenshots are the native default** — a TradingView-style chart or trade screenshot
   reads as real; designed carousels read as ads.
-- **Canva posters** (shared capability — `../../design/poster-style-guide.md`) are the
-  differentiator on top: use for the numbered-recap posts and quotable story lines, roughly 1-2
-  posts per week, not every post.
+- **Posters** (rendered locally with Pillow, not Canva — `../../design/poster-style-guide.md` for
+  the locked style) are the differentiator on top, used for numbered-recap posts and quotable
+  story lines. Bumped from 1-in-3 to 1-in-2 posts on 2026-08-10 — see "Performance review" below.
 - Video remains the biggest production investment across every large creator studied; when Blue
   Hulk's operator is ready for video, the text frameworks here double as scripts.
 
@@ -106,3 +106,29 @@ growth signal found).
 Tens-to-low-hundreds of reactions per post is *normal* even for big pages in this niche.
 Optimize for: consistency, comment-thread depth, follower growth over months, and the 1-in-5
 Malaysian posts building a distinct local moat no US page can copy.
+
+## Performance review — 2026-08-10
+
+Triggered by the same operator review that produced Hulk's performance review (see
+`../../hulk/playbook/content-playbook.md` for the full data-driven analysis over there). The
+honest finding for Blue Hulk specifically: **there is no on-platform engagement data to analyze
+yet.** `metrics/history.jsonl` has never been created because `FB_PAGE_ACCESS_TOKEN` is missing
+the `pages_read_engagement` permission — every `collect_metrics.py` run since 2026-08-01 has
+hit `(#10) This endpoint requires the 'pages_read_engagement' permission`. 9 posts have published
+successfully (post_log.jsonl proves that), but none of their likes/comments/shares have ever been
+readable. Fixing that permission is the actual highest-priority item before anything on this page
+can become a locally-validated decision rather than an external-research-based bet.
+
+**What changed anyway, on external evidence (Aug 2026 research):**
+- Facebook brands cut posting volume ~22% industry-wide in 2026, now averaging ~1.3 posts/day —
+  Blue Hulk's existing 1x/day already matches this; **not changing cadence.**
+- Text-only and static-image posts are losing algorithmic distribution priority; carousels and
+  educational-format visual posts are favored. Blue Hulk's poster pipeline (Pillow, already
+  working — see daily_post.py) was underused at 1-in-3 days given this. Bumped to 1-in-2.
+
+**Explicitly flagged as a bet, not a result:** unlike Hulk's reweighting (backed by this account's
+own measured views/likes/replies), this poster-frequency change rests entirely on external
+research because Blue Hulk has zero internal signal to check it against. Once
+`pages_read_engagement` is fixed and a few weeks of real likes/comments/shares data exist, redo
+this section properly — compare poster vs. text-only posts head to head on this account's own
+numbers, the same way Hulk's framework table above does, and adjust from there.

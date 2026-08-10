@@ -67,9 +67,11 @@ standing rules, all deterministic by date (no state file needed):
 2. **1 in every 4 posts is a Striker Zones post** — topic from
    [`config/striker_zones_topics.yaml`](./config/striker_zones_topics.yaml), CTA always linking
    to `https://t.me/strikerzonesadmin_bot`.
-3. **1 in every 3 posts carries a Canva poster** related to the post. Not yet automated for the
-   headless daily job — see `scripts/README.md` → "Automating Canva posters (rule 3)" for what's
-   needed to wire it up; until then those days post text-only with a note in the run log.
+3. **1 in every 2 posts carries a poster** related to the post — rendered locally with Pillow
+   (`render_poster.py`), not Canva (bumped from 1-in-3 on 2026-08-10; see
+   [`playbook/content-playbook.md`](./playbook/content-playbook.md) "Performance review" for
+   why). Fully automated in the headless daily job; if rendering ever fails, that day posts
+   text-only with a note in the run log.
 
 See [`scripts/README.md`](./scripts/README.md) for setup, activation, and the manual test flags
 (`--force-striker`, `--force-poster`).
