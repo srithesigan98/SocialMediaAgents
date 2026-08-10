@@ -163,3 +163,47 @@ a genuinely reply-worthy question?), not a proof the format itself doesn't work.
 rotation has enough new data (aim for 2+ more instances of each framework), compare per-framework
 averages against this baseline, and adjust `FRAMEWORK_WEIGHTS` again rather than treating this as
 a one-time fix.
+
+## Performance review — 2026-08-17 (loop iteration 1)
+
+First weekly firing of the review Routine — same calendar day the reweighting above went live, so
+there's only one new day (739838, 2026-08-10: 3 posts) to look at. **No change made — sample is
+far too small to act on** (the standing rule from the last review: don't retire/promote on <4
+instances; this adds exactly 1 instance each to `confession_lesson`, `progress_reveal`, and
+`historical_compounding_reveal`).
+
+**QA note, not a strategy finding:** day 739838's slot 0 (`confession_lesson`) doesn't match what
+the new weighted `ROTATION` predicts for that slot (`contrarian_reframe`) — but it exactly matches
+what the *old* flat 8-way rotation would have produced. Slots 1 and 2 that same day *do* match the
+new `ROTATION` (`progress_reveal`, `historical_compounding_reveal`). Conclusion: slot 0 (01:00
+UTC) ran before PR #15 merged; slots 1 and 2 (06:00/12:00 UTC) ran after. Expected one-time
+transition artifact from deploying mid-day, not a bug — confirmed the new rotation is live and
+computing correctly going forward.
+
+**Cumulative table, all 35 posts logged to date (days 739827–739838):**
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 4 | 222 | 0.00 | 0.00 |
+| contrarian_reframe | 3 | 81 | 0.67 | 0.33 |
+| call_reasoning_risk | 4 | 76 | 0.00 | 0.25 |
+| STRIKER | 4 | 66 | 0.50 | 0.00 |
+| standalone_aphorism | 4 | 43 | 0.75 | 0.00 |
+| progress_reveal | 5 | 41 | 0.80 | 0.20 |
+| audience_question | 4 | 39 | 0.25 | 0.00 |
+| listicle_breakdown | 4 | 39 | 0.50 | 0.00 |
+| confession_lesson | 3 | 29 | 0.33 | 0.00 |
+
+Ranking is essentially unchanged from the 2026-08-10 baseline — nothing here contradicts that
+review's read. One small positive: `progress_reveal` picked up its first-ever reply (now
+0.20/post), still consistent with it being the engagement-rate leader rather than the reach leader.
+`historical_compounding_reveal` is still at zero likes/replies across all 4 instances — worth
+flagging again if it stays at zero once it reaches 6-8 instances (would start to look structural
+— e.g. the format itself reading as "interesting fact, nothing to reply to" — rather than sample
+noise).
+
+**Blue Hulk:** `metrics/history.jsonl` still doesn't exist — the `pages_read_engagement`
+permission gap is still open. 10 posts logged, zero engagement data. No analysis possible;
+carrying the same external-evidence-only bet forward unchanged.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-08-24.

@@ -132,3 +132,13 @@ research because Blue Hulk has zero internal signal to check it against. Once
 `pages_read_engagement` is fixed and a few weeks of real likes/comments/shares data exist, redo
 this section properly — compare poster vs. text-only posts head to head on this account's own
 numbers, the same way Hulk's framework table above does, and adjust from there.
+
+## Performance review — 2026-08-17 (loop iteration 1)
+
+First weekly firing of the review Routine (see `../../hulk/playbook/content-playbook.md` for the
+Hulk side, which has real data to act on). Blue Hulk: `metrics/history.jsonl` still doesn't exist
+— `pages_read_engagement` is still missing from `FB_PAGE_ACCESS_TOKEN`. 10 posts logged
+(post_log.jsonl), zero readable engagement. Nothing to analyze; the 2026-08-10 bet (poster
+cadence 1-in-3 → 1-in-2) carries forward unchanged. This permission fix remains the single
+highest-leverage next step for this agent — every future loop iteration repeats this same "no
+data" note until it's done.
