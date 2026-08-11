@@ -35,3 +35,4 @@
 {"date": "2026-08-10", "day_index": 739838, "slot": 2, "post_id": "18066015953569051", "platform": "threads", "striker_zone_slot": false, "framework": "historical_compounding_reveal", "had_poster": true}
 {"date": "2026-08-11", "day_index": 739839, "slot": 0, "post_id": "17945038095052283", "platform": "threads", "striker_zone_slot": true, "framework": null, "had_poster": true}
 {"date": "2026-08-11", "day_index": 739839, "slot": 1, "post_id": "18616455682039855", "platform": "threads", "striker_zone_slot": false, "framework": "call_reasoning_risk", "had_poster": true}
+{"date": "2026-08-11", "day_index": 739839, "slot": 2, "post_id": "17928140592146521", "platform": "threads", "striker_zone_slot": false, "framework": "progress_reveal", "had_poster": true}
