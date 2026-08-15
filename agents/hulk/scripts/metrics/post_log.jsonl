@@ -45,3 +45,4 @@
 {"date": "2026-08-14", "day_index": 739842, "slot": 0, "post_id": "18144530665545808", "platform": "threads", "striker_zone_slot": true, "framework": null, "had_poster": true}
 {"date": "2026-08-14", "day_index": 739842, "slot": 1, "post_id": "18116288071852356", "platform": "threads", "striker_zone_slot": false, "framework": "contrarian_reframe", "had_poster": true}
 {"date": "2026-08-14", "day_index": 739842, "slot": 2, "post_id": "18096159428457080", "platform": "threads", "striker_zone_slot": false, "framework": "progress_reveal", "had_poster": false}
+{"date": "2026-08-15", "day_index": 739843, "slot": 0, "post_id": "18173404231440136", "platform": "threads", "striker_zone_slot": false, "framework": "historical_compounding_reveal", "had_poster": true}
