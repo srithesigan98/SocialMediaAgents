@@ -142,3 +142,12 @@ Hulk side, which has real data to act on). Blue Hulk: `metrics/history.jsonl` st
 cadence 1-in-3 → 1-in-2) carries forward unchanged. This permission fix remains the single
 highest-leverage next step for this agent — every future loop iteration repeats this same "no
 data" note until it's done.
+
+## Performance review — 2026-08-17 (loop iteration 2)
+
+Second weekly firing. `metrics/history.jsonl` still doesn't exist — `pages_read_engagement` is
+still missing from `FB_PAGE_ACCESS_TOKEN`. 12 posts logged in `post_log.jsonl` now (up from 10),
+zero of them with readable engagement. Nothing to analyze; the deferred head-to-head
+poster-vs-text-only comparison stays deferred, and the 2026-08-10 bet (poster cadence 1-in-3 →
+1-in-2, based on external research rather than this account's own data) carries forward
+unchanged. Same highest-leverage next step as last time: fix the Facebook permission.
