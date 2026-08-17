@@ -207,3 +207,75 @@ permission gap is still open. 10 posts logged, zero engagement data. No analysis
 carrying the same external-evidence-only bet forward unchanged.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-08-24.
+
+## Performance review — 2026-08-17 (loop iteration 2)
+
+Second weekly firing. 19 new posts since iteration 1 (days 739839–739845, 2026-08-11 through
+2026-08-17 — the last day has only 1 post, slot 0, since Hulk's scheduled posting was stopped
+partway through that day at the operator's request).
+
+**New-posts-only breakdown (the 19 posts since the last review, latest snapshot per post):**
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 3 | 457 | 2.67 | 0.00 |
+| progress_reveal | 3 | 67 | 0.67 | 0.00 |
+| STRIKER | 3 | 54 | 0.00 | 0.00 |
+| listicle_breakdown | 1 | 44 | 0.00 | 1.00 |
+| call_reasoning_risk | 3 | 39 | 0.33 | 0.00 |
+| standalone_aphorism | 2 | 38 | 0.50 | 0.00 |
+| confession_lesson | 1 | 30 | 0.00 | 0.00 |
+| audience_question | 1 | 21 | 0.00 | 0.00 |
+| contrarian_reframe | 2 | 19 | 0.00 | 0.00 |
+
+**Cumulative table, all 54 posts logged to date (days 739827–739845):**
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 7 | 325 | 1.14 | 0.00 |
+| STRIKER | 7 | 64 | 0.29 | 0.00 |
+| call_reasoning_risk | 7 | 61 | 0.14 | 0.14 |
+| contrarian_reframe | 5 | 57 | 0.40 | 0.20 |
+| progress_reveal | 8 | 55 | 0.88 | 0.13 |
+| standalone_aphorism | 6 | 42 | 0.67 | 0.00 |
+| listicle_breakdown | 5 | 40 | 0.40 | 0.20 |
+| audience_question | 5 | 36 | 0.20 | 0.00 |
+| confession_lesson | 4 | 30 | 0.25 | 0.00 |
+
+**Finding — the `historical_compounding_reveal` "zero engagement" flag from iteration 1 has
+resolved, in the direction the format's proponents would hope.** The 2026-08-10 review flagged
+it as worth re-checking "if it stays at zero once it reaches 6-8 instances (would start to look
+structural)." It just hit n=7, and all 3 new instances picked up real likes (2, 2, 4) — cumulative
+likes/post is now 1.14, the highest of any framework. This reads as reach *and* interaction, not
+reach instead of interaction — no longer the pure "biggest number, zero conversation" case the
+2026-08-10 "balanced portfolio" decision was hedging against. Its weight-3 slot in `ROTATION`
+looks more justified now than when it was first assigned, not less.
+
+**Watched, not acted on:**
+- `contrarian_reframe` (weight 2) had a weak batch — both new instances came in low on reach (19,
+  16 views) and picked up no likes/replies, pulling its cumulative avg down from 81 to 57. It's
+  still ahead of `call_reasoning_risk` on combined engagement (0.40+0.20 vs 0.14+0.14 per post)
+  despite the reach drop, and n=5 is a thin base to read a 2-post dip as a trend. Holding weight,
+  re-checking next iteration.
+- `audience_question` (weight 1) is now at n=5 with **still zero replies** — the one thing this
+  format is explicitly designed to produce. Same read as iteration 1: this looks like a
+  content-execution problem (is the model actually asking a reply-worthy question?) rather than
+  proof the format can't work, and n=5 is still too thin to retire a format on. Flagging again;
+  will look seriously at a content-level fix (not just a weight cut) if it's still at zero replies
+  next time this comes up.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change this iteration.** Nothing crossed from
+"interesting" to "act on it" — the one clear resolution (`historical_compounding_reveal`)
+confirms the existing weight rather than demanding a new one, and the one soft signal
+(`contrarian_reframe`) is too small and too fresh to trust over a 2-post wobble.
+
+**Blue Hulk:** `metrics/history.jsonl` still doesn't exist — the `pages_read_engagement`
+permission gap is still open. 12 posts logged, zero engagement data. No analysis possible;
+carrying the same external-evidence-only bet forward unchanged (see that playbook for detail).
+
+**Operational note:** Hulk's scheduled daily posting (`hulk-daily.yml`) was stopped at the
+operator's request partway through 2026-08-17 — see that PR's history. This review's numbers are
+unaffected (it only analyzes posts that already published), but there will be no new Hulk posts
+to review next iteration unless posting is resumed or manual runs are used.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-08-24.
