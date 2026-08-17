@@ -3,6 +3,10 @@ name: Hulk daily post
 # Generates Threads posts and publishes them, three times a day.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
 #
+# STOPPED 2026-08-17: scheduled runs disabled at the user's request. Manual runs via
+# workflow_dispatch (the "Run workflow" button) still work for testing. To resume
+# automatic posting, uncomment the `schedule:` block below.
+#
 # Daily duty rules (see agents/hulk/scripts/README.md "Daily duty rules"):
 #   1. Posts 3 times a day, no matter what — one run per cron entry below (slots 0/1/2).
 #   2. Every post carries a poster, rendered locally with Pillow (render_poster.py), committed to
@@ -15,10 +19,10 @@ name: Hulk daily post
 # in the "Determine slot" step — keep their order in sync with SLOT_HOURS_UTC in daily_post.py.
 
 on:
-  schedule:
-    - cron: "0 1 * * *"   # slot 0 — 9:00am Malaysia (UTC+8)
-    - cron: "0 6 * * *"   # slot 1 — 2:00pm Malaysia
-    - cron: "0 12 * * *"  # slot 2 — 8:00pm Malaysia
+  # schedule:
+  #   - cron: "0 1 * * *"   # slot 0 — 9:00am Malaysia (UTC+8)
+  #   - cron: "0 6 * * *"   # slot 1 — 2:00pm Malaysia
+  #   - cron: "0 12 * * *"  # slot 2 — 8:00pm Malaysia
   workflow_dispatch:       # adds a manual "Run workflow" button, with test overrides
     inputs:
       slot:
