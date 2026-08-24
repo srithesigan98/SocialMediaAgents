@@ -279,3 +279,48 @@ unaffected (it only analyzes posts that already published), but there will be no
 to review next iteration unless posting is resumed or manual runs are used.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-08-24.
+
+## Performance review — 2026-08-24 (loop iteration 3)
+
+Third weekly firing. **Zero new Hulk posts since iteration 2** — as flagged in that entry,
+scheduled posting has been off since 2026-08-17 and nobody has run it manually, so
+`post_log.jsonl` is still exactly the same 54 posts (days 739827–739845). There is nothing new to
+compute a "since last review" table from.
+
+**What did change: the same 54 posts kept accumulating views/likes over the week, as posts do.**
+Re-pulling `history.jsonl` and taking the latest snapshot per post:
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 7 | 328 | 1.14 | 0.00 |
+| STRIKER | 7 | 70 | 0.29 | 0.00 |
+| progress_reveal | 8 | 63 | 0.88 | 0.12 |
+| call_reasoning_risk | 7 | 62 | 0.14 | 0.14 |
+| contrarian_reframe | 5 | 58 | 0.40 | 0.20 |
+| listicle_breakdown | 5 | 52 | 0.40 | 0.20 |
+| standalone_aphorism | 6 | 43 | 0.67 | 0.00 |
+| audience_question | 5 | 36 | 0.20 | 0.00 |
+| confession_lesson | 4 | 30 | 0.25 | 0.00 |
+
+`n` is identical to iteration 2 for every framework (no new instances possible). The averages
+moved a little on continued organic view accumulation (`listicle_breakdown` picked up the most,
+40→52 avg views) but the *ranking* and every likes/replies-per-post figure are essentially
+unchanged — this is old posts maturing, not a new signal about which framework performs better.
+`audience_question` is still stuck at zero replies; not commenting further until there's a new
+instance to actually judge.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change — there is no new data to justify one.**
+Re-litigating the same 54-post table a second time without new posts would be overfitting to
+noise, which is exactly what the "don't over-trust samples" rule exists to prevent.
+
+**Blue Hulk:** `metrics/history.jsonl` still doesn't exist — `pages_read_engagement` is still
+missing. 24 posts logged now (up from 12 at iteration 2 — Blue Hulk's own posting was never
+stopped), zero of them with readable engagement. Bet from 2026-08-10 carries forward unchanged.
+
+**Standing blocker for this whole loop:** until either (a) Hulk's scheduled posting resumes, or
+(b) Blue Hulk's Facebook permission gets fixed, each weekly firing has strictly less new signal to
+work with than the last — Hulk is frozen at 54 posts and Blue Hulk has never had any engagement
+data at all. Flagging this plainly rather than manufacturing a change to look busy: **the most
+useful thing this loop can report right now is that it's blocked, not a tweak.**
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-08-31.

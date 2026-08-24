@@ -151,3 +151,13 @@ zero of them with readable engagement. Nothing to analyze; the deferred head-to-
 poster-vs-text-only comparison stays deferred, and the 2026-08-10 bet (poster cadence 1-in-3 →
 1-in-2, based on external research rather than this account's own data) carries forward
 unchanged. Same highest-leverage next step as last time: fix the Facebook permission.
+
+## Performance review — 2026-08-24 (loop iteration 3)
+
+Third weekly firing. `metrics/history.jsonl` still doesn't exist — `pages_read_engagement` is
+still missing from `FB_PAGE_ACCESS_TOKEN`. 24 posts logged in `post_log.jsonl` now (up from 12 —
+this account's own posting cadence hasn't stopped, unlike Hulk's), zero of them with readable
+engagement. Still nothing to analyze; the deferred poster-vs-text-only comparison stays deferred,
+and the 2026-08-10 external-evidence bet carries forward unchanged. Same highest-leverage next
+step as every iteration so far: fix the Facebook permission — this is now 3 weeks and 24 posts of
+completely unreadable engagement data.
