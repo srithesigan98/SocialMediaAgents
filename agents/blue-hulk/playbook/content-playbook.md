@@ -161,3 +161,29 @@ engagement. Still nothing to analyze; the deferred poster-vs-text-only compariso
 and the 2026-08-10 external-evidence bet carries forward unchanged. Same highest-leverage next
 step as every iteration so far: fix the Facebook permission — this is now 3 weeks and 24 posts of
 completely unreadable engagement data.
+
+## Performance review — 2026-08-31 (loop iteration 4)
+
+Fourth weekly firing, and the situation for this agent got materially worse since last time. Two
+separate, independent problems now:
+
+1. **`pages_read_engagement` still missing** (the original gap) — `metrics/history.jsonl` still
+   doesn't exist, so even posts that publish successfully have unreadable engagement.
+2. **New: `FB_PAGE_ACCESS_TOKEN` itself was invalidated starting 2026-08-25** —
+   `OAuthException` code 190, subcode 460 ("session invalidated because the user changed their
+   password or Facebook changed the session for security reasons"). This blocks *posting*, not
+   just metrics. Confirmed via the daily workflow's run history: every scheduled run since
+   2026-08-25 fails at the publish step, with the post fully generated but never sent. `post_log`
+   is stuck at 24 posts (last one 2026-08-24, day 739852) — 7 consecutive missed days as of this
+   firing.
+
+Nothing to analyze — there were zero opportunities to even generate new data this week, let alone
+readable engagement on it. The deferred poster-vs-text-only comparison and the 2026-08-10
+external-evidence bet both stay exactly as they were; there's nothing new to fold in either
+direction.
+
+**Two things need fixing, not one:** a fresh Facebook Page access token (unblocks posting), and
+that token should include `pages_read_engagement` when it's regenerated (unblocks metrics) — doing
+both in the same pass avoids a second round-trip. Both are user-side steps in the Meta Graph API
+Explorer; flagged directly to the operator when the posting failure was first found
+(2026-08-26 dashboard-refresh turn).
