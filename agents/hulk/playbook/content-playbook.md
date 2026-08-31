@@ -324,3 +324,49 @@ data at all. Flagging this plainly rather than manufacturing a change to look bu
 useful thing this loop can report right now is that it's blocked, not a tweak.**
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-08-31.
+
+## Performance review — 2026-08-31 (loop iteration 4)
+
+Fourth weekly firing. **Still zero new Hulk posts** — scheduled posting remains off, still frozen
+at the same 54 posts (days 739827–739845). Re-pulled engagement on the same posts again; every
+framework's `n` is unchanged from iteration 3, per the same rule as last time (no new instances,
+nothing to promote/demote).
+
+Reach kept drifting up on old posts (as it always does), most notably `listicle_breakdown`
+(avg views 52→61, all from continued growth on the single reply-earning post in that bucket) —
+this moved it two spots up the ranking table, but that's the same "old posts maturing" effect
+flagged twice already, not a new content signal. Full current table, cumulative, n unchanged from
+iteration 3:
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 7 | 331 | 1.14 | 0.00 |
+| STRIKER | 7 | 72 | 0.29 | 0.00 |
+| progress_reveal | 8 | 69 | 0.88 | 0.12 |
+| call_reasoning_risk | 7 | 62 | 0.14 | 0.14 |
+| listicle_breakdown | 5 | 61 | 0.40 | 0.20 |
+| contrarian_reframe | 5 | 58 | 0.40 | 0.20 |
+| standalone_aphorism | 6 | 43 | 0.67 | 0.00 |
+| audience_question | 5 | 36 | 0.20 | 0.00 |
+| confession_lesson | 4 | 30 | 0.25 | 0.00 |
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as iteration 3 — there is
+no new post data, and re-ranking on reach drift alone would be fitting noise, not signal.
+
+**Blue Hulk — new development, not just a repeat of the permission gap:** on top of
+`pages_read_engagement` still being missing (metrics), Blue Hulk's `FB_PAGE_ACCESS_TOKEN` itself
+was invalidated starting 2026-08-25 (`OAuthException` code 190, subcode 460 — "session invalidated
+because the user changed their password or Facebook changed the session"). This is a different,
+more severe failure than the metrics gap: it blocks *posting*, not just *reading engagement*. Blue
+Hulk has not published anything since 2026-08-24 (day 739852) — 7 consecutive missed days as of
+this firing, confirmed via the daily workflow's run history (each scheduled run fails at the
+publish step with a fully-generated post that never goes out). Flagged to the operator directly
+when found (2026-08-26 dashboard-refresh turn); still unresolved as of this review.
+
+**Standing blocker, now worse:** last iteration's blocker note said each firing has "strictly less
+new signal" than the last. That's now literally true for Blue Hulk too — it went from "posting but
+unreadable" to "not posting at all." Nothing for this loop to analyze or tune on either agent until
+a human fixes one of: Hulk's scheduled posting, Blue Hulk's access token, or Blue Hulk's
+`pages_read_engagement` scope.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-09-07.
