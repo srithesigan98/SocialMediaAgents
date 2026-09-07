@@ -187,3 +187,21 @@ that token should include `pages_read_engagement` when it's regenerated (unblock
 both in the same pass avoids a second round-trip. Both are user-side steps in the Meta Graph API
 Explorer; flagged directly to the operator when the posting failure was first found
 (2026-08-26 dashboard-refresh turn).
+
+## Performance review — 2026-09-07 (loop iteration 5)
+
+Fifth weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 14
+consecutive missed days, confirmed via the daily workflow's run history (each run still fails at
+the publish step with a fully-generated post that never sends).
+
+Nothing to analyze — there were again zero opportunities to generate new data this week. The
+deferred poster-vs-text-only comparison and the 2026-08-10 external-evidence bet both carry
+forward unchanged for the third iteration in a row.
+
+**Same fix needed as last time, still outstanding:** regenerate `FB_PAGE_ACCESS_TOKEN` with
+`pages_read_engagement` included, so posting and metrics are unblocked in one pass. This has been
+flagged to the operator; no new action taken this iteration since the underlying blocker hasn't
+moved.
