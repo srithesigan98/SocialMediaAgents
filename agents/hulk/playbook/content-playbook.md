@@ -370,3 +370,31 @@ a human fixes one of: Hulk's scheduled posting, Blue Hulk's access token, or Blu
 `pages_read_engagement` scope.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-09-07.
+
+## Performance review — 2026-09-07 (loop iteration 5)
+
+Fifth weekly firing. `post_log.jsonl` is still exactly 54 posts, days 739827–739845 — scheduled
+posting has now been off for three full weekly cycles in a row (iterations 3, 4, 5), so there is
+still no new post to add to any framework's `n`. Re-pulled engagement on the same 54 posts anyway
+to confirm nothing structural changed; every framework's `n` is identical to iterations 2–4, and
+the ranking order is unchanged from iteration 4 — only reach continues to drift upward on the
+existing posts, same "old posts maturing" effect noted every iteration so far, not a new signal.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as the last two iterations —
+there is zero new post data to promote or demote anything on, and doing so anyway would be fitting
+reach drift, not content performance.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist — `pages_read_engagement` remains
+missing. `post_log.jsonl` is still stuck at 24 posts, last one 2026-08-24 (day 739852) — now 14
+consecutive missed days, confirmed via the daily workflow's run history (still failing at the
+publish step on the invalidated `FB_PAGE_ACCESS_TOKEN` first flagged at iteration 4). Nothing new
+to fold into either the deferred poster-vs-text-only comparison or the 2026-08-10 external-evidence
+bet.
+
+**Standing blocker, unchanged for the third iteration running:** this loop remains blocked on the
+same two user-side fixes — Hulk's scheduled posting staying off, and Blue Hulk's invalidated
+access token (plus its missing `pages_read_engagement` scope). Repeating the same 54/24-post
+tables a third and fourth time without new data would be manufacturing motion rather than signal,
+so this entry documents the blocked state rather than a tweak, as before.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-09-14.
