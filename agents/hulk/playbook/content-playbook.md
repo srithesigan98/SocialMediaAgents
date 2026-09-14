@@ -398,3 +398,28 @@ tables a third and fourth time without new data would be manufacturing motion ra
 so this entry documents the blocked state rather than a tweak, as before.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-09-14.
+
+## Performance review — 2026-09-14 (loop iteration 6)
+
+Sixth weekly firing. `post_log.jsonl` is still exactly 54 posts, days 739827–739845 — scheduled
+posting has now been off for four consecutive weekly cycles (iterations 3 through 6). No new post
+exists to add to any framework's `n`, so there is nothing to compare against the iteration 5
+baseline. Re-pulled engagement anyway; every framework's `n` is unchanged, and the ranking order
+is identical to iteration 5 — only reach continues to drift upward on the same posts, the same
+"old posts maturing" effect flagged every iteration so far.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as the last three
+iterations — zero new post data, nothing to promote or demote.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist — `pages_read_engagement` remains
+missing. `post_log.jsonl` is still stuck at 24 posts, last one 2026-08-24 (day 739852) — now 21
+consecutive missed days, confirmed via the daily workflow's run history (still failing at the
+publish step on the invalidated `FB_PAGE_ACCESS_TOKEN`). Nothing new to fold into either the
+deferred poster-vs-text-only comparison or the 2026-08-10 external-evidence bet.
+
+**Standing blocker, unchanged for the fourth iteration running:** this loop remains blocked on the
+same two user-side fixes — Hulk's scheduled posting staying off, and Blue Hulk's invalidated
+access token (plus its missing `pages_read_engagement` scope). Continuing to document the blocked
+state rather than manufacturing a tweak.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-09-21.
