@@ -62,16 +62,16 @@ def render_reply(cfg: dict, intent: dict, listing: dict, username: str) -> str:
     )
 
 
-def fetch_comments(platform: str, post_id: str) -> list[dict]:
+def fetch_comments(cfg: dict, platform: str, post_id: str) -> list[dict]:
     if platform == "threads":
         return [
             {"id": c["id"], "text": c.get("text", ""), "username": c.get("username", "")}
-            for c in platforms.threads_replies(post_id)
+            for c in platforms.threads_replies(cfg, post_id)
         ]
     return [
         {"id": c["id"], "text": c.get("text", ""),
          "username": c.get("username") or (c.get("from") or {}).get("username", "")}
-        for c in platforms.instagram_comments(post_id)
+        for c in platforms.instagram_comments(cfg, post_id)
     ]
 
 
@@ -82,16 +82,16 @@ def send(cfg: dict, platform: str, comment_id: str, text: str, dry_run: bool) ->
     if platform == "threads":
         if rc.get("threads_public_reply", True):
             if not dry_run:
-                platforms.threads_reply(comment_id, text)
+                platforms.threads_reply(cfg, comment_id, text)
             actions.append("threads public reply")
     else:
         if rc.get("instagram_private_reply", True):
             if not dry_run:
-                platforms.instagram_private_reply(comment_id, text)
+                platforms.instagram_private_reply(cfg, comment_id, text)
             actions.append("instagram DM")
         if rc.get("instagram_public_reply", True):
             if not dry_run:
-                platforms.instagram_reply(comment_id, text)
+                platforms.instagram_reply(cfg, comment_id, text)
             actions.append("instagram public reply")
     return actions
 
@@ -104,18 +104,18 @@ def run_once(cfg: dict, dry_run: bool) -> int:
     me = {}
     for platform, fetch_me in (("threads", platforms.threads_me), ("instagram", platforms.instagram_me)):
         try:
-            me[platform] = fetch_me().get("username", "").lower()
+            me[platform] = fetch_me(cfg).get("username", "").lower()
         except Exception:
             me[platform] = ""  # own-comment filtering is best-effort
 
-    state = common.read_state("replied")
+    state = common.read_state(cfg, "replied")
     done = set(state.get("comment_ids", []))
     handled = 0
 
     for post in common.recent_posts(cfg):
         platform, post_id = post["platform"], post["post_id"]
         try:
-            comments = fetch_comments(platform, post_id)
+            comments = fetch_comments(cfg, platform, post_id)
         except Exception:
             print(f"! could not read comments on {platform} {post_id}:\n{traceback.format_exc()}")
             continue
@@ -148,19 +148,21 @@ def run_once(cfg: dict, dry_run: bool) -> int:
 
     if not dry_run:
         state["comment_ids"] = sorted(done)
-        common.write_state("replied", state)
+        common.write_state(cfg, "replied", state)
     return handled
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", default=None, help="Hulk profile (default: HULK_PROFILE or senang-homes)")
     parser.add_argument("--dry-run", action="store_true", help="Print replies without sending")
     parser.add_argument("--watch", type=int, metavar="SECONDS",
                         help="Keep polling this often instead of running once")
     args = parser.parse_args()
 
     load_dotenv(HERE / ".env")
-    cfg = common.load_config()
+    cfg = common.load_config(args.profile)
+    print(f"Profile: {cfg['_profile']} ({cfg.get('name', '')})")
 
     while True:
         count = run_once(cfg, args.dry_run)

@@ -1,24 +1,89 @@
-# Hulk — Finance/Trading/Crypto Threads Agent
+# Hulk — Threads + Instagram content agent
 
-Hulk is a Threads (threads.net) content agent scoped **exclusively** to finance, trading, the
-stock market, and cryptocurrency. It never posts about, or drifts into, unrelated topics.
+Hulk posts as one brand at a time, selected by **profile**. A profile bundles a persona,
+templates, a schedule, a content source and its own credentials, so one engine serves several
+accounts without ever mixing their voices or their tokens.
+
+| Profile | Brand | Scope | Platforms |
+|---|---|---|---|
+| `tansri-millionaires` | TanSri \| Millionaires | finance, trading, stock market, crypto — **exclusively**; it never drifts into unrelated topics | Threads |
+| `senang-homes` | Senang Homes | real-estate listings, drawn from a property spreadsheet | Threads + Instagram |
+
+Run anything against a profile with `--profile <name>`; the default comes from `HULK_PROFILE`
+in `scripts/.env`.
+
+```bash
+cd scripts
+python daily_posts.py --profile senang-homes --dry-run   # two property posts + posters
+python generate_draft.py "BTC broke resistance"          # finance, reviewed flow
+```
+
+## Profiles
+
+### `tansri-millionaires` — finance (the original Hulk)
+
+Persona, playbook, templates and topic guard are the researched originals, unchanged, in
+`persona/`, `playbook/`, `templates/` and `config/topics.yaml`. Its flow is still
+`generate_draft.py` → human review → `post_to_threads.py`. Nothing about it auto-posts.
+
+### `senang-homes` — real estate
+
+Spreadsheet-driven. Twice a day it picks the least-recently-posted active listing, drafts a post
+from that row, generates a poster image, publishes to Threads and Instagram, and then
+auto-replies to every commenter with a WhatsApp link prefilled with that property's reference.
+
+```
+your spreadsheet (CSV / XLSX / Google Sheet)
+      │
+      ▼
+ pick_listings()          least-recently-posted active rows, cooldown_days apart
+      │
+      ▼
+ make_poster.py           brand-coloured PNG from the row  (or Canva, or your own photo)
+      │
+      ▼
+ generate_property_post   Claude + persona + framework, facts strictly from the row
+      │                   CTA line with wa.me/<number>?text=<prefilled, per property>
+      ▼
+ daily_posts.py           publish → Threads + Instagram, record post ids
+      │
+      ▼
+ reply_bot.py             comments → keyword intent → per-property reply
+                          Instagram: DM + public reply · Threads: public reply
+```
+
+Everything tunable lives in [`profiles/senang-homes/profile.yaml`](./profiles/senang-homes/profile.yaml):
+sheet source and column mapping, poster mode and brand colours, schedule and cooldown, the
+WhatsApp number and prefill, and the reply intents.
+
+**Platform limits worth knowing before you rely on it:**
+
+- **Threads has no DM API.** No tool — this one, ManyChat, or a self-hosted one — can auto-DM
+  someone who comments on a Thread. Hulk replies publicly with the WhatsApp link instead.
+- **Instagram private replies** (real DMs) are one per comment, within **7 days** of it, and the
+  `instagram_business_manage_messages` scope needs App Review to reach non-testers.
+- **Instagram posts need an image**, and Meta accepts only a **public URL** — never a file
+  upload. Generated posters must be hosted somewhere public first
+  (see [`scripts/README.md`](./scripts/README.md)).
+- Meta tokens expire every 60 days and need refreshing.
 
 ## Folder guide
 
 | Path | Purpose |
 |---|---|
-| [`persona/hulk-system-prompt.md`](./persona/hulk-system-prompt.md) | Hulk's identity, voice, scope boundaries, and operating rules. This is the system prompt to load when running Hulk. |
+| [`profiles/`](./profiles) | One folder per brand: `profile.yaml` plus, for `senang-homes`, its own persona, playbook and templates. |
+| [`persona/hulk-system-prompt.md`](./persona/hulk-system-prompt.md) | The **finance** persona (`tansri-millionaires`) — identity, voice, scope boundaries, operating rules. |
 | [`playbook/creator-research.md`](./playbook/creator-research.md) | Pass-1 raw research findings (6 creators) on the Threads accounts Hulk's style was reverse-engineered from. |
 | [`playbook/creator-research-pass2.md`](./playbook/creator-research-pass2.md) | Pass-2 raw research findings (11 more creators, 17 total) — broadened/validated the pattern library. |
 | [`playbook/content-playbook.md`](./playbook/content-playbook.md) | The distilled, actionable playbook: hook patterns, content frameworks, topic pillars, CTA styles. |
 | [`templates/`](./templates) | One markdown template per content framework, ready to fill in for a new post. |
 | [`config/topics.yaml`](./config/topics.yaml) | Machine-readable allow/deny list of topics, used to guard generated content. |
-| [`scripts/`](./scripts) | Draft-generation and Threads-posting scripts (text and image posts). |
+| [`scripts/`](./scripts) | The shared engine: drafting, poster rendering, publishing, and the comment auto-reply bot. |
 | [`../design/poster-style-guide.md`](../design/poster-style-guide.md) | Shared (with Blue Hulk) Canva poster workflow — Hulk attaches posters selectively to listicle/aphorism/historical-reveal posts. |
 
-## Research basis
+## Research basis (the `tansri-millionaires` profile)
 
-Hulk's style is reverse-engineered from analysis of 17 Threads accounts across two research
+Hulk's finance style is reverse-engineered from analysis of 17 Threads accounts across two research
 passes (see `playbook/creator-research.md` and `playbook/creator-research-pass2.md` for full
 breakdowns, including which findings are verified vs. inferred):
 

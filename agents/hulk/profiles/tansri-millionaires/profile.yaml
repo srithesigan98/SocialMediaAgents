@@ -1,0 +1,22 @@
+# Hulk profile: TanSri | Millionaires (finance / trading / crypto).
+# This is Hulk's original scope. The files it points at are the researched ones that were
+# already here — this profile just registers them with the shared engine.
+# Run any script against this profile with:  --profile tansri-millionaires
+
+name: TanSri | Millionaires
+mode: topic               # topic = you give it a subject. (senang-homes uses mode: property)
+persona: ../../persona/hulk-system-prompt.md
+playbook: ../../playbook/content-playbook.md
+templates_dir: ../../templates
+topics: ../../config/topics.yaml
+
+credentials:
+  threads_user_id: THREADS_USER_ID
+  threads_access_token: THREADS_ACCESS_TOKEN
+
+schedule:
+  platforms: [threads]
+
+# Posting for this profile still goes through generate_draft.py + post_to_threads.py,
+# which predate the profile system and remain the reviewed, human-in-the-loop flow.
+# Nothing here auto-posts.

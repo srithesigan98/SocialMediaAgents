@@ -1,5 +1,20 @@
-# Hulk Estate configuration.
-# Everything the agent needs that is NOT a secret lives here. Secrets go in scripts/.env.
+# Hulk profile: Senang Homes (real estate).
+# Everything that is NOT a secret lives here. Secrets go in scripts/.env.
+# Run any script against this profile with:  --profile senang-homes
+
+name: Senang Homes
+mode: property          # property = spreadsheet-driven listings. (tansri-millionaires uses mode: topic)
+persona: persona.md
+playbook: playbook.md
+templates_dir: templates
+
+# Which .env credential names this profile posts with. Two brands = two Threads/IG accounts,
+# so each profile names its own variables and they never get crossed.
+credentials:
+  threads_user_id: SENANG_THREADS_USER_ID
+  threads_access_token: SENANG_THREADS_ACCESS_TOKEN
+  ig_user_id: SENANG_IG_USER_ID
+  ig_access_token: SENANG_IG_ACCESS_TOKEN
 
 listings:
   # Where the property spreadsheet comes from. One of:
@@ -7,7 +22,7 @@ listings:
   #   xlsx   — local Excel file (needs `openpyxl`)
   #   gsheet — a Google Sheet published/exported as CSV (see scripts/README.md)
   source: csv
-  path: ../config/listings.example.csv
+  path: listings.example.csv
   # For source: gsheet — put the export URL here instead of path, or set
   # LISTINGS_URL in .env to keep a private sheet URL out of git.
   url: ""
@@ -33,6 +48,24 @@ listings:
     highlight: "Highlight"        # the one line that makes this property interesting
     image_url: "Image URL"        # publicly reachable image, optional
     status: "Status"
+
+poster:
+  # Every post gets an image. Instagram REQUIRES one; on Threads it lifts reach.
+  #   auto   — make_poster.py renders a PNG locally from the listing row (works in cron, no network)
+  #   canva  — a Claude session generates it through the Canva connector (richer, not cron-able)
+  #   sheet  — use the row's Image URL column as-is, skip generation
+  #   none   — text-only posts (Instagram will then be skipped)
+  mode: auto
+  # Used by mode: auto. Colours are the Senang Homes palette — change them here.
+  background: "#0E1A16"
+  accent: "#14B87A"
+  text: "#F5F7F6"
+  muted: "#8FA39B"
+  brand: "SENANG HOMES"
+  size: [1080, 1350]        # 4:5 — the tallest ratio Instagram shows in full
+  # Posters render to scripts/posters/. Threads and Instagram both need a PUBLIC url,
+  # so a local file must be uploaded somewhere reachable first — see scripts/README.md.
+  public_base_url: ""
 
 schedule:
   # Two posts a day, as asked. Times are local to the machine running the scheduler.

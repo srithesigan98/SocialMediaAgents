@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Shared helpers for Hulk Estate: config, listings loading, WhatsApp links, run state."""
+"""Shared Hulk engine: profiles, listings loading, WhatsApp links, run state.
+
+A *profile* is one brand Hulk posts as — its persona, templates, schedule, spreadsheet and
+credential names. Profiles live in ../profiles/<name>/profile.yaml. Every script takes
+--profile; the default comes from HULK_PROFILE in .env, falling back to senang-homes.
+"""
 from __future__ import annotations
 
 import csv
@@ -16,18 +21,62 @@ import yaml
 
 HERE = Path(__file__).resolve().parent
 AGENT_DIR = HERE.parent
-CONFIG_PATH = AGENT_DIR / "config" / "agent.yaml"
+PROFILES_DIR = AGENT_DIR / "profiles"
 STATE_DIR = HERE / "state"
+POSTERS_DIR = HERE / "posters"
+
+DEFAULT_PROFILE = "senang-homes"
 
 
-def load_config() -> dict:
-    cfg = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+def available_profiles() -> list[str]:
+    return sorted(p.name for p in PROFILES_DIR.iterdir() if (p / "profile.yaml").exists())
+
+
+def resolve_profile(name: str | None) -> str:
+    profile = name or os.environ.get("HULK_PROFILE") or DEFAULT_PROFILE
+    if profile not in available_profiles():
+        raise SystemExit(f"Unknown profile {profile!r}. Available: {', '.join(available_profiles())}")
+    return profile
+
+
+def load_config(profile: str | None = None) -> dict:
+    """Load one profile. Paths inside it are resolved relative to the profile directory."""
+    profile = resolve_profile(profile)
+    profile_dir = PROFILES_DIR / profile
+    cfg = yaml.safe_load((profile_dir / "profile.yaml").read_text(encoding="utf-8"))
+    cfg["_profile"] = profile
+    cfg["_dir"] = profile_dir
+
     # Secrets / private URLs may override the file so they never land in git.
-    if os.environ.get("LISTINGS_URL"):
-        cfg["listings"]["url"] = os.environ["LISTINGS_URL"]
-    if os.environ.get("WHATSAPP_NUMBER"):
-        cfg["whatsapp"]["number"] = os.environ["WHATSAPP_NUMBER"]
+    # Scoped per profile first (SENANG_HOMES_LISTINGS_URL), then the plain name.
+    prefix = profile.upper().replace("-", "_")
+    for env_suffix, path in (("LISTINGS_URL", ("listings", "url")),
+                             ("WHATSAPP_NUMBER", ("whatsapp", "number"))):
+        value = os.environ.get(f"{prefix}_{env_suffix}") or os.environ.get(env_suffix)
+        if value and path[0] in cfg:
+            cfg[path[0]][path[1]] = value
     return cfg
+
+
+def profile_path(cfg: dict, raw: str) -> Path:
+    """Resolve a path written in a profile.yaml, relative to that profile's directory."""
+    path = Path(raw)
+    return path if path.is_absolute() else (cfg["_dir"] / path).resolve()
+
+
+def credential(cfg: dict, key: str) -> str:
+    """Read a credential this profile names, e.g. credential(cfg, "threads_access_token").
+
+    Each profile maps a logical name to an .env variable, so two brands' tokens can never
+    be mixed up by a script that forgot which account it was posting to.
+    """
+    var = cfg.get("credentials", {}).get(key)
+    if not var:
+        raise SystemExit(f"Profile {cfg['_profile']} defines no credential for {key!r}.")
+    value = os.environ.get(var, "").strip()
+    if not value:
+        raise SystemExit(f"{var} is not set in .env (needed for {key} on profile {cfg['_profile']}).")
+    return value
 
 
 # --------------------------------------------------------------------------- listings
@@ -55,12 +104,6 @@ def _rows_from_xlsx(path: Path) -> list[dict]:
         for r in rows[1:]
         if any(v is not None and str(v).strip() for v in r)
     ]
-
-
-def _resolve_path(raw: str) -> Path:
-    """Listing paths in agent.yaml are relative to the config/ directory."""
-    path = Path(raw)
-    return path if path.is_absolute() else (CONFIG_PATH.parent / path).resolve()
 
 
 def _gsheet_csv_url(url: str) -> str:
@@ -93,9 +136,9 @@ def load_listings(cfg: dict) -> list[dict]:
             )
         raw = _rows_from_csv_text(resp.text)
     elif source == "xlsx":
-        raw = _rows_from_xlsx(_resolve_path(lc["path"]))
+        raw = _rows_from_xlsx(profile_path(cfg, lc["path"]))
     elif source == "csv":
-        raw = _rows_from_csv_text(_resolve_path(lc["path"]).read_text(encoding="utf-8-sig"))
+        raw = _rows_from_csv_text(profile_path(cfg, lc["path"]).read_text(encoding="utf-8-sig"))
     else:
         raise SystemExit(f"Unknown listings.source: {source!r} (use csv, xlsx or gsheet)")
 
@@ -146,13 +189,13 @@ def cta_line(cfg: dict, listing: dict) -> str:
 
 # --------------------------------------------------------------------------- state
 
-def _state_path(name: str) -> Path:
+def _state_path(cfg: dict, name: str) -> Path:
     STATE_DIR.mkdir(exist_ok=True)
-    return STATE_DIR / f"{name}.json"
+    return STATE_DIR / f"{cfg['_profile']}-{name}.json"
 
 
-def read_state(name: str) -> dict:
-    path = _state_path(name)
+def read_state(cfg: dict, name: str) -> dict:
+    path = _state_path(cfg, name)
     if not path.exists():
         return {}
     try:
@@ -161,8 +204,8 @@ def read_state(name: str) -> dict:
         return {}
 
 
-def write_state(name: str, data: dict) -> None:
-    _state_path(name).write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+def write_state(cfg: dict, name: str, data: dict) -> None:
+    _state_path(cfg, name).write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def now_utc() -> datetime:
@@ -175,7 +218,7 @@ def days_ago(n: int) -> datetime:
 
 def pick_listings(cfg: dict, count: int) -> list[dict]:
     """Choose the least-recently-posted active listings, respecting the cooldown."""
-    posted = read_state("posted").get("listings", {})
+    posted = read_state(cfg, "posted").get("listings", {})
     cooldown = int(cfg["schedule"]["cooldown_days"])
     cutoff = days_ago(cooldown)
 
@@ -193,22 +236,22 @@ def pick_listings(cfg: dict, count: int) -> list[dict]:
     return [item for _, item in candidates[:count]]
 
 
-def mark_posted(listing_ref: str, platform: str, post_id: str) -> None:
-    state = read_state("posted")
+def mark_posted(cfg: dict, listing_ref: str, platform: str, post_id: str) -> None:
+    state = read_state(cfg, "posted")
     listings = state.setdefault("listings", {})
     entry = listings.setdefault(listing_ref, {})
     entry["last_posted"] = now_utc().isoformat()
     entry.setdefault("posts", []).append(
         {"platform": platform, "post_id": post_id, "at": now_utc().isoformat()}
     )
-    write_state("posted", state)
+    write_state(cfg, "posted", state)
 
 
 def recent_posts(cfg: dict) -> list[dict]:
     """Every post the agent made inside the reply lookback window, newest first."""
     cutoff = days_ago(int(cfg["replies"]["lookback_days"]))
     out = []
-    for ref, entry in read_state("posted").get("listings", {}).items():
+    for ref, entry in read_state(cfg, "posted").get("listings", {}).items():
         for post in entry.get("posts", []):
             if datetime.fromisoformat(post["at"]) >= cutoff:
                 out.append({**post, "ref": ref})

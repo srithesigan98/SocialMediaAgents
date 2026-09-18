@@ -22,13 +22,16 @@ import common
 MODEL = "claude-sonnet-5"
 LIMITS = {"threads": 500, "instagram": 800}
 
-HERE = Path(__file__).resolve().parent
-AGENT_DIR = HERE.parent
+HERE = common.HERE
 DRAFTS_DIR = HERE / "drafts"
 
 
-def frameworks() -> list[str]:
-    return sorted(p.stem for p in (AGENT_DIR / "templates").glob("*.md"))
+def templates_dir(cfg: dict) -> Path:
+    return common.profile_path(cfg, cfg.get("templates_dir", "templates"))
+
+
+def frameworks(cfg: dict) -> list[str]:
+    return sorted(p.stem for p in templates_dir(cfg).glob("*.md"))
 
 
 def listing_block(listing: dict) -> str:
@@ -43,7 +46,7 @@ def listing_block(listing: dict) -> str:
     return "\n".join(lines)
 
 
-def build_prompt(listing: dict, framework: str | None, platform: str, cta: str) -> str:
+def build_prompt(cfg: dict, listing: dict, framework: str | None, platform: str, cta: str) -> str:
     parts = [
         "Write one post for this property. Use ONLY the facts below — no invented details.",
         "",
@@ -55,11 +58,11 @@ def build_prompt(listing: dict, framework: str | None, platform: str, cta: str) 
         cta,
     ]
     if framework:
-        template = (AGENT_DIR / "templates" / f"{framework}.md").read_text(encoding="utf-8")
+        template = (templates_dir(cfg) / f"{framework}.md").read_text(encoding="utf-8")
         parts += ["", "Use this framework:", "", template]
     else:
         available = "\n\n".join(
-            (AGENT_DIR / "templates" / f"{name}.md").read_text(encoding="utf-8") for name in frameworks()
+            (templates_dir(cfg) / f"{name}.md").read_text(encoding="utf-8") for name in frameworks(cfg)
         )
         parts += ["", "Pick whichever of these frameworks fits this property best:", "", available]
     return "\n".join(parts)
@@ -70,7 +73,7 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
     if not api_key:
         sys.exit("ANTHROPIC_API_KEY is not set. Copy .env.example to .env and fill it in.")
 
-    persona = (AGENT_DIR / "persona" / "hulk-estate-system-prompt.md").read_text(encoding="utf-8")
+    persona = common.profile_path(cfg, cfg["persona"]).read_text(encoding="utf-8")
     cta = common.cta_line(cfg, listing)
 
     client = Anthropic(api_key=api_key)
@@ -78,7 +81,7 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
         model=MODEL,
         max_tokens=800,
         system=persona,
-        messages=[{"role": "user", "content": build_prompt(listing, framework, platform, cta)}],
+        messages=[{"role": "user", "content": build_prompt(cfg, listing, framework, platform, cta)}],
     )
     text = "".join(block.text for block in response.content if block.type == "text").strip()
 
@@ -90,12 +93,12 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
     return text
 
 
-def save_draft(text: str, listing: dict, platform: str, framework: str | None) -> Path:
+def save_draft(cfg: dict, text: str, listing: dict, platform: str, framework: str | None) -> Path:
     DRAFTS_DIR.mkdir(exist_ok=True)
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    path = DRAFTS_DIR / f"{stamp}-{listing['ref']}-{platform}.md"
+    path = DRAFTS_DIR / f"{stamp}-{cfg['_profile']}-{listing['ref']}-{platform}.md"
     path.write_text(
-        f"<!-- ref: {listing['ref']} -->\n<!-- platform: {platform} -->\n"
+        f"<!-- profile: {cfg['_profile']} -->\n<!-- ref: {listing['ref']} -->\n<!-- platform: {platform} -->\n"
         f"<!-- framework: {framework or 'auto'} -->\n\n{text}\n",
         encoding="utf-8",
     )
@@ -105,15 +108,18 @@ def save_draft(text: str, listing: dict, platform: str, framework: str | None) -
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("ref", help="Listing reference from the sheet, e.g. HE-001")
-    parser.add_argument("--framework", choices=frameworks(), default=None)
+    parser.add_argument("--profile", default=None, help="Hulk profile (default: HULK_PROFILE or senang-homes)")
+    parser.add_argument("--framework", default=None)
     parser.add_argument("--platform", choices=sorted(LIMITS), default="threads")
     args = parser.parse_args()
 
     load_dotenv(HERE / ".env")
-    cfg = common.load_config()
+    cfg = common.load_config(args.profile)
+    if args.framework and args.framework not in frameworks(cfg):
+        sys.exit(f"Unknown framework. Options: {', '.join(frameworks(cfg))}")
     listing = common.find_listing(cfg, args.ref)
     text = generate(listing, args.framework, args.platform, cfg)
-    path = save_draft(text, listing, args.platform, args.framework)
+    path = save_draft(cfg, text, listing, args.platform, args.framework)
 
     print(text)
     print(f"\nSaved to {path}")

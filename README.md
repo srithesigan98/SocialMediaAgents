@@ -8,8 +8,7 @@ Each agent has its own folder under [`agents/`](agents) (docs, assets, and — f
 the posting agents — persona, playbook, templates, config, and scripts). The
 Claude Code skills live under `.claude/skills/`.
 
-- **Hulk** 🟢 — Threads finance/trading/crypto content agent (built) → [`agents/hulk`](agents/hulk)
-- **Hulk Estate** 🏠 — real-estate Threads + Instagram agent, spreadsheet-driven, with WhatsApp auto-reply (built) → [`agents/hulk-estate`](agents/hulk-estate)
+- **Hulk** 🟢 — Threads + Instagram content agent, run per **profile**: `tansri-millionaires` (finance/trading/crypto) and `senang-homes` (real estate — spreadsheet-driven listings, auto-generated posters, WhatsApp auto-reply) → [`agents/hulk`](agents/hulk)
 - **Blue Hulk** 🔵 — Facebook finance/trading/crypto content agent (built) → [`agents/blue-hulk`](agents/blue-hulk)
 - **Black Panther** 🐾 — Instagram + TikTok posting agent (stub) → [`agents/black-panther`](agents/black-panther)
 - **Repurposer** ♻️ — one video → platform-tailored variants (stub) → [`agents/repurposer`](agents/repurposer)
