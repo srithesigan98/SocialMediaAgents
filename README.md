@@ -9,6 +9,7 @@ the posting agents — persona, playbook, templates, config, and scripts). The
 Claude Code skills live under `.claude/skills/`.
 
 - **Hulk** 🟢 — Threads finance/trading/crypto content agent (built) → [`agents/hulk`](agents/hulk)
+- **Hulk Estate** 🏠 — real-estate Threads + Instagram agent, spreadsheet-driven, with WhatsApp auto-reply (built) → [`agents/hulk-estate`](agents/hulk-estate)
 - **Blue Hulk** 🔵 — Facebook finance/trading/crypto content agent (built) → [`agents/blue-hulk`](agents/blue-hulk)
 - **Black Panther** 🐾 — Instagram + TikTok posting agent (stub) → [`agents/black-panther`](agents/black-panther)
 - **Repurposer** ♻️ — one video → platform-tailored variants (stub) → [`agents/repurposer`](agents/repurposer)

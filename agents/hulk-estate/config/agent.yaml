@@ -1,0 +1,83 @@
+# Hulk Estate configuration.
+# Everything the agent needs that is NOT a secret lives here. Secrets go in scripts/.env.
+
+listings:
+  # Where the property spreadsheet comes from. One of:
+  #   csv    — local .csv file
+  #   xlsx   — local Excel file (needs `openpyxl`)
+  #   gsheet — a Google Sheet published/exported as CSV (see scripts/README.md)
+  source: csv
+  path: ../config/listings.example.csv
+  # For source: gsheet — put the export URL here instead of path, or set
+  # LISTINGS_URL in .env to keep a private sheet URL out of git.
+  url: ""
+  # Only rows whose `status` column matches one of these are eligible to post.
+  active_statuses: [active, available, "for sale", "for rent"]
+
+  # Map YOUR spreadsheet's column headers to the fields the agent uses.
+  # Left = agent field, right = your column header (case-insensitive, spaces ok).
+  # Any field you don't have: leave the value empty and the agent writes around it.
+  columns:
+    ref: "Ref"                    # unique id per property — REQUIRED (used for dedupe + WhatsApp link)
+    title: "Title"
+    type: "Type"                  # condo / terrace / land / shoplot
+    deal: "Deal"                  # sale / rent
+    location: "Location"
+    price: "Price"
+    size: "Size (sqft)"
+    bedrooms: "Bedrooms"
+    bathrooms: "Bathrooms"
+    tenure: "Tenure"              # freehold / leasehold
+    monthly_instalment: "Monthly Instalment"
+    rental_yield: "Rental Yield"
+    highlight: "Highlight"        # the one line that makes this property interesting
+    image_url: "Image URL"        # publicly reachable image, optional
+    status: "Status"
+
+schedule:
+  # Two posts a day, as asked. Times are local to the machine running the scheduler.
+  posts_per_day: 2
+  times: ["09:30", "19:30"]
+  # Don't repost the same property until this many days have passed.
+  cooldown_days: 14
+  # Post to these platforms. Remove one to disable it.
+  platforms: [threads, instagram]
+
+whatsapp:
+  # Your closing number in full international format, digits only (no +, no spaces).
+  # e.g. Malaysia 011-1234 5678 -> 601112345678
+  number: "60000000000"
+  # Prefilled message. {ref} and {title} are substituted per property.
+  prefill: "Hi, I saw your post about {title} ({ref}). Can you send me the full details?"
+  # The CTA line appended verbatim to every post. {link} is the wa.me URL.
+  cta_template: "Full details + floor plan on WhatsApp 👉 {link}"
+
+replies:
+  # Auto-reply to every comment on a Hulk Estate post.
+  enabled: true
+  # Threads has no public DM API, so Threads replies are public (the wa.me link is in the reply).
+  # Instagram supports a real private DM reply — that's the ManyChat-style behaviour.
+  instagram_private_reply: true
+  instagram_public_reply: true
+  threads_public_reply: true
+  # Never reply twice to the same comment; never reply to your own comments.
+  skip_own_comments: true
+  # Only look at posts from the last N days (Instagram private replies expire after 7 days).
+  lookback_days: 7
+  # Keyword → reply intent. First match wins; `default` is used when nothing matches.
+  intents:
+    price:
+      keywords: [price, harga, how much, berapa, cost, rm]
+      reply: "{name} it's {price} for {title} — {size_line}. Full breakdown + instalment on WhatsApp 👉 {link}"
+    loan:
+      keywords: [loan, financing, instalment, installment, ansuran, mortgage, deposit, downpayment]
+      reply: "{name} happy to run the loan + down payment numbers for {ref} with you. Send me your details here 👉 {link}"
+    viewing:
+      keywords: [view, viewing, visit, appointment, tengok, survey]
+      reply: "{name} viewings are open this week for {title}. Pick a slot with me here 👉 {link}"
+    availability:
+      keywords: [available, still, sold, rented, ada lagi]
+      reply: "{name} yes — {ref} is still {status}. Grab the full details before it moves 👉 {link}"
+    default:
+      keywords: []
+      reply: "{name} thanks for the interest in {title} ({ref}) — sending you the full details, floor plan and pricing here 👉 {link}"

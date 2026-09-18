@@ -19,6 +19,14 @@ agents/hulk/scripts/.env
 agents/hulk/scripts/drafts/*
 !agents/hulk/scripts/drafts/.gitkeep
 
+# Hulk Estate scripts
+agents/hulk-estate/scripts/venv/
+agents/hulk-estate/scripts/.env
+agents/hulk-estate/scripts/drafts/*
+!agents/hulk-estate/scripts/drafts/.gitkeep
+agents/hulk-estate/scripts/state/*
+!agents/hulk-estate/scripts/state/.gitkeep
+
 # Blue Hulk scripts
 agents/blue-hulk/scripts/venv/
 agents/blue-hulk/scripts/.env
