@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a property poster PNG from a listing row — locally, with no network and no Canva.
+"""Render a property poster PNG from a listing row — no Canva, no design tool.
 
     python make_poster.py HE-001 --profile senang-homes
     python make_poster.py HE-001 --open-size 1080x1080
@@ -9,22 +9,28 @@ without an image, and a cron job at 09:30 cannot drive the Canva connector. For 
 art direction, use `poster.mode: canva` and generate it in a Claude session instead — see
 ../../design/poster-style-guide.md.
 
-Layout is deliberately plain and information-first: brand tag, price, title, location, a spec
-row, and the highlight. Type sizes auto-fit so a long title never overflows.
+The poster is the listing photo (from the sheet's Image URL column) with a bottom gradient and
+four lines over it: location + size, the monthly price, the one-line highlight, and a "comment
+the property name" CTA — deliberately no WhatsApp link, ref number or title on the image itself;
+that's the hook (viewers have to comment to find out the name), and the rest of the detail lives
+in the caption, which already gets every field. No photo URL → falls back to a plain brand-colour
+card so the pipeline never breaks on a missing image.
 """
 from __future__ import annotations
 
 import argparse
+import io
 import re
 import textwrap
 from pathlib import Path
 
+import requests
 from dotenv import load_dotenv
 
 import common
 
 try:
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw, ImageFont, ImageOps
 except ImportError:  # pragma: no cover
     raise SystemExit("make_poster.py needs Pillow — run: pip install Pillow")
 
@@ -57,93 +63,91 @@ def group_digits(value: str) -> str:
     return re.sub(r"\d{4,}", lambda m: f"{int(m.group()):,}", value)
 
 
-def spec_row(listing: dict) -> str:
-    bits = []
-    if listing.get("bedrooms"):
-        beds = listing["bedrooms"]
-        baths = listing.get("bathrooms")
-        bits.append(f"{beds}R{baths}B" if baths else f"{beds} rooms")
-    if listing.get("size"):
-        bits.append(f"{listing['size']} sqft")
-    if listing.get("tenure"):
-        bits.append(listing["tenure"])
-    if listing.get("monthly_instalment"):
-        bits.append(f"{listing['monthly_instalment']}/mo")
-    return "   ·   ".join(bits)
+def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
+    """Cover-crop the listing photo to the poster canvas. None on no URL / fetch / decode error
+    — a bad or missing photo must never break the daily posting run.
+
+    ponytail: an animated (GIF) source renders as its first frame — the output here is always a
+    static PNG, since Instagram/Threads image posts don't play GIFs anyway. True animated/video
+    posting would be a different pipeline; add it if that's ever actually requested.
+    """
+    if not url:
+        return None
+    try:
+        resp = requests.get(url, timeout=15)
+        resp.raise_for_status()
+        photo = Image.open(io.BytesIO(resp.content))
+        photo.seek(0)  # first frame if it's a GIF
+        photo = photo.convert("RGB")
+    except Exception:
+        return None
+    return ImageOps.fit(photo, size, Image.LANCZOS)
+
+
+def scrim(size: tuple[int, int]) -> Image.Image:
+    """Dark gradient so text stays legible over a photo: a light fade behind the brand tag up
+    top, transparent middle so the photo breathes, a stronger fade behind the text stack at the
+    bottom."""
+    w, h = size
+    overlay = Image.new("RGBA", size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    top_h = int(h * 0.16)
+    for y in range(top_h):
+        draw.line([(0, y), (w, y)], fill=(0, 0, 0, int(110 * (1 - y / top_h))))
+    bottom_start = int(h * 0.58)
+    for y in range(bottom_start, h):
+        draw.line([(0, y), (w, y)], fill=(0, 0, 0, int(215 * (y - bottom_start) / (h - bottom_start))))
+    return overlay
 
 
 def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) -> Path:
     pc = cfg.get("poster", {})
     width, height = size or tuple(pc.get("size", [1080, 1350]))
     bg, accent = pc.get("background", "#0E1A16"), pc.get("accent", "#14B87A")
-    fg, muted = pc.get("text", "#F5F7F6"), pc.get("muted", "#8FA39B")
+    fg = pc.get("text", "#F5F7F6")
     margin = int(width * 0.08)
     inner = width - margin * 2
 
-    img = Image.new("RGB", (width, height), bg)
+    photo = fetch_photo(listing.get("image_url", ""), (width, height))
+    base = photo if photo else Image.new("RGB", (width, height), bg)
+    img = Image.alpha_composite(base.convert("RGBA"), scrim((width, height))).convert("RGB")
     draw = ImageDraw.Draw(img)
-
-    # A single accent bar at the top and a filled CTA band at the bottom frame the type.
-    draw.rectangle([0, 0, width, int(height * 0.012)], fill=accent)
-    band_top = height - int(height * 0.16)
-
-    # Build the content as measurable blocks first, then centre them in the space between the
-    # brand tag and the CTA band — otherwise short listings leave a dead lower third.
-    blocks: list[tuple] = []  # (kind, text, font, fill, gap_after)
-
-    deal = (listing.get("deal") or "").upper()
-    ptype = (listing.get("type") or "").upper()
-    tag = "  ·  ".join(filter(None, [f"FOR {deal}" if deal else "", ptype]))
-    if tag:
-        blocks.append(("text", tag, font(REGULAR, 28), muted, 26))
-
-    if listing.get("price"):
-        price = group_digits(listing["price"])
-        blocks.append(("text", price, fit_font(draw, price, BOLD, inner, int(width * 0.115)), fg, 22))
-
-    if listing.get("title"):
-        blocks.append(("text", listing["title"], fit_font(draw, listing["title"], BOLD, inner, 58), fg, 14))
-
-    if listing.get("location"):
-        blocks.append(("text", listing["location"], font(REGULAR, 36), muted, 40))
-
-    specs = spec_row(listing)
-    if specs:
-        blocks.append(("rule", "", None, muted, 30))
-        blocks.append(("text", specs, fit_font(draw, specs, REGULAR, inner, 34), fg, 40))
-
-    if listing.get("highlight"):
-        highlight_font = font(REGULAR, 38)
-        chars = max(18, int(inner / draw.textlength("n", font=highlight_font)))
-        for line in textwrap.wrap(listing["highlight"], width=chars)[:4]:
-            blocks.append(("text", line, highlight_font, accent, 10))
-
-    def block_height(kind, _text, f, *_rest) -> int:
-        return 2 if kind == "rule" else f.size
-
-    content_height = sum(block_height(*b) + b[4] for b in blocks)
-
-    top_limit = margin + 70          # under the brand tag
-    bottom_limit = band_top - margin
-    y = top_limit + max(0, (bottom_limit - top_limit - content_height) // 2)
 
     brand = pc.get("brand", cfg.get("name", "")).upper()
     draw.text((margin, margin), brand, font=font(REGULAR, 30), fill=accent)
 
-    for kind, text, f, fill, gap in blocks:
-        if kind == "rule":
-            draw.line([(margin, y), (margin + inner, y)], fill=fill, width=2)
-            y += 2 + gap
-        else:
-            draw.text((margin, y), text, font=f, fill=fill)
-            y += f.size + gap
+    # Deliberately minimal and deliberately missing the title/ref/WhatsApp link — the title is
+    # withheld on purpose (the CTA asks viewers to comment it), and everything else lives in the
+    # caption instead, which already gets every field via generate_property_post.py.
+    blocks: list[tuple] = []  # (text, font, fill, gap_after)
 
-    draw.rectangle([0, band_top, width, height], fill=accent)
-    cta_font = fit_font(draw, "WHATSAPP FOR FULL DETAILS", BOLD, inner, 52)
-    cta_y = band_top + int(height * 0.035)
-    draw.text((margin, cta_y), "WHATSAPP FOR FULL DETAILS", font=cta_font, fill=bg)
-    draw.text((margin, cta_y + cta_font.size + 14), f"Ref {listing.get('ref', '')}",
-              font=font(REGULAR, 30), fill=bg)
+    loc_size = "   ·   ".join(filter(None, [
+        listing.get("location", ""),
+        f"{listing['size']} sqft" if listing.get("size") else "",
+    ]))
+    if loc_size:
+        blocks.append((loc_size, fit_font(draw, loc_size, REGULAR, inner, 34), fg, 20))
+
+    monthly = listing.get("monthly_instalment") or listing.get("price")
+    if monthly:
+        price_text = f"{group_digits(monthly)}/mo"
+        blocks.append((price_text, fit_font(draw, price_text, BOLD, inner, int(width * 0.1)), fg, 22))
+
+    if listing.get("highlight"):
+        highlight_font = font(REGULAR, 34)
+        chars = max(18, int(inner / draw.textlength("n", font=highlight_font)))
+        lines = textwrap.wrap(listing["highlight"], width=chars)[:3]
+        for i, line in enumerate(lines):
+            blocks.append((line, highlight_font, fg, 10 if i < len(lines) - 1 else 30))
+
+    cta_font = fit_font(draw, "COMMENT THE PROPERTY NAME BELOW", BOLD, inner, 42)
+    blocks.append(("COMMENT THE PROPERTY NAME BELOW", cta_font, accent, 0))
+
+    content_height = sum(f.size + gap for _, f, _, gap in blocks)
+    y = max(margin + 70, height - margin - content_height)
+    for text, f, fill, gap in blocks:
+        draw.text((margin, y), text, font=f, fill=fill)
+        y += f.size + gap
 
     out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.png"
     out_path.parent.mkdir(parents=True, exist_ok=True)
