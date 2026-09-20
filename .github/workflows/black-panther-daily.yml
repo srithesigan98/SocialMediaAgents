@@ -1,0 +1,42 @@
+name: Black Panther daily post
+
+# Generates one Instagram feed post (caption + poster) and publishes it, once a day.
+# Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+#
+# Duty rule (see agents/black-panther/scripts/README.md):
+#   Posts once a day. Every post carries a poster, rendered locally with Pillow
+#   (render_poster.py), committed to this repo, and posted via its raw.githubusercontent.com
+#   URL — the Instagram Graph API requires a publicly reachable image URL and doesn't accept
+#   local file uploads (same constraint Hulk has for Threads).
+
+on:
+  schedule:
+    - cron: "0 13 * * *"  # 13:00 UTC = 9:00pm Malaysia (UTC+8)
+  workflow_dispatch: {}   # manual "Run workflow" button, for testing
+
+permissions:
+  contents: write   # needed to commit/push the poster PNG and post_log.jsonl
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install fonts (for poster rendering)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
+      - name: Install dependencies
+        run: pip install -r agents/black-panther/scripts/requirements.txt
+      - name: Configure git identity (for poster/log commits)
+        run: |
+          git config user.name "black-panther-bot"
+          git config user.email "black-panther-bot@users.noreply.github.com"
+      - name: Generate and post
+        working-directory: agents/black-panther/scripts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY_3 }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python daily_post.py

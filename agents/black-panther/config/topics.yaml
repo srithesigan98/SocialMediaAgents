@@ -1,0 +1,32 @@
+# Black Panther topic guard — machine-readable allow/deny list.
+# Same finance/trading/crypto scope as Hulk and Blue Hulk (shared brand: TanSri | Millionaires).
+# Keep in sync with persona/black-panther-system-prompt.md if scope changes.
+
+allowed_topics:
+  - stock market (equities, indices, earnings, sector moves)
+  - trading (technical analysis, fundamental analysis, setups, strategy)
+  - trading psychology and risk management (core Blue Hulk pillar)
+  - trader experience / war stories (own, clearly-illustrative, or attributed third-party)
+  - cryptocurrency (BTC, ETH, altcoins, on-chain data, market structure, cycles)
+  - macro news as it affects markets (rate decisions, CPI, jobs reports, etc.)
+  - market-condition commentary resolved into trader behavior
+  - portfolio / net worth tracking as it relates to investing
+  - Malaysian market context (EPF, ASNB, Bursa/KLCI) within the ~1-in-5 Malaysian posts
+  - CTAs and engagement prompts directly tied to the above
+
+denied_topics:
+  - general business / entrepreneurship advice not tied to trading or investing
+  - lifestyle, health, relationships, productivity content
+  - politics and unrelated current events
+  - general personal finance not connected to markets/investing (budgeting tips, saving on
+    groceries)
+  - memes or humor not related to finance/trading/crypto
+  - promotion of specific paid courses, signal groups, or "get rich" pitches
+  - broker/IB recruitment content and income-opportunity framing
+  - urgency/scarcity sales mechanics of any kind
+
+notes: >
+  When a requested topic isn't clearly in allowed_topics, decline or ask for clarification
+  rather than stretching it to fit. The broker-recruitment and scarcity-mechanics denials come
+  directly from the creator research: both patterns were tied to the least credible (and in two
+  cases, sanctioned) creators in the study set.

@@ -1,27 +1,47 @@
 #!/usr/bin/env python3
-"""Blue Hulk daily auto-poster — generate ONE on-brand Facebook post and publish it.
+"""Blue Hulk daily auto-poster — generate ONE on-brand Facebook post and publish it, every day.
 
-Fully automatic (no human review). Designed to run on a schedule (GitHub Actions). It is
-grounded in the persona, content playbook, copywriting engine, and topic guard, and rotates
-through config/daily_topics.yaml so posts don't repeat soon.
+Fully automatic (no human review). Designed to run on a schedule (GitHub Actions). Grounded in
+the persona, content playbook, copywriting engine, and topic guard.
+
+Duty rules (see agents/blue-hulk/README.md "Daily duty rules" for the source of truth):
+    1. Post every day.
+    2. 1 out of every 4 posts is a Striker Zones post — drawn from
+       config/striker_zones_topics.yaml — and its CTA must link to
+       https://t.me/strikerzonesadmin_bot.
+    3. 1 out of every 2 posts carries a poster graphic related to that post — rendered locally
+       with Pillow (see render_poster.py), matching the locked style spec in
+       ../../design/poster-style-guide.md. No Canva account or API involved: Canva's
+       Autofill/Brand Template API requires a Canva Enterprise plan, which this account doesn't
+       have. If poster generation ever fails for any reason, rule 1 always wins — it falls back
+       to a text-only post and prints a NOTE.
+       (Bumped from 1-in-3 to 1-in-2 on 2026-08-10 — see ../playbook/content-playbook.md
+       "Performance review": external 2026 Facebook algorithm research shows text-only/static
+       posts losing distribution priority against visual/carousel formats industry-wide. Blue
+       Hulk has no on-platform engagement data of its own yet to confirm this locally — see the
+       FB_PAGE_ACCESS_TOKEN pages_read_engagement gap — so this is an evidence-based bet to
+       revisit once that data exists, not a locally-validated result.)
+
+All three rules run off ONE deterministic day counter, so which rule applies on a given day is
+reproducible and never drifts:
+    day_index = date.today().toordinal()
+    is_striker_zone_day = day_index % 4 == 0   (rule 2 — exactly 1 in 4 days)
+    is_poster_day       = day_index % 2 == 0   (rule 3 — exactly 1 in 2 days)
 
 Credentials come from environment variables (GitHub Actions secrets) or a local .env:
     ANTHROPIC_API_KEY, FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN
 
-Duties (see ../playbook/posting-duties.md):
-  1. Post every day.
-  2. Every 4th day is a Striker Zones post ending with the Telegram CTA.
-  3. Every 3rd day is a poster day — logged here; Canva generation happens in an assisted
-     session (this headless job has no Canva access). Attach one with --poster-image PATH.
-
 Run manually to test:
-    python daily_post.py                       # generate + post today's topic
-    python daily_post.py --dry-run             # generate + print only, do NOT post
-    python daily_post.py --poster-image p.png  # post today's text with a poster image attached
+    python daily_post.py                    # generate + post today's topic/rules
+    python daily_post.py --dry-run          # generate + print only, do NOT post
+    python daily_post.py --force-striker    # test the Striker Zones branch regardless of date
+    python daily_post.py --force-poster     # test the poster branch regardless of date
 """
 import argparse
 import datetime
+import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -29,6 +49,8 @@ import requests
 import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
+
+from render_poster import compute_illustrative_levels, render_poster, render_striker_poster
 
 # Windows consoles default to cp1252; make emoji/curly-quote output safe.
 try:
@@ -38,21 +60,14 @@ except Exception:
 
 HERE = Path(__file__).resolve().parent
 AGENT_DIR = HERE.parent
+REPO_ROOT = AGENT_DIR.parent.parent
+POST_LOG_PATH = HERE / "metrics" / "post_log.jsonl"
 GRAPH_API_BASE = "https://graph.facebook.com/v21.0"
 MODEL = "claude-sonnet-5"
 
-# Duty 2/3 cadence (see ../playbook/posting-duties.md). Deterministic by date so ratios hold.
-STRIKER_EVERY = 4   # 1 in 4 posts is a Striker Zones post
-POSTER_EVERY = 3    # 1 in 3 posts carries a poster
-STRIKER_TELEGRAM_CTA = "https://t.me/strikerzonesadmin_bot"
-
-
-def is_striker_day(d: datetime.date) -> bool:
-    return d.toordinal() % STRIKER_EVERY == 0
-
-
-def is_poster_day(d: datetime.date) -> bool:
-    return d.toordinal() % POSTER_EVERY == 0
+STRIKER_ZONES_CTA_LINK = "https://t.me/strikerzonesadmin_bot"
+STRIKER_ZONE_EVERY_N_DAYS = 4   # rule 2: 1 out of every 4 posts
+POSTER_EVERY_N_DAYS = 2        # rule 3: 1 out of every 2 posts (bumped from 3, see docstring)
 
 
 def load_context() -> str:
@@ -67,38 +82,52 @@ def load_context() -> str:
     return f"{persona}\n\n---\n\n{playbook}\n\n---\n\n{engine}\n\n---\n\n{topics_block}"
 
 
-def todays_topic(d: datetime.date) -> str:
-    cfg = yaml.safe_load((AGENT_DIR / "config" / "daily_topics.yaml").read_text(encoding="utf-8"))
-    if is_striker_day(d):
-        pool = cfg["striker_zones_angles"]
-    else:
-        pool = cfg["topics"]
+def day_index() -> int:
+    return datetime.date.today().toordinal()
+
+
+def is_striker_zone_day(force: bool = False) -> bool:
+    return force or day_index() % STRIKER_ZONE_EVERY_N_DAYS == 0
+
+
+def is_poster_day(force: bool = False) -> bool:
+    return force or day_index() % POSTER_EVERY_N_DAYS == 0
+
+
+def todays_topic(striker_zone_day: bool) -> str:
+    filename = "striker_zones_topics.yaml" if striker_zone_day else "daily_topics.yaml"
+    pool = yaml.safe_load((AGENT_DIR / "config" / filename).read_text(encoding="utf-8"))["topics"]
     # deterministic rotation by date so the whole list cycles before repeating
-    return pool[d.toordinal() % len(pool)]
+    idx = day_index() % len(pool)
+    return pool[idx]
 
 
-def generate_post(topic: str, striker: bool) -> str:
+def generate_post(topic: str, striker_zone_day: bool) -> str:
     client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    if striker:
-        cta_rule = (
-            "This is a STRIKER ZONES post. After the trading lesson lands, close by inviting the "
-            "reader into the Striker Zones trading community and include this exact link on its "
-            f"own line: {STRIKER_TELEGRAM_CTA}\n"
-            "The invite must be value-first and low-pressure (a community of traders working on "
-            "the same discipline) — NO profit promises, income claims, 'signals', or scarcity."
+
+    if striker_zone_day:
+        instruction = (
+            f'Write ONE ready-to-publish Facebook post about: "{topic}".\n\n'
+            "This is a Striker Zones promotional post — the body should teach the zone-based "
+            "trading concept genuinely (not a bare ad), then transition naturally into Striker "
+            "Zones as where readers can see this in practice. The FINAL line of the post MUST be "
+            "a call to action that invites the reader to join Striker Zones and includes this "
+            f"exact link, verbatim, with no changes: {STRIKER_ZONES_CTA_LINK}\n\n"
+            "Output ONLY the final post text exactly as it should appear on Facebook — no "
+            "framework label, no emotion line, no notes, no preamble, and no surrounding quotes. "
+            "Follow the copywriting engine's pre-publish checklist and the persona's voice and "
+            "scope, except that this post's CTA is explicitly promotional by design (Striker "
+            "Zones) rather than the usual soft engagement CTA."
         )
     else:
-        cta_rule = (
-            "End with a natural engagement CTA (a question or soft ask to comment/save), never a "
-            "hard sales pitch and no external links."
+        instruction = (
+            f'Write ONE ready-to-publish Facebook post about: "{topic}".\n\n'
+            "Output ONLY the final post text exactly as it should appear on Facebook — no framework "
+            "label, no emotion line, no notes, no preamble, and no surrounding quotes. Follow the "
+            "copywriting engine's pre-publish checklist and the persona's voice and scope. End with a "
+            "natural engagement CTA (a question or soft ask to comment/save), never a hard sales pitch."
         )
-    instruction = (
-        f'Write ONE ready-to-publish Facebook post about: "{topic}".\n\n'
-        "Output ONLY the final post text exactly as it should appear on Facebook — no framework "
-        "label, no emotion line, no notes, no preamble, and no surrounding quotes. Follow the "
-        "copywriting engine's pre-publish checklist and the persona's voice and scope. "
-        + cta_rule
-    )
+
     resp = client.messages.create(
         model=MODEL,
         max_tokens=1200,
@@ -108,33 +137,149 @@ def generate_post(topic: str, striker: bool) -> str:
     return "".join(b.text for b in resp.content if b.type == "text").strip()
 
 
-def publish(text: str, image_path: str | None = None) -> str:
+def generate_poster_slots(topic: str, post_text: str) -> dict:
+    """Ask Claude to split the already-written post into the poster's four text slots, per the
+    locked style spec in ../../design/poster-style-guide.md."""
+    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    instruction = (
+        f'This Facebook post (topic: "{topic}") needs a companion poster graphic. Extract these '
+        "four slots from it and respond with ONLY a JSON object, no other text:\n\n"
+        f'"""\n{post_text}\n"""\n\n'
+        '{\n'
+        '  "top_label": "a short one-line context tag, <=40 chars",\n'
+        '  "headline": "the hook line, punchy, <=70 chars",\n'
+        '  "body_lines": ["1-2 short supporting lines, each <=90 chars"],\n'
+        '  "footer": "the closing CTA/question line, <=90 chars"\n'
+        "}"
+    )
+    resp = client.messages.create(
+        model=MODEL,
+        max_tokens=400,
+        messages=[{"role": "user", "content": instruction}],
+    )
+    raw = "".join(b.text for b in resp.content if b.type == "text").strip()
+    raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    return json.loads(raw)
+
+
+def generate_poster(topic: str, post_text: str) -> Path | None:
+    """Rule 3: render a poster locally with Pillow (see render_poster.py) and return its file
+    path. No Canva account/API involved — Canva's Autofill/Brand Template API requires a Canva
+    Enterprise plan, which this account doesn't have (see agents/design/poster-style-guide.md)."""
+    try:
+        slots = generate_poster_slots(topic, post_text)
+    except Exception as e:  # malformed JSON from the model, etc. — never let a poster kill the post
+        print(f"[blue-hulk] Could not derive poster slots, skipping poster: {e}")
+        return None
+
+    out_path = HERE / "drafts" / f"poster-{day_index()}.png"
+    try:
+        render_poster(
+            slots["top_label"],
+            slots["headline"],
+            slots.get("body_lines", []),
+            slots["footer"],
+            out_path,
+            seed=day_index(),
+        )
+    except Exception as e:
+        print(f"[blue-hulk] Poster render failed, skipping poster: {e}")
+        return None
+    return out_path
+
+
+def generate_striker_zone_poster() -> Path | None:
+    """When a poster day (rule 3) coincides with a Striker Zones day (rule 2), use the
+    dedicated poster style that mirrors the real Striker Zones 2.1 Pro TradingView indicator
+    (light theme, teal entry/SL risk box, orange/green TP labels) instead of the generic dark
+    poster. Levels are always synthetic/illustrative (compute_illustrative_levels) — never a
+    real live price."""
+    levels = compute_illustrative_levels(day_index())
+    out_path = HERE / "drafts" / f"poster-{day_index()}.png"
+    try:
+        render_striker_poster(
+            levels["symbol_label"], levels["entry"], levels["sl"],
+            levels["tp1"], levels["tp2"], levels["tp3"], levels["decimals"],
+            out_path, seed=day_index(),
+        )
+    except Exception as e:
+        print(f"[blue-hulk] Striker Zones poster render failed, skipping poster: {e}")
+        return None
+    return out_path
+
+
+def publish_text(text: str) -> str:
     page_id = os.environ["FB_PAGE_ID"]
     token = os.environ["FB_PAGE_ACCESS_TOKEN"]
-    if image_path:
-        # Photo post — the poster (duty 3) rides along as the image, caption carries the text.
-        with open(image_path, "rb") as fh:
-            r = requests.post(
-                f"{GRAPH_API_BASE}/{page_id}/photos",
-                data={"caption": text, "access_token": token},
-                files={"source": fh},
-                timeout=60,
-            )
-    else:
-        r = requests.post(
-            f"{GRAPH_API_BASE}/{page_id}/feed",
-            data={"message": text, "access_token": token},
-            timeout=30,
-        )
+    r = requests.post(
+        f"{GRAPH_API_BASE}/{page_id}/feed",
+        data={"message": text, "access_token": token},
+        timeout=30,
+    )
     if not r.ok:
         sys.exit(f"Publish failed: {r.status_code} {r.text}")
     return r.json()["id"]
 
 
+def publish_photo(text: str, image_path: Path) -> str:
+    page_id = os.environ["FB_PAGE_ID"]
+    token = os.environ["FB_PAGE_ACCESS_TOKEN"]
+    with open(image_path, "rb") as f:
+        r = requests.post(
+            f"{GRAPH_API_BASE}/{page_id}/photos",
+            data={"caption": text, "access_token": token},
+            files={"source": f},
+            timeout=60,
+        )
+    if not r.ok:
+        sys.exit(f"Publish (photo) failed: {r.status_code} {r.text}")
+    return r.json()["id"]
+
+
+def log_publish(post_id: str, striker: bool, poster: bool, topic: str) -> None:
+    """Append this publish to metrics/post_log.jsonl and push it — the metrics-collect
+    workflow reads this log to know which post IDs to fetch engagement numbers for. A logging
+    failure must never fail the run; the post already went out successfully."""
+    entry = {
+        "date": datetime.date.today().isoformat(),
+        "day_index": day_index(),
+        "post_id": post_id,
+        "platform": "facebook",
+        "striker": striker,
+        "poster": poster,
+        "topic": topic,
+    }
+    try:
+        POST_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(POST_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+
+        branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        subprocess.run(["git", "add", str(POST_LOG_PATH)], cwd=REPO_ROOT, check=True)
+        commit = subprocess.run(
+            ["git", "commit", "-m", f"blue-hulk: log post {post_id} (day {day_index()})"],
+            cwd=REPO_ROOT, capture_output=True, text=True,
+        )
+        if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
+            raise RuntimeError(f"git commit failed: {commit.stdout}\n{commit.stderr}")
+        if commit.returncode == 0:
+            subprocess.run(["git", "push", "origin", branch], cwd=REPO_ROOT, check=True)
+    except Exception as e:
+        print(f"[blue-hulk] NOTE: could not log post to metrics/post_log.jsonl: {e}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="Generate and print, do not post")
-    parser.add_argument("--poster-image", help="Path to a poster image to attach (duty 3)")
+    parser.add_argument(
+        "--force-striker", action="store_true", help="Force today's post onto the Striker Zones branch"
+    )
+    parser.add_argument(
+        "--force-poster", action="store_true", help="Force today's post onto the poster branch"
+    )
     args = parser.parse_args()
 
     load_dotenv(HERE / ".env")  # local convenience; real env vars (Actions secrets) take precedence
@@ -143,27 +288,36 @@ def main() -> None:
     if missing:
         sys.exit(f"Missing required env var(s): {', '.join(missing)}")
 
-    today = datetime.date.today()
-    striker = is_striker_day(today)
-    poster_day = is_poster_day(today)
-    print(f"[blue-hulk] {today} | striker_zones_day={striker} | poster_day={poster_day}")
+    striker = is_striker_zone_day(args.force_striker)
+    poster = is_poster_day(args.force_poster)
 
-    topic = todays_topic(today)
+    topic = todays_topic(striker)
+    print(f"[blue-hulk] day_index={day_index()} striker_zone_day={striker} poster_day={poster}")
     print(f"[blue-hulk] topic: {topic}")
+
     text = generate_post(topic, striker)
     print("[blue-hulk] generated post:\n" + "-" * 48 + f"\n{text}\n" + "-" * 48)
 
-    if poster_day and not args.poster_image:
-        # Duty 3: headless job can't reach Canva. Flag it so the poster is produced in-session.
-        print("[blue-hulk] NOTE: today is a poster day — generate a Canva poster in an assisted "
-              "session (see ../playbook/posting-duties.md), or re-run with --poster-image PATH.")
+    if striker and STRIKER_ZONES_CTA_LINK not in text:
+        # Safety net: the model must include the exact CTA link on Striker Zones days.
+        text = text.rstrip() + f"\n\nJoin Striker Zones: {STRIKER_ZONES_CTA_LINK}"
+        print("[blue-hulk] NOTE: CTA link was missing from the generated text; appended it.")
+
+    image_path = None
+    if poster:
+        image_path = generate_striker_zone_poster() if striker else generate_poster(topic, text)
+        if not image_path:
+            print("[blue-hulk] NOTE: today is a poster day (1-in-3) but poster generation failed — posting text-only.")
 
     if args.dry_run:
-        print("[blue-hulk] --dry-run: not posting.")
+        print(f"[blue-hulk] --dry-run: not posting. would_attach_poster={bool(image_path)}")
+        if image_path:
+            print(f"[blue-hulk] poster saved at: {image_path.resolve()}")
         return
 
-    post_id = publish(text, image_path=args.poster_image)
-    print(f"[blue-hulk] published{' with poster' if args.poster_image else ''}. post id: {post_id}")
+    post_id = publish_photo(text, image_path) if image_path else publish_text(text)
+    print(f"[blue-hulk] published{' (with poster)' if image_path else ''}. post id: {post_id}")
+    log_publish(post_id, striker, bool(image_path), topic)
 
 
 if __name__ == "__main__":

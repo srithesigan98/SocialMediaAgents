@@ -86,9 +86,9 @@ growth signal found).
 
 - **Charts/screenshots are the native default** — a TradingView-style chart or trade screenshot
   reads as real; designed carousels read as ads.
-- **Canva posters** (shared capability — `../../design/poster-style-guide.md`) are the
-  differentiator on top: use for the numbered-recap posts and quotable story lines, roughly 1-2
-  posts per week, not every post.
+- **Posters** (rendered locally with Pillow, not Canva — `../../design/poster-style-guide.md` for
+  the locked style) are the differentiator on top, used for numbered-recap posts and quotable
+  story lines. Bumped from 1-in-3 to 1-in-2 posts on 2026-08-10 — see "Performance review" below.
 - Video remains the biggest production investment across every large creator studied; when Blue
   Hulk's operator is ready for video, the text frameworks here double as scripts.
 
@@ -106,3 +106,119 @@ growth signal found).
 Tens-to-low-hundreds of reactions per post is *normal* even for big pages in this niche.
 Optimize for: consistency, comment-thread depth, follower growth over months, and the 1-in-5
 Malaysian posts building a distinct local moat no US page can copy.
+
+## Performance review — 2026-08-10
+
+Triggered by the same operator review that produced Hulk's performance review (see
+`../../hulk/playbook/content-playbook.md` for the full data-driven analysis over there). The
+honest finding for Blue Hulk specifically: **there is no on-platform engagement data to analyze
+yet.** `metrics/history.jsonl` has never been created because `FB_PAGE_ACCESS_TOKEN` is missing
+the `pages_read_engagement` permission — every `collect_metrics.py` run since 2026-08-01 has
+hit `(#10) This endpoint requires the 'pages_read_engagement' permission`. 9 posts have published
+successfully (post_log.jsonl proves that), but none of their likes/comments/shares have ever been
+readable. Fixing that permission is the actual highest-priority item before anything on this page
+can become a locally-validated decision rather than an external-research-based bet.
+
+**What changed anyway, on external evidence (Aug 2026 research):**
+- Facebook brands cut posting volume ~22% industry-wide in 2026, now averaging ~1.3 posts/day —
+  Blue Hulk's existing 1x/day already matches this; **not changing cadence.**
+- Text-only and static-image posts are losing algorithmic distribution priority; carousels and
+  educational-format visual posts are favored. Blue Hulk's poster pipeline (Pillow, already
+  working — see daily_post.py) was underused at 1-in-3 days given this. Bumped to 1-in-2.
+
+**Explicitly flagged as a bet, not a result:** unlike Hulk's reweighting (backed by this account's
+own measured views/likes/replies), this poster-frequency change rests entirely on external
+research because Blue Hulk has zero internal signal to check it against. Once
+`pages_read_engagement` is fixed and a few weeks of real likes/comments/shares data exist, redo
+this section properly — compare poster vs. text-only posts head to head on this account's own
+numbers, the same way Hulk's framework table above does, and adjust from there.
+
+## Performance review — 2026-08-17 (loop iteration 1)
+
+First weekly firing of the review Routine (see `../../hulk/playbook/content-playbook.md` for the
+Hulk side, which has real data to act on). Blue Hulk: `metrics/history.jsonl` still doesn't exist
+— `pages_read_engagement` is still missing from `FB_PAGE_ACCESS_TOKEN`. 10 posts logged
+(post_log.jsonl), zero readable engagement. Nothing to analyze; the 2026-08-10 bet (poster
+cadence 1-in-3 → 1-in-2) carries forward unchanged. This permission fix remains the single
+highest-leverage next step for this agent — every future loop iteration repeats this same "no
+data" note until it's done.
+
+## Performance review — 2026-08-17 (loop iteration 2)
+
+Second weekly firing. `metrics/history.jsonl` still doesn't exist — `pages_read_engagement` is
+still missing from `FB_PAGE_ACCESS_TOKEN`. 12 posts logged in `post_log.jsonl` now (up from 10),
+zero of them with readable engagement. Nothing to analyze; the deferred head-to-head
+poster-vs-text-only comparison stays deferred, and the 2026-08-10 bet (poster cadence 1-in-3 →
+1-in-2, based on external research rather than this account's own data) carries forward
+unchanged. Same highest-leverage next step as last time: fix the Facebook permission.
+
+## Performance review — 2026-08-24 (loop iteration 3)
+
+Third weekly firing. `metrics/history.jsonl` still doesn't exist — `pages_read_engagement` is
+still missing from `FB_PAGE_ACCESS_TOKEN`. 24 posts logged in `post_log.jsonl` now (up from 12 —
+this account's own posting cadence hasn't stopped, unlike Hulk's), zero of them with readable
+engagement. Still nothing to analyze; the deferred poster-vs-text-only comparison stays deferred,
+and the 2026-08-10 external-evidence bet carries forward unchanged. Same highest-leverage next
+step as every iteration so far: fix the Facebook permission — this is now 3 weeks and 24 posts of
+completely unreadable engagement data.
+
+## Performance review — 2026-08-31 (loop iteration 4)
+
+Fourth weekly firing, and the situation for this agent got materially worse since last time. Two
+separate, independent problems now:
+
+1. **`pages_read_engagement` still missing** (the original gap) — `metrics/history.jsonl` still
+   doesn't exist, so even posts that publish successfully have unreadable engagement.
+2. **New: `FB_PAGE_ACCESS_TOKEN` itself was invalidated starting 2026-08-25** —
+   `OAuthException` code 190, subcode 460 ("session invalidated because the user changed their
+   password or Facebook changed the session for security reasons"). This blocks *posting*, not
+   just metrics. Confirmed via the daily workflow's run history: every scheduled run since
+   2026-08-25 fails at the publish step, with the post fully generated but never sent. `post_log`
+   is stuck at 24 posts (last one 2026-08-24, day 739852) — 7 consecutive missed days as of this
+   firing.
+
+Nothing to analyze — there were zero opportunities to even generate new data this week, let alone
+readable engagement on it. The deferred poster-vs-text-only comparison and the 2026-08-10
+external-evidence bet both stay exactly as they were; there's nothing new to fold in either
+direction.
+
+**Two things need fixing, not one:** a fresh Facebook Page access token (unblocks posting), and
+that token should include `pages_read_engagement` when it's regenerated (unblocks metrics) — doing
+both in the same pass avoids a second round-trip. Both are user-side steps in the Meta Graph API
+Explorer; flagged directly to the operator when the posting failure was first found
+(2026-08-26 dashboard-refresh turn).
+
+## Performance review — 2026-09-07 (loop iteration 5)
+
+Fifth weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 14
+consecutive missed days, confirmed via the daily workflow's run history (each run still fails at
+the publish step with a fully-generated post that never sends).
+
+Nothing to analyze — there were again zero opportunities to generate new data this week. The
+deferred poster-vs-text-only comparison and the 2026-08-10 external-evidence bet both carry
+forward unchanged for the third iteration in a row.
+
+**Same fix needed as last time, still outstanding:** regenerate `FB_PAGE_ACCESS_TOKEN` with
+`pages_read_engagement` included, so posting and metrics are unblocked in one pass. This has been
+flagged to the operator; no new action taken this iteration since the underlying blocker hasn't
+moved.
+
+## Performance review — 2026-09-14 (loop iteration 6)
+
+Sixth weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 21
+consecutive missed days, confirmed via the daily workflow's run history (each run still fails at
+the publish step with a fully-generated post that never sends).
+
+Nothing to analyze — zero new data again this week. The deferred poster-vs-text-only comparison
+and the 2026-08-10 external-evidence bet both carry forward unchanged for the fourth iteration in
+a row.
+
+**Same fix needed as every iteration so far, still outstanding:** regenerate
+`FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
+new action taken this iteration since the underlying blocker hasn't moved.
