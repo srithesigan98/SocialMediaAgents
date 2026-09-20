@@ -1,0 +1,34 @@
+name: Hulk (Senang Homes) daily post
+
+# Posts one Senang Homes listing to Threads + Instagram, twice a day (matching
+# agents/hulk/profiles/senang-homes/profile.yaml's schedule.times: 09:30 and 19:30 Malaysia time).
+# Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+
+on:
+  schedule:
+    # Cron is always UTC. Malaysia is UTC+8, so 09:30 MYT = 01:30 UTC and 19:30 MYT = 11:30 UTC.
+    # GitHub may start scheduled runs a few minutes late under load — that's normal.
+    - cron: "30 1 * * *"
+    - cron: "30 11 * * *"
+  workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Generate and post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SENANG_THREADS_USER_ID: ${{ secrets.SENANG_THREADS_USER_ID }}
+          SENANG_THREADS_ACCESS_TOKEN: ${{ secrets.SENANG_THREADS_ACCESS_TOKEN }}
+          SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
+          SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
+          # Only needed if listings.source is gsheet in profile.yaml — omit if using the bundled csv.
+          SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
+        run: python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes

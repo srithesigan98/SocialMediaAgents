@@ -14,6 +14,7 @@ plus the ability to generate poster/graphic versions of posts via Canva.
 | [`playbook/copywriting-engine.md`](./playbook/copywriting-engine.md) | Emotional-copywriting training layer: drivers, conversion frameworks (PAS/BAB/open loops/Schwartz), CTA mechanics, human-touch rules, and the ≈1-in-5 Malaysian layer. Binding on every draft. |
 | [`../design/poster-style-guide.md`](../design/poster-style-guide.md) | Canva poster-generation workflow and locked visual style spec. |
 | [`playbook/content-playbook.md`](./playbook/content-playbook.md) | Distilled actionable playbook: hooks, storytelling frameworks, weekly content mix, CTA ladder, visuals, expectations. |
+| [`playbook/posting-duties.md`](./playbook/posting-duties.md) | Standing duties: daily post, Striker Zones + Telegram CTA every 4th post, poster every 3rd post — with the deterministic rotation calendar and the poster-execution options. |
 | [`templates/`](./templates) | Seven fill-in-the-blank templates: loss-confession→lesson (flagship), numbered-step recap, origin-story arc, third-party war story, market-condition read, milestone arc (gated ⚠️), and the Malaysian post voice. |
 | [`config/topics.yaml`](./config/topics.yaml) | Topic allow/deny guard (mirrors Hulk's, plus research-driven denials: broker-recruitment content, scarcity mechanics). |
 | [`scripts/`](./scripts) | Draft generation (`generate_draft.py`) and Facebook Page posting (`post_to_facebook.py`, text + image). Credential setup guide in [`scripts/README.md`](./scripts/README.md). |
