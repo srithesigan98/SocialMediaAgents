@@ -423,3 +423,35 @@ access token (plus its missing `pages_read_engagement` scope). Continuing to doc
 state rather than manufacturing a tweak.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-09-21.
+
+## Performance review — 2026-09-21 (loop iteration 7)
+
+Seventh weekly firing. `post_log.jsonl` for this profile (tansri-millionaires) is still exactly 54
+posts, days 739827–739845 — scheduled posting has now been off for five consecutive weekly cycles
+(iterations 3 through 7). No new post exists to compare against the iteration 6 baseline; every
+framework's `n` is unchanged and the ranking order is identical, only reach continuing to drift on
+the same posts as every prior iteration.
+
+Note: since last week's firing, PR #23 merged a substantial restructuring — Hulk now supports
+multiple brand profiles (this account is `tansri-millionaires`; a new `senang-homes` real-estate
+profile was added alongside it with its own daily workflow, `hulk-senang-homes-daily.yml`). This
+does not affect the data or decisions tracked here: `daily_post.py`, `FRAMEWORK_WEIGHTS`, and
+`ROTATION` are structurally unchanged, `hulk-daily.yml` (the tansri-millionaires schedule this
+loop tracks) remains stopped exactly as before, and `post_log.jsonl`/`history.jsonl` are unaffected.
+Flagging the restructuring here only so it's not mistaken for silence in a future diff.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as the last four
+iterations — zero new post data for this profile, nothing to promote or demote.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist — `pages_read_engagement` remains
+missing. `post_log.jsonl` is still stuck at 24 posts, last one 2026-08-24 (day 739852) — now 28
+consecutive missed days, confirmed via the daily workflow's run history (still failing at the
+publish step on the invalidated `FB_PAGE_ACCESS_TOKEN`). Nothing new to fold into either the
+deferred poster-vs-text-only comparison or the 2026-08-10 external-evidence bet.
+
+**Standing blocker, unchanged for the fifth iteration running:** this loop remains blocked on the
+same two user-side fixes — Hulk's (tansri-millionaires) scheduled posting staying off, and Blue
+Hulk's invalidated access token (plus its missing `pages_read_engagement` scope). Continuing to
+document the blocked state rather than manufacturing a tweak.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-09-28.

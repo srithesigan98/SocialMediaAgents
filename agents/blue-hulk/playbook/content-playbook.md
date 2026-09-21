@@ -222,3 +222,29 @@ a row.
 **Same fix needed as every iteration so far, still outstanding:** regenerate
 `FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
 new action taken this iteration since the underlying blocker hasn't moved.
+
+## Performance review — 2026-09-21 (loop iteration 7)
+
+Seventh weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 28
+consecutive missed days, confirmed via the daily workflow's run history (each run still fails at
+the publish step with a fully-generated post that never sends).
+
+Nothing to analyze — zero new data again this week. The deferred poster-vs-text-only comparison
+and the 2026-08-10 external-evidence bet both carry forward unchanged for the fifth iteration in
+a row.
+
+(Unrelated note, for context: PR #23 merged this week was a long-running feature branch that
+mainly added a new `senang-homes` real-estate profile under the Hulk agent. It also brought in a
+few older, already-written Blue Hulk doc/config commits that had been sitting on that branch
+unmerged (`README.md`, `persona/blue-hulk-system-prompt.md`, `config/topics.yaml`,
+`playbook/posting-duties.md` — poster cadence bumped 1-in-3 → 1-in-2, Striker Zones CTA formalized
+at 1-in-4). None of this is new operational behavior — it predates this loop's iterations and has
+no effect while posting is blocked on the token — and `daily_post.py`'s actual logic, plus
+`post_log.jsonl`/would-be `history.jsonl`, are unaffected.)
+
+**Same fix needed as every iteration so far, still outstanding:** regenerate
+`FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
+new action taken this iteration since the underlying blocker hasn't moved.
