@@ -143,15 +143,39 @@ def load_listings(cfg: dict) -> list[dict]:
         raise SystemExit(f"Unknown listings.source: {source!r} (use csv, xlsx or gsheet)")
 
     colmap = {field: _norm(header) for field, header in lc["columns"].items() if header}
+    photo_overrides = _load_photo_overrides(cfg)
     listings = []
     for row in raw:
         lookup = {_norm(k): (v or "").strip() for k, v in row.items() if k}
         item = {field: lookup.get(header, "") for field, header in colmap.items()}
         if not item.get("ref"):
-            continue  # a row with no ref can't be tracked or linked
+            # No unique-id column in this sheet (common for agents whose listings are just
+            # project name + unit type rows) — derive a stable one from title + size instead
+            # of dropping the row. Stable across re-reads regardless of row order, as long as
+            # title/size don't change.
+            basis = f"{item.get('title', '')}-{item.get('size', '')}".strip("-")
+            if not basis:
+                continue  # nothing in the row to key off of at all
+            item["ref"] = re.sub(r"[^a-z0-9]+", "-", basis.lower()).strip("-")
+        if not item.get("photo_url"):
+            item["photo_url"] = photo_overrides.get(item.get("title", ""), "")
         item["_raw"] = row
         listings.append(item)
     return listings
+
+
+def _load_photo_overrides(cfg: dict) -> dict[str, str]:
+    """title -> photo_url. Optional agents/hulk/profiles/<profile>/photo_overrides.csv, for
+    sheets with no Image URL column of their own — one row per project, found by searching for
+    the building's real photo. Missing file means no overrides, not an error."""
+    path = cfg["_dir"] / "photo_overrides.csv"
+    if not path.exists():
+        return {}
+    rows = _rows_from_csv_text(path.read_text(encoding="utf-8-sig"))
+    return {
+        r["title"].strip(): r["photo_url"].strip()
+        for r in rows if r.get("title", "").strip() and r.get("photo_url", "").strip()
+    }
 
 
 def find_listing(cfg: dict, ref: str) -> dict:

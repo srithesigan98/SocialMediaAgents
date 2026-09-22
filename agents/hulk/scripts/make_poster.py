@@ -108,7 +108,12 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     margin = int(width * 0.08)
     inner = width - margin * 2
 
-    photo = fetch_photo(listing.get("image_url", ""), (width, height))
+    # photo_url is a raw source photo to composite into the poster (e.g. found via search).
+    # image_url means a finished, ready-to-post image and is handled upstream in daily_posts.py's
+    # poster_url(), which uses it as-is instead of calling render() at all — the two are
+    # deliberately different fields so a bare source photo never gets posted without the price/
+    # location/CTA text overlay.
+    photo = fetch_photo(listing.get("photo_url", "") or listing.get("image_url", ""), (width, height))
     base = photo if photo else Image.new("RGB", (width, height), bg)
     img = Image.alpha_composite(base.convert("RGBA"), scrim((width, height))).convert("RGB")
     draw = ImageDraw.Draw(img)

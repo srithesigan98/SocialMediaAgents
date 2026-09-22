@@ -13,8 +13,10 @@ the reply bot knows which posts to watch.
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 import traceback
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -23,8 +25,39 @@ import generate_property_post as drafter
 import make_poster
 import platforms
 
+# Windows consoles default to cp1252; make emoji/curly-quote output (e.g. the WhatsApp CTA) safe.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
 
-def poster_url(cfg: dict, listing: dict) -> str | None:
+
+def commit_poster(path: Path) -> None:
+    """Commit + push the rendered poster before we try to attach it, so its
+    raw.githubusercontent.com URL is actually live by the time Meta's servers fetch it. Mirrors
+    the pattern in agents/blue-hulk/scripts/daily_post.py's log_publish(). A failure here must
+    never kill the run — it just means posting falls back to text-only, same as an unset
+    poster.public_base_url."""
+    repo_root = common.AGENT_DIR.parent.parent
+    try:
+        branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=repo_root, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        subprocess.run(["git", "add", str(path)], cwd=repo_root, check=True)
+        commit = subprocess.run(
+            ["git", "commit", "-m", f"hulk: poster for {path.stem}"],
+            cwd=repo_root, capture_output=True, text=True,
+        )
+        if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
+            raise RuntimeError(f"git commit failed: {commit.stdout}\n{commit.stderr}")
+        if commit.returncode == 0:
+            subprocess.run(["git", "push", "origin", branch], cwd=repo_root, check=True)
+    except Exception as e:
+        print(f"  ! could not commit poster to git: {e}")
+
+
+def poster_url(cfg: dict, listing: dict, dry_run: bool = False) -> str | None:
     """Resolve the image for this post, per the profile's poster.mode.
 
     Meta requires a PUBLICLY reachable URL for both Threads and Instagram images — neither API
@@ -45,7 +78,9 @@ def poster_url(cfg: dict, listing: dict) -> str | None:
             return sheet_url  # a hand-made image in the sheet always wins over a generated one
         path = make_poster.render(cfg, listing)
         url = make_poster.public_url(cfg, path)
-        if not url:
+        if url and not dry_run:
+            commit_poster(path)  # must be live at the URL before we try to attach it
+        elif not url:
             print(f"  ! poster rendered to {path} but poster.public_base_url is empty, "
                   f"so it can't be attached — posting text-only.")
         return url
@@ -92,7 +127,7 @@ def main() -> None:
     for listing in listings:
         print(f"\n=== {listing['ref']} — {listing.get('title', '')} ===")
         try:
-            image_url = poster_url(cfg, listing)
+            image_url = poster_url(cfg, listing, dry_run=args.dry_run)
         except Exception:
             failures += 1
             print(f"  ! poster generation failed:\n{traceback.format_exc()}")

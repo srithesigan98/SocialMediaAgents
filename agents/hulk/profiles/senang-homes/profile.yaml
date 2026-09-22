@@ -21,33 +21,43 @@ listings:
   #   csv    — local .csv file
   #   xlsx   — local Excel file (needs `openpyxl`)
   #   gsheet — a Google Sheet published/exported as CSV (see scripts/README.md)
-  source: csv
-  path: listings.example.csv
-  # For source: gsheet — put the export URL here instead of path, or set
-  # LISTINGS_URL in .env to keep a private sheet URL out of git.
+  source: gsheet
+  # The real listings sheet: 23 new-development projects, one row per unit type (93 rows).
+  # Set via SENANG_HOMES_LISTINGS_URL in .env / GitHub secrets instead of hardcoding here, so
+  # the URL doesn't sit in git (common.load_config reads that env var automatically).
   url: ""
-  # Only rows whose `status` column matches one of these are eligible to post.
+  # Only rows whose `status` column matches one of these are eligible to post. This sheet has
+  # no status column, so `status` is left unmapped below — common.active_listings() treats a
+  # blank status as always-active, so every row is eligible by default.
   active_statuses: [active, available, "for sale", "for rent"]
 
   # Map YOUR spreadsheet's column headers to the fields the agent uses.
   # Left = agent field, right = your column header (case-insensitive, spaces ok).
   # Any field you don't have: leave the value empty and the agent writes around it.
   columns:
-    ref: "Ref"                    # unique id per property — REQUIRED (used for dedupe + WhatsApp link)
-    title: "Title"
-    type: "Type"                  # condo / terrace / land / shoplot
-    deal: "Deal"                  # sale / rent
+    ref: ""                       # this sheet has no unique-id column — common.py derives a
+                                   # stable one from title + size instead (see load_listings()).
+    title: "Project Name"
+    type: "Land Title"            # e.g. Residential (Condominium)
+    deal: ""                      # every row here is a developer new-project sale; no column for it
     location: "Location"
-    price: "Price"
+    price: "Nett Price"
     size: "Size (sqft)"
-    bedrooms: "Bedrooms"
-    bathrooms: "Bathrooms"
+    bedrooms: ""                  # not a clean separate column — see unit_type below
+    bathrooms: ""
+    unit_type: "Unit Type"        # e.g. "Type A (3+1R 3+1B)" — room counts when present, in prose
+    developer: "Developer"
+    completion_status: "Completion Status"   # e.g. Under-con / Completed
+    expected_vp: "Expected VP (Q/Y)"         # vacant possession date estimate
     tenure: "Tenure"              # freehold / leasehold
-    monthly_instalment: "Monthly Instalment"
-    rental_yield: "Rental Yield"
-    highlight: "Highlight"        # the one line that makes this property interesting
-    image_url: "Image URL"        # publicly reachable image, optional
-    status: "Status"
+    monthly_instalment: "Monthly Installment 3.8%"
+    loan_amount: "90% Loan Amount"
+    monthly_rental_estimate: "Monthly Rental (Est./Current)"
+    rental_yield: ""              # no yield % column, only a rental estimate above
+    legal_fees_freebies: "Legal Fees & Freebies"
+    highlight: "Rebates & Discount"   # the one line that makes this property interesting
+    image_url: "Image URL"        # publicly reachable image, optional — not in this sheet yet
+    status: ""
 
 poster:
   # Every post gets an image. Instagram REQUIRES one; on Threads it lifts reach.
@@ -63,9 +73,9 @@ poster:
   muted: "#8FA39B"
   brand: "SENANG HOMES"
   size: [1080, 1350]        # 4:5 — the tallest ratio Instagram shows in full
-  # Posters render to scripts/posters/. Threads and Instagram both need a PUBLIC url,
-  # so a local file must be uploaded somewhere reachable first — see scripts/README.md.
-  public_base_url: ""
+  # Posters render to scripts/posters/, which daily_posts.py commits + pushes (see
+  # commit_poster()) so Threads/Instagram can fetch it from here — see scripts/README.md.
+  public_base_url: "https://raw.githubusercontent.com/srithesigan98/SocialMediaAgents/main/agents/hulk/scripts/posters"
 
 schedule:
   # Two posts a day, as asked. Times are local to the machine running the scheduler.
@@ -79,9 +89,11 @@ schedule:
 whatsapp:
   # Your closing number in full international format, digits only (no +, no spaces).
   # e.g. Malaysia 011-1234 5678 -> 601112345678
-  number: "60000000000"
-  # Prefilled message. {ref} and {title} are substituted per property.
-  prefill: "Hi, I saw your post about {title} ({ref}). Can you send me the full details?"
+  number: "60169559848"
+  # Prefilled message — states buying intent explicitly so the agent knows why they're texting.
+  # {ref} and {title} are substituted per property; {ref} is left out here since it's now an
+  # auto-generated slug (e.g. "the-lantern-bangsar-570"), not a customer-facing code.
+  prefill: "Hi, I'm interested to buy {title}. Can you send me the full pricing and details?"
   # The CTA line appended verbatim to every post. {link} is the wa.me URL.
   cta_template: "Full details + floor plan on WhatsApp 👉 {link}"
 

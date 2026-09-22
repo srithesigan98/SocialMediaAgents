@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 import time
 import traceback
 
@@ -28,6 +29,12 @@ from dotenv import load_dotenv
 import common
 import platforms
 from common import HERE
+
+# Windows consoles default to cp1252; make emoji/curly-quote output (e.g. the WhatsApp CTA) safe.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
 
 
 def _matches(keyword: str, text: str) -> bool:
