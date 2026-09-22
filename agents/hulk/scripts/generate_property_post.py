@@ -19,6 +19,12 @@ from dotenv import load_dotenv
 
 import common
 
+# Windows consoles default to cp1252; make emoji/curly-quote output (e.g. the WhatsApp CTA) safe.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 MODEL = "claude-sonnet-5"
 LIMITS = {"threads": 500, "instagram": 800}
 
@@ -38,9 +44,13 @@ def listing_block(listing: dict) -> str:
     labels = {
         "ref": "Reference", "title": "Title", "type": "Property type", "deal": "Sale or rent",
         "location": "Location", "price": "Price", "size": "Size (sqft)",
-        "bedrooms": "Bedrooms", "bathrooms": "Bathrooms", "tenure": "Tenure",
-        "monthly_instalment": "Monthly instalment", "rental_yield": "Rental yield",
-        "highlight": "Highlight", "status": "Status",
+        "bedrooms": "Bedrooms", "bathrooms": "Bathrooms", "unit_type": "Unit type",
+        "tenure": "Tenure", "developer": "Developer",
+        "completion_status": "Completion status", "expected_vp": "Expected vacant possession",
+        "monthly_instalment": "Monthly instalment", "loan_amount": "Loan amount (90%)",
+        "monthly_rental_estimate": "Estimated monthly rental", "rental_yield": "Rental yield",
+        "legal_fees_freebies": "Legal fees / freebies", "highlight": "Highlight",
+        "status": "Status",
     }
     lines = [f"- {label}: {listing[key]}" for key, label in labels.items() if listing.get(key)]
     return "\n".join(lines)

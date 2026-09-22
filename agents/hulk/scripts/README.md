@@ -279,9 +279,9 @@ Instagram **cannot publish a caption without an image**, so every property post 
 
 | mode | Image source | Works in cron? |
 |---|---|---|
-| `auto` | `make_poster.py` renders a PNG from the listing row (brand colours, price, specs, WhatsApp band) | ✅ yes |
+| `auto` | `make_poster.py` composites the listing's photo with location/price/highlight text and a "comment the property name" CTA — deliberately minimal, no WhatsApp link or ref number on the image itself | ✅ yes |
 | `canva` | Generated in a Claude session via the Canva connector, then pasted into the sheet's `Image URL` | ❌ needs a session |
-| `sheet` | Whatever is in the row's `Image URL` (your own photography) | ✅ yes |
+| `sheet` | Whatever is in the row's `Image URL` (your own photography) — posted **as-is**, bypassing `make_poster.py` entirely | ✅ yes |
 | `none` | No image — Threads only, Instagram gets skipped | ✅ yes |
 
 ```bash
@@ -289,8 +289,22 @@ python make_poster.py HE-001                    # -> posters/senang-homes-HE-001
 python make_poster.py HE-001 --open-size 1080x1080
 ```
 
-In `auto` mode, a row that already has an `Image URL` always wins — a real photo beats a
-generated poster, so the generator only fills gaps.
+**Two different "image" fields, on purpose:**
+- `image_url` (mapped from your sheet's Image URL column, if you have one) means a **finished,
+  ready-to-post image** — `daily_posts.py` uses it as-is on Threads/Instagram and never calls
+  `make_poster.py` at all.
+- `photo_url` means a **raw source photo to composite into the poster** — `make_poster.py` uses
+  it as the background for the price/location/highlight text overlay. This is what a plain
+  building photo (e.g. found via search) should feed, so it never gets posted bare with no price
+  or CTA on it.
+
+If your sheet has no Image URL column at all (common for project-listing sheets), add
+`agents/hulk/profiles/<profile>/photo_overrides.csv` with two columns, `title,photo_url` — one
+row per project name, pointing at a real photo (the developer's own marketing render is the most
+reliable source). `common.load_listings()` fills `photo_url` from this file automatically when
+a row's title matches, so every unit-type row under the same project shares one photo without
+repeating the URL per row. In `auto` mode, a row that already has a real `Image URL` from the
+sheet always wins over this override — the override only fills gaps.
 
 ### Hosting posters (required before they can be attached)
 

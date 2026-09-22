@@ -12,6 +12,9 @@ on:
     - cron: "30 11 * * *"
   workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
 
+permissions:
+  contents: write   # needed to commit/push each post's poster PNG (see commit_poster())
+
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -22,6 +25,10 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Configure git identity (for poster commits)
+        run: |
+          git config user.name "hulk-bot"
+          git config user.email "hulk-bot@users.noreply.github.com"
       - name: Generate and post
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -29,6 +36,5 @@ jobs:
           SENANG_THREADS_ACCESS_TOKEN: ${{ secrets.SENANG_THREADS_ACCESS_TOKEN }}
           SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
-          # Only needed if listings.source is gsheet in profile.yaml — omit if using the bundled csv.
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
         run: python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes

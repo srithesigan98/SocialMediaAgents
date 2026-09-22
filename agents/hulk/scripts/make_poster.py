@@ -63,6 +63,21 @@ def group_digits(value: str) -> str:
     return re.sub(r"\d{4,}", lambda m: f"{int(m.group()):,}", value)
 
 
+_GENERIC_TITLE_WORDS = {"the", "one", "m", "a", "an"}
+
+
+def trigger_word(title: str) -> str:
+    """Pick a short, on-theme comment-trigger word from the project name (e.g. "The Lantern
+    Bangsar" -> "LANTERN") — a themed keyword tied to the property reads as more specific/
+    memorable than a generic instruction, and pairs with reply_bot.py's WhatsApp auto-reply the
+    same way a comment-triggered auto-DM would. Skips generic leading words/bare numbers."""
+    words = [w.strip("()'\".,") for w in title.split() if w.strip("()'\".,")]
+    for w in words:
+        if w.lower() not in _GENERIC_TITLE_WORDS and not w.isdigit():
+            return w.upper()
+    return words[0].upper() if words else "THIS"
+
+
 def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
     """Cover-crop the listing photo to the poster canvas. None on no URL / fetch / decode error
     — a bad or missing photo must never break the daily posting run.
@@ -108,7 +123,12 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     margin = int(width * 0.08)
     inner = width - margin * 2
 
-    photo = fetch_photo(listing.get("image_url", ""), (width, height))
+    # photo_url is a raw source photo to composite into the poster (e.g. found via search).
+    # image_url means a finished, ready-to-post image and is handled upstream in daily_posts.py's
+    # poster_url(), which uses it as-is instead of calling render() at all — the two are
+    # deliberately different fields so a bare source photo never gets posted without the price/
+    # location/CTA text overlay.
+    photo = fetch_photo(listing.get("photo_url", "") or listing.get("image_url", ""), (width, height))
     base = photo if photo else Image.new("RGB", (width, height), bg)
     img = Image.alpha_composite(base.convert("RGBA"), scrim((width, height))).convert("RGB")
     draw = ImageDraw.Draw(img)
@@ -140,8 +160,13 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
         for i, line in enumerate(lines):
             blocks.append((line, highlight_font, fg, 10 if i < len(lines) - 1 else 30))
 
-    cta_font = fit_font(draw, "COMMENT THE PROPERTY NAME BELOW", BOLD, inner, 42)
-    blocks.append(("COMMENT THE PROPERTY NAME BELOW", cta_font, accent, 0))
+    # Themed comment-trigger word (not the full title) — the pattern validated by watching
+    # @therumahouse's reels: a specific keyword tied to the property reads as more particular/
+    # memorable than a generic "comment the name" instruction, and doubles as the trigger phrase
+    # reply_bot.py's commenters would use.
+    cta_text = f'COMMENT "{trigger_word(listing.get("title", ""))}" FOR FULL DETAILS'
+    cta_font = fit_font(draw, cta_text, BOLD, inner, 42)
+    blocks.append((cta_text, cta_font, accent, 0))
 
     content_height = sum(f.size + gap for _, f, _, gap in blocks)
     y = max(margin + 70, height - margin - content_height)
