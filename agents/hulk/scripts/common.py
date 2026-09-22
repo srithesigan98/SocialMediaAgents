@@ -143,7 +143,7 @@ def load_listings(cfg: dict) -> list[dict]:
         raise SystemExit(f"Unknown listings.source: {source!r} (use csv, xlsx or gsheet)")
 
     colmap = {field: _norm(header) for field, header in lc["columns"].items() if header}
-    photo_overrides = _load_photo_overrides(cfg)
+    photo_overrides = load_photo_overrides(cfg)
     listings = []
     for row in raw:
         lookup = {_norm(k): (v or "").strip() for k, v in row.items() if k}
@@ -164,7 +164,70 @@ def load_listings(cfg: dict) -> list[dict]:
     return listings
 
 
-def _load_photo_overrides(cfg: dict) -> dict[str, str]:
+# --------------------------------------------------------------------------- area analytics
+
+def _parse_number(text: str) -> float | None:
+    """'RM729,600.00' -> 729600.0, '570' -> 570.0, '3,550 - 3,856' (a size range) -> 3703.0
+    (the average — naively stripping non-digits from a range would concatenate both numbers
+    into one bogus value). None if nothing numeric is in there."""
+    text = text or ""
+    range_match = re.match(r"\s*([\d,]+(?:\.\d+)?)\s*-\s*([\d,]+(?:\.\d+)?)\s*$", text)
+    if range_match:
+        lo, hi = (float(g.replace(",", "")) for g in range_match.groups())
+        return (lo + hi) / 2
+    digits = re.sub(r"[^\d.]", "", text)
+    return float(digits) if digits else None
+
+
+def price_per_sqft(listing: dict) -> float | None:
+    price, size = _parse_number(listing.get("price", "")), _parse_number(listing.get("size", ""))
+    return price / size if price and size else None
+
+
+# Trailing tokens too generic to be a "neighborhood" on their own — e.g. "Jalan Kiara 5, Mont
+# Kiara, KL" should group as "Mont Kiara", not the city-wide catch-all "KL".
+_GENERIC_CITY_TOKENS = {"kl", "kuala lumpur", "kuala lumpur city"}
+
+
+def _extract_area(location: str) -> str:
+    parts = [p.strip() for p in location.split(",") if p.strip()]
+    while parts and re.sub(r"\(.*?\)", "", parts[-1]).strip().lower() in _GENERIC_CITY_TOKENS:
+        parts.pop()
+    return parts[-1] if parts else location
+
+
+def area_stats(cfg: dict) -> list[dict]:
+    """Group active listings by area — the most specific comma-separated part of `location`
+    after dropping generic trailing city tokens (see _extract_area) — and compute price/sqft
+    stats per area — the data behind "which area fits your budget/lifestyle" comparison posts,
+    as opposed to a single-listing post. Areas with no listing that has both a parseable price
+    AND size are skipped — an average of zero real data points would just be a made-up number
+    in the caption.
+    """
+    by_area: dict[str, list[dict]] = {}
+    for item in active_listings(cfg):
+        area = _extract_area(item.get("location", ""))
+        if area:
+            by_area.setdefault(area, []).append(item)
+
+    stats = []
+    for area, items in by_area.items():
+        psf_values = [p for p in (price_per_sqft(i) for i in items) if p]
+        if not psf_values:
+            continue
+        stats.append({
+            "area": area,
+            "listing_count": len(items),
+            "project_count": len(set(i["title"] for i in items)),
+            "avg_price_per_sqft": round(sum(psf_values) / len(psf_values)),
+            "min_price_per_sqft": round(min(psf_values)),
+            "max_price_per_sqft": round(max(psf_values)),
+            "projects": sorted(set(i["title"] for i in items)),
+        })
+    return stats
+
+
+def load_photo_overrides(cfg: dict) -> dict[str, str]:
     """title -> photo_url. Optional agents/hulk/profiles/<profile>/photo_overrides.csv, for
     sheets with no Image URL column of their own — one row per project, found by searching for
     the building's real photo. Missing file means no overrides, not an error."""

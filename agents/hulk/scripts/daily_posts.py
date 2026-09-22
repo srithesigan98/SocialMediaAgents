@@ -21,6 +21,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 import common
+import generate_area_post as area_drafter
 import generate_property_post as drafter
 import make_poster
 import platforms
@@ -98,6 +99,55 @@ def publish(cfg: dict, platform: str, text: str, image_url: str | None) -> str |
     raise ValueError(platform)
 
 
+def run_area_post(cfg: dict, platform_list: list[str], args) -> None:
+    """Draft + publish an area/market-comparison carousel — real building photos from 2+ areas
+    side by side (carousels get meaningfully more engagement than a single image), with the
+    price/sqft + lifestyle analysis as the shared caption. See generate_area_post.py."""
+    stats = area_drafter.pick_areas(cfg, args.area_count)
+    if not stats:
+        print("Nothing to post: not enough listings with parseable price/sqft data per area.")
+        return
+    print("Comparing: " + ", ".join(s["area"] for s in stats))
+
+    photos = area_drafter.area_photo_urls(cfg, stats)
+    if len(photos) < 2:
+        print(f"  ! only {len(photos)} area photo(s) found (need >=2 for a carousel) — skipping.")
+        return
+
+    failures = 0
+    for platform in platform_list:
+        try:
+            text = area_drafter.generate(stats, platform, cfg)
+        except Exception as exc:
+            failures += 1
+            print(f"  ! draft failed for {platform}: {exc}")
+            continue
+
+        print(f"--- {platform} ({len(text)} chars, {len(photos)} photos) ---\n{text}\n")
+        area_drafter.save_draft(cfg, text, stats, platform)
+
+        if args.dry_run:
+            continue
+        if not args.yes and input(f"Publish carousel to {platform}? [y/N] ").strip().lower() != "y":
+            print("  skipped.")
+            continue
+        try:
+            if platform == "threads":
+                post_id = platforms.threads_publish_carousel(cfg, text, photos)
+            elif platform == "instagram":
+                post_id = platforms.instagram_publish_carousel(cfg, text, photos)
+            else:
+                raise ValueError(platform)
+        except Exception:
+            failures += 1
+            print(f"  ! publish to {platform} failed:\n{traceback.format_exc()}")
+            continue
+        print(f"  published carousel to {platform}: {post_id}")
+
+    if failures:
+        sys.exit(f"\nFinished with {failures} failure(s) — see above.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", default=None, help="Hulk profile (default: HULK_PROFILE or senang-homes)")
@@ -105,6 +155,9 @@ def main() -> None:
     parser.add_argument("--platform", action="append", choices=["threads", "instagram"],
                         help="Override configured platforms; repeatable")
     parser.add_argument("--framework", default=None)
+    parser.add_argument("--area-post", action="store_true",
+                        help="Post an area/market price-per-sqft comparison (carousel) instead of single listings")
+    parser.add_argument("--area-count", type=int, default=2, help="How many areas to compare, with --area-post")
     parser.add_argument("--dry-run", action="store_true", help="Draft and print only")
     parser.add_argument("--yes", action="store_true", help="Publish without confirmation (cron)")
     args = parser.parse_args()
@@ -115,9 +168,13 @@ def main() -> None:
         sys.exit(f"Unknown framework. Options: {', '.join(drafter.frameworks(cfg))}")
     print(f"Profile: {cfg['_profile']} ({cfg.get('name', '')})")
 
-    count = args.count if args.count is not None else int(cfg["schedule"]["posts_per_day"])
     platform_list = args.platform or cfg["schedule"]["platforms"]
 
+    if args.area_post:
+        run_area_post(cfg, platform_list, args)
+        return
+
+    count = args.count if args.count is not None else int(cfg["schedule"]["posts_per_day"])
     listings = common.pick_listings(cfg, count)
     if not listings:
         print("Nothing to post: every active listing is still inside its cooldown window.")

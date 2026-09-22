@@ -54,6 +54,36 @@ def threads_publish(cfg: dict, text: str, image_url: str | None = None) -> str:
     ))["id"]
 
 
+def threads_publish_carousel(cfg: dict, text: str, image_urls: list[str]) -> str:
+    """Multi-image carousel post — 2-10 images, per Meta's carousel container flow: each image
+    is created as its own item first (is_carousel_item=true), then combined into one CAROUSEL
+    container carrying the caption, then published like any other post."""
+    if not 2 <= len(image_urls) <= 10:
+        raise ValueError(f"Threads carousels need 2-10 images, got {len(image_urls)}")
+    user_id, token = _threads(cfg)
+
+    item_ids = []
+    for url in image_urls:
+        item_ids.append(_check(requests.post(
+            f"{THREADS_BASE}/{user_id}/threads",
+            params={"media_type": "IMAGE", "image_url": url, "is_carousel_item": "true",
+                    "access_token": token},
+            timeout=30,
+        ))["id"])
+
+    carousel_id = _check(requests.post(
+        f"{THREADS_BASE}/{user_id}/threads",
+        params={"media_type": "CAROUSEL", "children": ",".join(item_ids), "text": text,
+                "access_token": token},
+        timeout=30,
+    ))["id"]
+    time.sleep(PUBLISH_DELAY_SECONDS)
+    return _check(requests.post(
+        f"{THREADS_BASE}/{user_id}/threads_publish",
+        params={"creation_id": carousel_id, "access_token": token}, timeout=30,
+    ))["id"]
+
+
 def threads_replies(cfg: dict, media_id: str) -> list[dict]:
     """Top-level replies on one of our posts. Needs threads_manage_replies."""
     _, token = _threads(cfg)
@@ -99,6 +129,34 @@ def instagram_publish(cfg: dict, caption: str, image_url: str) -> str:
     return _check(requests.post(
         f"{IG_BASE}/{user_id}/media_publish",
         params={"creation_id": creation_id, "access_token": token}, timeout=60,
+    ))["id"]
+
+
+def instagram_publish_carousel(cfg: dict, caption: str, image_urls: list[str]) -> str:
+    """Multi-image carousel post — 2-10 images. Same container-then-publish flow as
+    instagram_publish, except each image is created as a captionless carousel item first."""
+    if not 2 <= len(image_urls) <= 10:
+        raise ValueError(f"Instagram carousels need 2-10 images, got {len(image_urls)}")
+    user_id, token = _ig(cfg)
+
+    item_ids = []
+    for url in image_urls:
+        item_ids.append(_check(requests.post(
+            f"{IG_BASE}/{user_id}/media",
+            params={"image_url": url, "is_carousel_item": "true", "access_token": token},
+            timeout=60,
+        ))["id"])
+
+    carousel_id = _check(requests.post(
+        f"{IG_BASE}/{user_id}/media",
+        params={"media_type": "CAROUSEL", "children": ",".join(item_ids), "caption": caption,
+                "access_token": token},
+        timeout=60,
+    ))["id"]
+    time.sleep(PUBLISH_DELAY_SECONDS)
+    return _check(requests.post(
+        f"{IG_BASE}/{user_id}/media_publish",
+        params={"creation_id": carousel_id, "access_token": token}, timeout=60,
     ))["id"]
 
 
