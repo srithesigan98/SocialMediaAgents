@@ -87,6 +87,8 @@ def generate(stats: list[dict], platform: str, cfg: dict) -> str:
         messages=[{"role": "user", "content": build_prompt(stats, platform, cta)}],
     )
     text = "".join(b.text for b in response.content if b.type == "text").strip()
+    if len(text) < 100:
+        raise ValueError(f"Draft came back too short ({len(text)} chars) — treating as a bad response.")
 
     # Always appended in code — see generate_property_post.py's generate() for why.
     text = f"{text}\n\n{cta}"

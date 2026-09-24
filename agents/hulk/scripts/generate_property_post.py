@@ -96,6 +96,11 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
         messages=[{"role": "user", "content": build_prompt(cfg, listing, framework, platform, cta)}],
     )
     text = "".join(block.text for block in response.content if block.type == "text").strip()
+    if len(text) < 100:
+        # A rare model failure mode: most of the answer lands in a discarded thinking block
+        # instead of the text block, leaving almost nothing real here. Publishing this would
+        # ship a caption that's just the CTA with no property content.
+        raise ValueError(f"Draft came back too short ({len(text)} chars) — treating as a bad response.")
 
     # Always appended in code, never left to the model — asking it to reproduce the CTA
     # "unchanged" was unreliable: it would sometimes write its own close paraphrase of the
