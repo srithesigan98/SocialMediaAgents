@@ -34,17 +34,20 @@ try:
 except ImportError:  # pragma: no cover
     raise SystemExit("make_poster.py needs Pillow — run: pip install Pillow")
 
-# DejaVu ships with Pillow, so this works on a bare container with no system fonts installed.
-FONT_DIR = Path(ImageFont.__file__).resolve().parent / "fonts"
-BOLD = FONT_DIR / "DejaVuSans-Bold.ttf"
-REGULAR = FONT_DIR / "DejaVuSans.ttf"
+# Bundled here rather than assumed to ship with Pillow — pip wheels don't actually include
+# DejaVu (confirmed: Path(ImageFont.__file__).parent / "fonts" doesn't exist on a plain pip
+# install), so font() was silently falling back to PIL's ~10px default bitmap font for every
+# size requested, on every poster ever rendered. Bundling real files here works identically on
+# any machine or CI runner regardless of what fonts happen to be installed system-wide.
+FONT_DIR = Path(__file__).resolve().parent / "fonts"
+BOLD = FONT_DIR / "OpenSans-Bold.ttf"
+REGULAR = FONT_DIR / "OpenSans-Regular.ttf"
 
 
 def font(path: Path, size: int) -> ImageFont.FreeTypeFont:
-    try:
-        return ImageFont.truetype(str(path), size)
-    except OSError:  # no bundled fonts — fall back to the built-in bitmap font
-        return ImageFont.load_default()
+    # No silent fallback to PIL's tiny fixed-size default bitmap font — that failure mode is
+    # exactly what shipped every poster so far with near-invisible text (see FONT_DIR above).
+    return ImageFont.truetype(str(path), size)
 
 
 def fit_font(draw, text: str, path: Path, max_width: int, start: int, minimum: int = 28):
@@ -76,6 +79,41 @@ def trigger_word(title: str) -> str:
         if w.lower() not in _GENERIC_TITLE_WORDS and not w.isdigit():
             return w.upper()
     return words[0].upper() if words else "THIS"
+
+
+def hook_text(listing: dict) -> str:
+    """The single boldest, shortest fact for this listing — what someone scrolling past should
+    get without reading the caption. Prefers the rental-gap number (the same figure the caption
+    leads with) since it's the most concrete "why this matters" fact; falls back to the
+    highlight, then the price, then just the location, so there's always something to show."""
+    instalment = common.parse_number(listing.get("monthly_instalment", ""))
+    rental = common.parse_number(listing.get("monthly_rental_estimate", ""))
+    if instalment and rental and rental > instalment:
+        return f"RM{round(rental - instalment):,} monthly rental gap"
+    if listing.get("highlight"):
+        return listing["highlight"]
+    price = common.parse_number(listing.get("price", ""))
+    if price:
+        return f"From RM{price:,.0f}"
+    return listing.get("location", "")
+
+
+def fit_hook(draw, text: str, max_width: int, max_height: int, start: int, minimum: int = 48):
+    """Largest bold size (down from `start`) whose word-wrapped text fits both max_width and
+    max_height, capped at 4 lines — the hook is meant to dominate the poster, so it should be
+    as big as the available space allows, not just legible."""
+    size = start
+    while size > minimum:
+        f = font(BOLD, size)
+        chars = max(6, int(max_width / draw.textlength("M", font=f)))
+        lines = textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False)[:4]
+        line_h = size + 14
+        if len(lines) * line_h <= max_height and all(draw.textlength(l, font=f) <= max_width for l in lines):
+            return lines, f
+        size -= 6
+    f = font(BOLD, minimum)
+    chars = max(6, int(max_width / draw.textlength("M", font=f)))
+    return textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False)[:4], f
 
 
 def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
@@ -139,6 +177,8 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     # Deliberately minimal and deliberately missing the title/ref/WhatsApp link — the title is
     # withheld on purpose (the CTA asks viewers to comment it), and everything else lives in the
     # caption instead, which already gets every field via generate_property_post.py.
+    # Built before the hook headline below so the hook can be sized to whatever vertical space
+    # is actually left, instead of risking an overlap with a fixed position.
     blocks: list[tuple] = []  # (text, font, fill, gap_after)
 
     loc_size = "   ·   ".join(filter(None, [
@@ -153,10 +193,13 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
         price_text = f"{group_digits(monthly)}/mo"
         blocks.append((price_text, fit_font(draw, price_text, BOLD, inner, int(width * 0.1)), fg, 22))
 
-    if listing.get("highlight"):
+    hook = hook_text(listing)
+    # Skip re-showing the highlight down here if it's already the big hook headline above —
+    # same fact shouldn't appear twice.
+    if listing.get("highlight") and listing["highlight"] != hook:
         highlight_font = font(REGULAR, 34)
         chars = max(18, int(inner / draw.textlength("n", font=highlight_font)))
-        lines = textwrap.wrap(listing["highlight"], width=chars)[:3]
+        lines = textwrap.wrap(listing["highlight"], width=chars, break_long_words=False, break_on_hyphens=False)[:3]
         for i, line in enumerate(lines):
             blocks.append((line, highlight_font, fg, 10 if i < len(lines) - 1 else 30))
 
@@ -169,7 +212,29 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     blocks.append((cta_text, cta_font, accent, 0))
 
     content_height = sum(f.size + gap for _, f, _, gap in blocks)
-    y = max(margin + 70, height - margin - content_height)
+    bottom_y = max(margin + 70, height - margin - content_height)
+
+    # The big hook headline — the one fact someone should get without reading the caption.
+    # Sized to fill whatever vertical space is left between the brand tag and the detail stack
+    # below, so it's the dominant visual element on the poster, not just another text line.
+    hook_top = margin + 90
+    hook_bottom = bottom_y - 30
+    if hook_bottom > hook_top:
+        hook_lines, hook_font_obj = fit_hook(
+            draw, hook.upper(), inner, hook_bottom - hook_top, start=int(width * 0.15)
+        )
+        line_h = hook_font_obj.size + 14
+        band_height = len(hook_lines) * line_h + 40
+        band_top = hook_top + max(0, (hook_bottom - hook_top - band_height) // 2)
+        band = Image.new("RGBA", (width, band_height), (0, 0, 0, 165))
+        img.paste(band, (0, band_top), band)
+        draw = ImageDraw.Draw(img)
+        y = band_top + 20
+        for line in hook_lines:
+            draw.text((margin, y), line, font=hook_font_obj, fill=fg)
+            y += line_h
+
+    y = bottom_y
     for text, f, fill, gap in blocks:
         draw.text((margin, y), text, font=f, fill=fill)
         y += f.size + gap

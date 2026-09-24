@@ -166,7 +166,7 @@ def load_listings(cfg: dict) -> list[dict]:
 
 # --------------------------------------------------------------------------- area analytics
 
-def _parse_number(text: str) -> float | None:
+def parse_number(text: str) -> float | None:
     """'RM729,600.00' -> 729600.0, '570' -> 570.0, '3,550 - 3,856' (a size range) -> 3703.0
     (the average — naively stripping non-digits from a range would concatenate both numbers
     into one bogus value). None if nothing numeric is in there."""
@@ -180,7 +180,7 @@ def _parse_number(text: str) -> float | None:
 
 
 def price_per_sqft(listing: dict) -> float | None:
-    price, size = _parse_number(listing.get("price", "")), _parse_number(listing.get("size", ""))
+    price, size = parse_number(listing.get("price", "")), parse_number(listing.get("size", ""))
     return price / size if price and size else None
 
 
