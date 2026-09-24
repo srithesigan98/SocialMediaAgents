@@ -62,10 +62,12 @@ def build_prompt(cfg: dict, listing: dict, framework: str | None, platform: str,
         "",
         listing_block(listing),
         "",
-        f"Platform: {platform}. Hard limit: {LIMITS[platform]} characters including the CTA line.",
+        f"Platform: {platform}. Hard limit: {LIMITS[platform]} characters, of which the last "
+        f"{len(cta)} are reserved for a closing WhatsApp CTA that gets appended automatically "
+        f"after your text — so budget for at most {LIMITS[platform] - len(cta) - 2} characters.",
         "",
-        "End the post with this exact CTA line, unchanged, on its own line:",
-        cta,
+        "Do NOT write a WhatsApp link, phone number, or any closing call-to-action yourself — "
+        "just end after your last content sentence.",
     ]
     if framework:
         template = (templates_dir(cfg) / f"{framework}.md").read_text(encoding="utf-8")
@@ -95,9 +97,10 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
     )
     text = "".join(block.text for block in response.content if block.type == "text").strip()
 
-    # The CTA carries the closing link — never ship a post without it.
-    if cta not in text:
-        text = f"{text}\n\n{cta}"
+    # Always appended in code, never left to the model — asking it to reproduce the CTA
+    # "unchanged" was unreliable: it would sometimes write its own close paraphrase of the
+    # link instead, which didn't string-match and produced a duplicated CTA in the final post.
+    text = f"{text}\n\n{cta}"
     if len(text) > LIMITS[platform]:
         raise ValueError(f"Draft is {len(text)} chars, over the {platform} limit of {LIMITS[platform]}.")
     return text

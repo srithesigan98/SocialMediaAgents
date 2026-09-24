@@ -60,10 +60,12 @@ def build_prompt(stats: list[dict], platform: str, cta: str) -> str:
         "",
         area_block(stats),
         "",
-        f"Platform: {platform}. Hard limit: {drafter.LIMITS[platform]} characters including the CTA line.",
+        f"Platform: {platform}. Hard limit: {drafter.LIMITS[platform]} characters, of which the "
+        f"last {len(cta)} are reserved for a closing WhatsApp CTA appended automatically after "
+        f"your text — budget for at most {drafter.LIMITS[platform] - len(cta) - 2} characters.",
         "",
-        "End the post with this exact CTA line, unchanged, on its own line:",
-        cta,
+        "Do NOT write a WhatsApp link, phone number, or any closing call-to-action yourself — "
+        "just end after your last content sentence.",
     ]
     return "\n".join(parts)
 
@@ -86,8 +88,8 @@ def generate(stats: list[dict], platform: str, cfg: dict) -> str:
     )
     text = "".join(b.text for b in response.content if b.type == "text").strip()
 
-    if cta not in text:
-        text = f"{text}\n\n{cta}"
+    # Always appended in code — see generate_property_post.py's generate() for why.
+    text = f"{text}\n\n{cta}"
     if len(text) > drafter.LIMITS[platform]:
         raise ValueError(f"Draft is {len(text)} chars, over the {platform} limit of {drafter.LIMITS[platform]}.")
     return text
