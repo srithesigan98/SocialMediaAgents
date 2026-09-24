@@ -2,6 +2,8 @@ name: Hulk (Senang Homes) daily post
 
 # Posts one Senang Homes listing to Threads + Instagram, twice a day (matching
 # agents/hulk/profiles/senang-homes/profile.yaml's schedule.times: 09:30 and 19:30 Malaysia time).
+# Every Monday, the 09:00 MYT slot posts an area/market-comparison carousel instead (see the
+# `if` in the Generate and post step) — a different format so the feed isn't only single listings.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
 
 on:
@@ -10,6 +12,7 @@ on:
     # GitHub may start scheduled runs a few minutes late under load — that's normal.
     - cron: "30 1 * * *"
     - cron: "30 11 * * *"
+    - cron: "0 1 * * 1"    # 09:00 MYT Monday — area/market comparison carousel
   workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
 
 permissions:
@@ -37,4 +40,9 @@ jobs:
           SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
-        run: python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 1 * * 1" ]; then
+            python agents/hulk/scripts/daily_posts.py --profile senang-homes --area-post --area-count 2 --yes
+          else
+            python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes
+          fi

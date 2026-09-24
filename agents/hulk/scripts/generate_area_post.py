@@ -46,6 +46,8 @@ def area_block(stats: list[dict]) -> str:
 
 
 def build_prompt(stats: list[dict], platform: str, cta: str) -> str:
+    budget = drafter.LIMITS[platform] - len(cta) - 2
+    per_area = budget // (len(stats) + 1)  # +1 leaves room for a short shared intro line
     parts = [
         "Write one social post comparing these Kuala Lumpur areas by price-per-sqft, framed "
         "around how the price tier and area character translate into lifestyle — who each area "
@@ -55,17 +57,16 @@ def build_prompt(stats: list[dict], platform: str, cta: str) -> str:
         "Lumpur neighbourhoods (e.g. Bangsar's dining/nightlife scene, Mont Kiara's expat/"
         "international-school density, Seputeh's quieter established-residential feel) but never "
         "invent a specific amenity, distance, or fact that isn't in the data below or genuinely "
-        "well-known. Give every area roughly equal space and a complete lifestyle sentence — "
-        "budget your words so the LAST area doesn't get cut short to make room for the CTA.",
+        "well-known.",
         "",
         area_block(stats),
         "",
-        f"Platform: {platform}. Hard limit: {drafter.LIMITS[platform]} characters, of which the "
-        f"last {len(cta)} are reserved for a closing WhatsApp CTA appended automatically after "
-        f"your text — budget for at most {drafter.LIMITS[platform] - len(cta) - 2} characters.",
-        "",
-        "Do NOT write a WhatsApp link, phone number, or any closing call-to-action yourself — "
-        "just end after your last content sentence.",
+        f"Platform: {platform}. STRICT limit: {budget} characters total for your text (the CTA is "
+        f"appended separately, don't write one). Count your characters as you go. With "
+        f"{len(stats)} areas, budget about {per_area} characters per area plus a one-sentence "
+        f"intro — a post that runs over this limit gets rejected outright, so write short and "
+        f"plain rather than risk going over. Prefer trimming detail on the LAST area over cutting "
+        f"it entirely.",
     ]
     return "\n".join(parts)
 
@@ -79,13 +80,18 @@ def generate(stats: list[dict], platform: str, cfg: dict) -> str:
     number = re.sub(r"\D", "", str(cfg["whatsapp"]["number"]))
     cta = cfg["whatsapp"]["cta_template"].format(link=f"https://wa.me/{number}")
 
+    # See generate_property_post.py's generate() for why thinking is disabled here.
     client = Anthropic(api_key=api_key)
     response = client.messages.create(
         model=MODEL,
         max_tokens=800,
+        thinking={"type": "disabled"},
         system=persona,
         messages=[{"role": "user", "content": build_prompt(stats, platform, cta)}],
     )
+    if response.stop_reason == "max_tokens":
+        # See generate_property_post.py's generate() for why this check exists.
+        raise ValueError("Draft was cut off mid-generation (hit max_tokens) — treating as a bad response.")
     text = "".join(b.text for b in response.content if b.type == "text").strip()
     if len(text) < 100:
         raise ValueError(f"Draft came back too short ({len(text)} chars) — treating as a bad response.")

@@ -88,13 +88,21 @@ def generate(listing: dict, framework: str | None, platform: str, cfg: dict) -> 
     persona = common.profile_path(cfg, cfg["persona"]).read_text(encoding="utf-8")
     cta = common.cta_line(cfg, listing)
 
+    # Plain copywriting, not reasoning — extended thinking ate an unpredictable share of the
+    # token budget and caused mid-sentence truncation, so it's disabled here.
     client = Anthropic(api_key=api_key)
     response = client.messages.create(
         model=MODEL,
         max_tokens=800,
+        thinking={"type": "disabled"},
         system=persona,
         messages=[{"role": "user", "content": build_prompt(cfg, listing, framework, platform, cta)}],
     )
+    if response.stop_reason == "max_tokens":
+        # Extended thinking eats into the same token budget as the visible answer, so a run
+        # that thinks a lot can get cut off mid-sentence while still under the char limit —
+        # that slips past a length check, so check the API's own truncation signal instead.
+        raise ValueError("Draft was cut off mid-generation (hit max_tokens) — treating as a bad response.")
     text = "".join(block.text for block in response.content if block.type == "text").strip()
     if len(text) < 100:
         # A rare model failure mode: most of the answer lands in a discarded thinking block
