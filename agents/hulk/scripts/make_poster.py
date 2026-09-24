@@ -153,7 +153,9 @@ def scrim(size: tuple[int, int]) -> Image.Image:
     return overlay
 
 
-def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) -> Path:
+def _new_canvas(cfg: dict, photo_url: str, size=None):
+    """Photo (or brand-colour fallback) + scrim + brand tag — the base every poster starts
+    from, whether it's a single listing or one area of a market-comparison carousel."""
     pc = cfg.get("poster", {})
     width, height = size or tuple(pc.get("size", [1080, 1350]))
     bg, accent = pc.get("background", "#0E1A16"), pc.get("accent", "#14B87A")
@@ -161,18 +163,58 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     margin = int(width * 0.08)
     inner = width - margin * 2
 
-    # photo_url is a raw source photo to composite into the poster (e.g. found via search).
-    # image_url means a finished, ready-to-post image and is handled upstream in daily_posts.py's
-    # poster_url(), which uses it as-is instead of calling render() at all — the two are
-    # deliberately different fields so a bare source photo never gets posted without the price/
-    # location/CTA text overlay.
-    photo = fetch_photo(listing.get("photo_url", "") or listing.get("image_url", ""), (width, height))
+    photo = fetch_photo(photo_url, (width, height))
     base = photo if photo else Image.new("RGB", (width, height), bg)
     img = Image.alpha_composite(base.convert("RGBA"), scrim((width, height))).convert("RGB")
     draw = ImageDraw.Draw(img)
 
     brand = pc.get("brand", cfg.get("name", "")).upper()
     draw.text((margin, margin), brand, font=font(REGULAR, 30), fill=accent)
+
+    return img, draw, width, height, margin, inner, fg, accent
+
+
+def _compose_hook_and_stack(img, draw, width: int, height: int, margin: int, inner: int,
+                             fg: str, hook: str, blocks: list[tuple]) -> None:
+    """Draws the big hook headline — sized to fill whatever vertical space is left between the
+    brand tag and `blocks` — then the bottom detail stack itself. Shared by render() (single
+    listing) and render_area() (market-comparison carousel): same visual language, different
+    content feeding it."""
+    content_height = sum(f.size + gap for _, f, _, gap in blocks)
+    bottom_y = max(margin + 70, height - margin - content_height)
+
+    hook_top = margin + 90
+    hook_bottom = bottom_y - 30
+    if hook_bottom > hook_top and hook:
+        hook_lines, hook_font_obj = fit_hook(
+            draw, hook.upper(), inner, hook_bottom - hook_top, start=int(width * 0.15)
+        )
+        line_h = hook_font_obj.size + 14
+        band_height = len(hook_lines) * line_h + 40
+        band_top = hook_top + max(0, (hook_bottom - hook_top - band_height) // 2)
+        band = Image.new("RGBA", (width, band_height), (0, 0, 0, 165))
+        img.paste(band, (0, band_top), band)
+        draw = ImageDraw.Draw(img)
+        y = band_top + 20
+        for line in hook_lines:
+            draw.text((margin, y), line, font=hook_font_obj, fill=fg)
+            y += line_h
+
+    y = bottom_y
+    for text, f, fill, gap in blocks:
+        draw.text((margin, y), text, font=f, fill=fill)
+        y += f.size + gap
+
+
+def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) -> Path:
+    # photo_url is a raw source photo to composite into the poster (e.g. found via search).
+    # image_url means a finished, ready-to-post image and is handled upstream in daily_posts.py's
+    # poster_url(), which uses it as-is instead of calling render() at all — the two are
+    # deliberately different fields so a bare source photo never gets posted without the price/
+    # location/CTA text overlay.
+    img, draw, width, height, margin, inner, fg, accent = _new_canvas(
+        cfg, listing.get("photo_url", "") or listing.get("image_url", ""), size
+    )
 
     # Deliberately minimal and deliberately missing the title/ref/WhatsApp link — the title is
     # withheld on purpose (the CTA asks viewers to comment it), and everything else lives in the
@@ -211,35 +253,35 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     cta_font = fit_font(draw, cta_text, BOLD, inner, 42)
     blocks.append((cta_text, cta_font, accent, 0))
 
-    content_height = sum(f.size + gap for _, f, _, gap in blocks)
-    bottom_y = max(margin + 70, height - margin - content_height)
-
-    # The big hook headline — the one fact someone should get without reading the caption.
-    # Sized to fill whatever vertical space is left between the brand tag and the detail stack
-    # below, so it's the dominant visual element on the poster, not just another text line.
-    hook_top = margin + 90
-    hook_bottom = bottom_y - 30
-    if hook_bottom > hook_top:
-        hook_lines, hook_font_obj = fit_hook(
-            draw, hook.upper(), inner, hook_bottom - hook_top, start=int(width * 0.15)
-        )
-        line_h = hook_font_obj.size + 14
-        band_height = len(hook_lines) * line_h + 40
-        band_top = hook_top + max(0, (hook_bottom - hook_top - band_height) // 2)
-        band = Image.new("RGBA", (width, band_height), (0, 0, 0, 165))
-        img.paste(band, (0, band_top), band)
-        draw = ImageDraw.Draw(img)
-        y = band_top + 20
-        for line in hook_lines:
-            draw.text((margin, y), line, font=hook_font_obj, fill=fg)
-            y += line_h
-
-    y = bottom_y
-    for text, f, fill, gap in blocks:
-        draw.text((margin, y), text, font=f, fill=fill)
-        y += f.size + gap
+    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
 
     out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.png"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path, "PNG")
+    return out_path
+
+
+def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = None, size=None) -> Path:
+    """One area's slide in a market-comparison carousel — same visual language as render(), but
+    the hook is the area's price/sqft (the fact these posts are actually about) instead of a
+    listing's rental gap, and there's no per-listing comment-trigger CTA since a carousel slide
+    isn't tied to one specific unit."""
+    img, draw, width, height, margin, inner, fg, accent = _new_canvas(cfg, photo_url, size)
+
+    area_line = stat["area"].upper()
+    detail = (f"{stat['project_count']} project(s)   ·   "
+              f"RM{stat['min_price_per_sqft']:,}-{stat['max_price_per_sqft']:,}/sqft range")
+    blocks = [
+        (area_line, fit_font(draw, area_line, BOLD, inner, 46), fg, 20),
+        (detail, fit_font(draw, detail, REGULAR, inner, 32), fg, 0),
+    ]
+
+    hook = f"RM{stat['avg_price_per_sqft']:,}/sqft"
+    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
+
+    if out_path is None:
+        slug = re.sub(r"[^a-z0-9]+", "-", stat["area"].lower()).strip("-")
+        out_path = common.POSTERS_DIR / f"{cfg['_profile']}-area-{slug}.png"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(out_path, "PNG")
     return out_path

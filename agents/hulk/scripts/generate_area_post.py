@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 
 import common
 import generate_property_post as drafter  # reuses its LIMITS/HERE/DRAFTS_DIR conventions
+import make_poster
 
 # Windows consoles default to cp1252; make emoji/curly-quote output (e.g. the WhatsApp CTA) safe.
 try:
@@ -117,19 +118,17 @@ def pick_areas(cfg: dict, count: int) -> list[dict]:
     return [stats[round(i * step)] for i in range(count)]
 
 
-def area_photo_urls(cfg: dict, stats: list[dict]) -> list[str]:
-    """One representative photo per compared area (its first project with a photo), for a
-    carousel post — real building photos, not a generated poster, since the point of a
-    comparison post is showing the areas side by side, not one property's price overlay."""
+def area_posters(cfg: dict, stats: list[dict]) -> list[Path]:
+    """Render one composited poster per compared area (its first project with a photo) — the
+    big RM/sqft hook overlaid on a real building photo, same visual language as the
+    single-listing posters. Areas with no project photo available are skipped."""
     overrides = common.load_photo_overrides(cfg)
-    urls = []
+    paths = []
     for s in stats:
-        for project in s["projects"]:
-            url = overrides.get(project)
-            if url:
-                urls.append(url)
-                break
-    return urls
+        photo_url = next((overrides[p] for p in s["projects"] if p in overrides), None)
+        if photo_url:
+            paths.append(make_poster.render_area(cfg, s, photo_url))
+    return paths
 
 
 def save_draft(cfg: dict, text: str, stats: list[dict], platform: str) -> Path:
@@ -167,11 +166,12 @@ def main() -> None:
 
     text = generate(stats, args.platform, cfg)
     path = save_draft(cfg, text, stats, args.platform)
-    photos = area_photo_urls(cfg, stats)
+    posters = area_posters(cfg, stats)
 
     print(text)
     print(f"\nSaved to {path}")
-    print(f"Carousel photos ({len(photos)}): " + (", ".join(photos) if photos else "none found"))
+    print(f"Carousel posters ({len(posters)}): "
+          + (", ".join(str(p) for p in posters) if posters else "none found"))
 
 
 if __name__ == "__main__":

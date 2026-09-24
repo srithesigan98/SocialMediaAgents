@@ -109,9 +109,19 @@ def run_area_post(cfg: dict, platform_list: list[str], args) -> None:
         return
     print("Comparing: " + ", ".join(s["area"] for s in stats))
 
-    photos = area_drafter.area_photo_urls(cfg, stats)
+    poster_paths = area_drafter.area_posters(cfg, stats)
+    photos = []
+    for path in poster_paths:
+        url = make_poster.public_url(cfg, path)
+        if url:
+            if not args.dry_run:
+                commit_poster(path)  # must be live at the URL before we try to attach it
+            photos.append(url)
     if len(photos) < 2:
-        print(f"  ! only {len(photos)} area photo(s) found (need >=2 for a carousel) — skipping.")
+        if poster_paths and not photos:
+            print("  ! poster.public_base_url is empty, so area posters can't be attached — skipping.")
+        else:
+            print(f"  ! only {len(photos)} area photo(s) found (need >=2 for a carousel) — skipping.")
         return
 
     failures = 0
