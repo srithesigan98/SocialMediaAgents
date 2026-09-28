@@ -16,6 +16,21 @@ facts:   # given to the caption writer as the only allowed claims
   - 90% of units have an unblocked view of KL city and the TNB tower
   - Same landscape architect as TRX (Land Art)
 
+# Reels, posted in this order. Hosted as assets on the repo's "khaya-reels" GitHub release (too big
+# for git) — Meta fetches them by URL. Captions never state a starting price: the videos have
+# "FROM RM 785,000*" burned in, which differs from the sheet's nett prices.
+reel_base_url: https://github.com/srithesigan98/SocialMediaAgents/releases/download/khaya-reels
+reels:
+  - {file: Khaya_Unit_B_High_Motion.mp4, angle: "Unit B walkthrough — contemporary luxury interior"}
+  - {file: Khaya_Unit_A_Featured.mp4, angle: "Unit A featured tour"}
+  - {file: Khaya_Unit_C_High_Motion.mp4, angle: "Unit C walkthrough — Scandinavian zen interior"}
+  - {file: Khaya_Luxury_Reel_Voiceover_Music.mp4, angle: "Luxury overview of the showroom unit"}
+  - {file: Khaya_Unit_B_Tour.mp4, angle: "Full Unit B tour, room by room"}
+  - {file: Khaya_High_Motion_Viral_Reel.mp4, angle: "Fast-paced first look at Khaya"}
+  - {file: Khaya_Unit_C_Tour.mp4, angle: "Full Unit C tour, room by room"}
+  - {file: Khaya_Master_Highlight_Reel.mp4, angle: "Highlights: kitchen, master suite, spa bathroom"}
+  - {file: Khaya_Unit_A_Tour.mp4, angle: "Full Unit A tour, room by room"}
+
 slides:
   - photo: tower.jpg
     hook: Khaya Residences, Bangsar

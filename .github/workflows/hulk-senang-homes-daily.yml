@@ -41,10 +41,20 @@ jobs:
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
         run: |
+          cd agents/hulk/scripts
+          # Khaya Residences focus month (to 2026-10-28): every other post is Khaya — the morning
+          # slot alternates Khaya reels and unit posts, the evening slot rotates everything else.
+          KHAYA_UNTIL=2026-10-28
           if [ "${{ github.event.schedule }}" = "0 1 * * 1" ]; then
-            python agents/hulk/scripts/daily_posts.py --profile senang-homes --area-post --area-count 2 --yes
+            python daily_posts.py --profile senang-homes --area-post --area-count 2 --yes
+          elif [ "$(date -u +%F)" \< "$KHAYA_UNTIL" ] || [ "$(date -u +%F)" = "$KHAYA_UNTIL" ]; then
+            if [ "${{ github.event.schedule }}" = "30 1 * * *" ]; then
+              python campaign_post.py khaya --profile senang-homes --next --yes
+            else
+              python daily_posts.py --profile senang-homes --count 1 --exclude-project "Khaya Residences" --yes
+            fi
           else
-            python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes
+            python daily_posts.py --profile senang-homes --count 1 --yes
           fi
       - name: Save posting history
         # Runs even if a platform failed, so whatever DID post is remembered and not reposted.

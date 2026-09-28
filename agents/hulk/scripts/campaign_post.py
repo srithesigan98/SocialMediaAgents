@@ -16,6 +16,7 @@ import os
 import sys
 from collections import Counter
 
+import requests
 import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -72,16 +73,25 @@ def render_slides(cfg: dict, name: str, camp: dict, data: dict) -> list:
     return paths
 
 
-def caption(cfg: dict, camp: dict, data: dict, rows: list[dict], platform: str) -> str:
+def caption(cfg: dict, camp: dict, data: dict, rows: list[dict], platform: str,
+            angle: str | None = None) -> str:
+    """Carousel caption, or — with `angle` — a Reel caption. Reel captions leave price out: the
+    videos carry their own burned-in "from" price, and quoting a different one beside it reads
+    as a mistake."""
     cta = common.cta_line(cfg, rows[0])
     budget = drafter.LIMITS[platform] - len(cta) - 2
+    what = f"a Reel ({angle})" if angle else "a swipe-through carousel"
+    price_line = [] if angle else [
+        f"- Prices from {data['from_price']}, from {data['psf_min']}/sqft, {data['rebate']}"]
     prompt = "\n".join([
-        f"Write one {platform} caption for a swipe-through carousel about {camp['project']}.",
+        f"Write one {platform} caption for {what} about {camp['project']}.",
         "Use ONLY these facts — no other claims about the project. Keep each fact's strength "
         "exactly as written: 'near' stays 'near' (never 'steps from' / 'next door'), and never "
-        "link two facts with 'so'/'because' unless the fact itself says so:",
+        "link two facts with 'so'/'because' unless the fact itself says so. Copy unit types, names "
+        "and numbers exactly — the video's own subject (e.g. 'Unit B') must never be merged into "
+        "another fact such as which types suit Airbnb:",
         *[f"- {f}" for f in camp["facts"]],
-        f"- Prices from {data['from_price']}, from {data['psf_min']}/sqft, {data['rebate']}",
+        *price_line,
         "",
         "Open with a one-line hook that restates ONE listed fact (no new framing such as 'zero "
         "restrictions', 'guaranteed', 'Airbnb-titled'), then the strongest 4-6 facts as short "
@@ -106,11 +116,77 @@ def caption(cfg: dict, camp: dict, data: dict, rows: list[dict], platform: str) 
     return text
 
 
+def last_posted(cfg: dict, keys) -> str:
+    posted = common.read_state(cfg, "posted").get("listings", {})
+    return max((posted[k]["last_posted"] for k in keys if k in posted), default="")
+
+
+def reel_key(name: str, reel: dict) -> str:
+    return f"campaign-{name}-reel-{reel['file']}"
+
+
+def post_reel(cfg, name, camp, data, rows, platform_list, args) -> int:
+    posted = common.read_state(cfg, "posted").get("listings", {})
+    reel = next((r for r in camp["reels"] if reel_key(name, r) not in posted), None)
+    if reel is None:
+        print("All reels already posted.")
+        return 0
+    url = f"{camp['reel_base_url'].rstrip('/')}/{reel['file']}"
+    print(f"Reel: {reel['file']} ({url})")
+    failures = 0
+    for platform in platform_list:
+        try:
+            text = daily_posts.draft(caption, cfg, camp, data, rows, platform, reel["angle"])
+        except Exception as exc:
+            failures += 1
+            print(f"  ! caption failed for {platform}: {exc}")
+            continue
+        print(f"--- {platform} reel ({len(text)} chars) ---\n{text}\n")
+        if args.dry_run or (not args.yes and input(f"Publish reel to {platform}? [y/N] ").strip().lower() != "y"):
+            continue
+        publish = platforms.threads_publish_video if platform == "threads" else platforms.instagram_publish_reel
+        try:
+            post_id = publish(cfg, text, url)
+        except Exception as exc:
+            failures += 1
+            print(f"  ! publish to {platform} failed: {exc}")
+            continue
+        common.mark_posted(cfg, reel_key(name, reel), platform, post_id)
+        print(f"  published reel to {platform}: {post_id}")
+    return failures
+
+
+def post_next(cfg, name, camp, data, rows, platform_list, args) -> int:
+    """The daily focus-project slot: alternate reels and single-unit posts, whichever went out
+    less recently; units only once the reels run out."""
+    reels_left = [r for r in camp.get("reels", [])
+                  if reel_key(name, r) not in common.read_state(cfg, "posted").get("listings", {})]
+    last_reel = last_posted(cfg, [reel_key(name, r) for r in camp.get("reels", [])])
+    last_unit = last_posted(cfg, [r["ref"] for r in rows])
+    if reels_left and last_reel <= last_unit:
+        url = f"{camp['reel_base_url'].rstrip('/')}/{reels_left[0]['file']}"
+        try:
+            reachable = requests.head(url, allow_redirects=True, timeout=20).ok
+        except requests.RequestException:
+            reachable = False
+        if reachable:
+            return post_reel(cfg, name, camp, data, rows, platform_list, args)
+        print(f"  ! reel not reachable at {url} — posting a unit instead so the slot isn't lost.")
+    # Least-recently-posted unit, ignoring the normal cooldown — the campaign deliberately
+    # cycles this project's units faster than the general rotation would.
+    posted = common.read_state(cfg, "posted").get("listings", {})
+    unit = min(rows, key=lambda r: posted.get(r["ref"], {}).get("last_posted", ""))
+    return daily_posts.post_listing(cfg, unit, platform_list, args)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("campaign")
     parser.add_argument("--profile", default=None)
     parser.add_argument("--platform", action="append", choices=["threads", "instagram"])
+    parser.add_argument("--reel", action="store_true", help="Post the next unposted reel")
+    parser.add_argument("--next", action="store_true",
+                        help="Scheduled slot: next reel or single-unit post, alternating")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--yes", action="store_true")
     args = parser.parse_args()
@@ -119,6 +195,14 @@ def main() -> None:
     cfg = common.load_config(args.profile)
     camp = yaml.safe_load(common.profile_path(cfg, f"campaigns/{args.campaign}.yaml").read_text(encoding="utf-8"))
     data, rows = sheet_data(cfg, camp["project"])
+    platform_list = args.platform or cfg["schedule"]["platforms"]
+    if args.reel or args.next:
+        run = post_reel if args.reel else post_next
+        failures = run(cfg, args.campaign, camp, data, rows, platform_list, args)
+        if failures:
+            sys.exit(f"Finished with {failures} failure(s).")
+        return
+
     paths = render_slides(cfg, args.campaign, camp, data)
     print(f"Rendered {len(paths)} slides: {paths[0].parent}")
 
@@ -130,7 +214,7 @@ def main() -> None:
         urls.append(url)
 
     failures = 0
-    for platform in args.platform or cfg["schedule"]["platforms"]:
+    for platform in platform_list:
         try:
             text = daily_posts.draft(caption, cfg, camp, data, rows, platform)
         except Exception as exc:

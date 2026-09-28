@@ -84,6 +84,35 @@ def threads_publish_carousel(cfg: dict, text: str, image_urls: list[str]) -> str
     ))["id"]
 
 
+def _wait_until_ready(url: str, token: str, field: str, timeout: int = 600) -> None:
+    """Video containers transcode asynchronously — publishing before they're FINISHED fails.
+    `field` is "status" on Threads and "status_code" on Instagram."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        data = _check(requests.get(url, params={"fields": field, "access_token": token}, timeout=30))
+        status = data.get(field)
+        if status == "FINISHED":
+            return
+        if status in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"Video processing failed: {data}")
+        time.sleep(10)
+    raise RuntimeError(f"Video still processing after {timeout}s — not published.")
+
+
+def threads_publish_video(cfg: dict, text: str, video_url: str) -> str:
+    user_id, token = _threads(cfg)
+    container = _check(requests.post(
+        f"{THREADS_BASE}/{user_id}/threads",
+        params={"media_type": "VIDEO", "video_url": video_url, "text": text, "access_token": token},
+        timeout=60,
+    ))["id"]
+    _wait_until_ready(f"{THREADS_BASE}/{container}", token, "status")
+    return _check(requests.post(
+        f"{THREADS_BASE}/{user_id}/threads_publish",
+        params={"creation_id": container, "access_token": token}, timeout=60,
+    ))["id"]
+
+
 def threads_replies(cfg: dict, media_id: str) -> list[dict]:
     """Top-level replies on one of our posts. Needs threads_manage_replies."""
     _, token = _threads(cfg)
@@ -157,6 +186,22 @@ def instagram_publish_carousel(cfg: dict, caption: str, image_urls: list[str]) -
     return _check(requests.post(
         f"{IG_BASE}/{user_id}/media_publish",
         params={"creation_id": carousel_id, "access_token": token}, timeout=60,
+    ))["id"]
+
+
+def instagram_publish_reel(cfg: dict, caption: str, video_url: str) -> str:
+    """Reel (also shared to the main feed). Needs a publicly fetchable MP4 URL."""
+    user_id, token = _ig(cfg)
+    container = _check(requests.post(
+        f"{IG_BASE}/{user_id}/media",
+        params={"media_type": "REELS", "video_url": video_url, "caption": caption,
+                "share_to_feed": "true", "access_token": token},
+        timeout=60,
+    ))["id"]
+    _wait_until_ready(f"{IG_BASE}/{container}", token, "status_code")
+    return _check(requests.post(
+        f"{IG_BASE}/{user_id}/media_publish",
+        params={"creation_id": container, "access_token": token}, timeout=60,
     ))["id"]
 
 

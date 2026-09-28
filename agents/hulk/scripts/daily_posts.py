@@ -184,6 +184,8 @@ def main() -> None:
     parser.add_argument("--area-post", action="store_true",
                         help="Post an area/market price-per-sqft comparison (carousel) instead of single listings")
     parser.add_argument("--area-count", type=int, default=2, help="How many areas to compare, with --area-post")
+    parser.add_argument("--exclude-project", action="append", default=[],
+                        help="Skip a project (e.g. one covered by its own campaign slot); repeatable")
     parser.add_argument("--dry-run", action="store_true", help="Draft and print only")
     parser.add_argument("--yes", action="store_true", help="Publish without confirmation (cron)")
     args = parser.parse_args()
@@ -201,51 +203,57 @@ def main() -> None:
         return
 
     count = args.count if args.count is not None else int(cfg["schedule"]["posts_per_day"])
-    listings = common.pick_listings(cfg, count)
+    excluded = {p.lower() for p in args.exclude_project}
+    listings = [l for l in common.pick_listings(cfg, count + len(excluded) * 2)
+                if common.project_of(l) not in excluded][:count]
     if not listings:
         print("Nothing to post: every active listing is still inside its cooldown window.")
         return
 
-    failures = 0
-    for listing in listings:
-        print(f"\n=== {listing['ref']} — {listing.get('title', '')} ===")
-        try:
-            image_url = poster_url(cfg, listing, dry_run=args.dry_run)
-        except Exception:
-            failures += 1
-            print(f"  ! poster generation failed:\n{traceback.format_exc()}")
-            image_url = None
-        if image_url:
-            print(f"  image: {image_url}")
-
-        for platform in platform_list:
-            try:
-                text = draft(drafter.generate, listing, args.framework, platform, cfg)
-            except Exception as exc:  # drafting failure shouldn't kill the whole run
-                failures += 1
-                print(f"  ! draft failed for {platform}: {exc}")
-                continue
-
-            print(f"--- {platform} ({len(text)} chars) ---\n{text}\n")
-            drafter.save_draft(cfg, text, listing, platform, args.framework)
-
-            if args.dry_run:
-                continue
-            if not args.yes and input(f"Publish to {platform}? [y/N] ").strip().lower() != "y":
-                print("  skipped.")
-                continue
-            try:
-                post_id = publish(cfg, platform, text, image_url)
-            except Exception:
-                failures += 1
-                print(f"  ! publish to {platform} failed:\n{traceback.format_exc()}")
-                continue
-            if post_id:
-                common.mark_posted(cfg, listing["ref"], platform, post_id)
-                print(f"  published to {platform}: {post_id}")
-
+    failures = sum(post_listing(cfg, listing, platform_list, args) for listing in listings)
     if failures:
         sys.exit(f"\nFinished with {failures} failure(s) — see above.")
+
+
+def post_listing(cfg: dict, listing: dict, platform_list: list[str], args) -> int:
+    """Poster + caption + publish for one listing; returns the number of failures."""
+    failures = 0
+    print(f"\n=== {listing['ref']} — {listing.get('title', '')} ===")
+    try:
+        image_url = poster_url(cfg, listing, dry_run=args.dry_run)
+    except Exception:
+        failures += 1
+        print(f"  ! poster generation failed:\n{traceback.format_exc()}")
+        image_url = None
+    if image_url:
+        print(f"  image: {image_url}")
+
+    for platform in platform_list:
+        try:
+            text = draft(drafter.generate, listing, getattr(args, "framework", None), platform, cfg)
+        except Exception as exc:  # drafting failure shouldn't kill the whole run
+            failures += 1
+            print(f"  ! draft failed for {platform}: {exc}")
+            continue
+
+        print(f"--- {platform} ({len(text)} chars) ---\n{text}\n")
+        drafter.save_draft(cfg, text, listing, platform, getattr(args, "framework", None))
+
+        if args.dry_run:
+            continue
+        if not args.yes and input(f"Publish to {platform}? [y/N] ").strip().lower() != "y":
+            print("  skipped.")
+            continue
+        try:
+            post_id = publish(cfg, platform, text, image_url)
+        except Exception:
+            failures += 1
+            print(f"  ! publish to {platform} failed:\n{traceback.format_exc()}")
+            continue
+        if post_id:
+            common.mark_posted(cfg, listing["ref"], platform, post_id)
+            print(f"  published to {platform}: {post_id}")
+    return failures
 
 
 if __name__ == "__main__":
