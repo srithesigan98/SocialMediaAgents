@@ -248,3 +248,25 @@ no effect while posting is blocked on the token — and `daily_post.py`'s actual
 **Same fix needed as every iteration so far, still outstanding:** regenerate
 `FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
 new action taken this iteration since the underlying blocker hasn't moved.
+
+## Performance review — 2026-09-28 (loop iteration 8)
+
+Eighth weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 35
+consecutive missed days, confirmed via the daily workflow's run history (each run still fails at
+the publish step with a fully-generated post that never sends).
+
+Nothing to analyze — zero new data again this week. The deferred poster-vs-text-only comparison
+and the 2026-08-10 external-evidence bet both carry forward unchanged for the sixth iteration in
+a row.
+
+Separately: the Hulk Threads long-lived access token (a different token, for the sibling agent's
+own platform) hit its 60-day refresh reminder this week and was flagged to the operator directly
+in this conversation. That is unrelated to Blue Hulk's Facebook token and does not change anything
+tracked here.
+
+**Same fix needed as every iteration so far, still outstanding:** regenerate
+`FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
+new action taken this iteration since the underlying blocker hasn't moved.
