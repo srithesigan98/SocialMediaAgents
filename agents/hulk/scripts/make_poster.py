@@ -144,14 +144,17 @@ def fit_hook(draw, text: str, max_width: int, max_height: int, start: int, minim
     while size > minimum:
         f = font(BOLD, size)
         chars = max(6, int(max_width / draw.textlength("M", font=f)))
-        lines = textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False)[:4]
+        # No [:4] slice here: slicing silently dropped the end of long hooks ("...GET AN
+        # UNBLOCKED" with "KL VIEW" lost) — too many lines must shrink the font instead.
+        lines = textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False)
         line_h = size + 14
-        if len(lines) * line_h <= max_height and all(draw.textlength(l, font=f) <= max_width for l in lines):
+        if (len(lines) <= 4 and len(lines) * line_h <= max_height
+                and all(draw.textlength(l, font=f) <= max_width for l in lines)):
             return lines, f
         size -= 6
     f = font(BOLD, minimum)
     chars = max(6, int(max_width / draw.textlength("M", font=f)))
-    return textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False)[:4], f
+    return textwrap.wrap(text, width=chars, break_long_words=False, break_on_hyphens=False), f
 
 
 def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
@@ -165,9 +168,12 @@ def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
     if not url:
         return None
     try:
-        resp = requests.get(url, timeout=15)
-        resp.raise_for_status()
-        photo = Image.open(io.BytesIO(resp.content))
+        if Path(url).is_file():  # campaign photos live in the repo, not at a URL
+            photo = ImageOps.exif_transpose(Image.open(url))
+        else:
+            resp = requests.get(url, timeout=15)
+            resp.raise_for_status()
+            photo = Image.open(io.BytesIO(resp.content))
         photo.seek(0)  # first frame if it's a GIF
         photo = photo.convert("RGB")
     except Exception:
@@ -377,6 +383,34 @@ def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = N
     if out_path is None:
         slug = re.sub(r"[^a-z0-9]+", "-", stat["area"].lower()).strip("-")
         out_path = common.POSTERS_DIR / f"{cfg['_profile']}-area-{slug}.png"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path, "PNG")
+    return out_path
+
+
+def render_slide(cfg: dict, photo: str, hook: str, out_path: Path, tiles=(), lines=(),
+                 cta_word: str | None = None, page: int = 0, total: int = 0) -> Path:
+    """One slide of a feature carousel (see campaign_post.py): photo + big hook + optional stat
+    tiles, bullet lines and comment-trigger CTA — same visual language as render()."""
+    img, draw, width, height, margin, inner, fg, accent = _new_canvas(cfg, photo)
+    if total:
+        counter = f"{page}/{total}"
+        cf = font(BOLD, 30)
+        draw.text((width - margin - draw.textlength(counter, font=cf), margin), counter,
+                  font=cf, fill=fg, stroke_width=2, stroke_fill="#000000")
+
+    blocks: list[tuple] = []
+    if tiles:
+        blocks.append(tile_block(draw, [tuple(t) for t in tiles], inner, accent))
+    line_font = font(REGULAR, 34)
+    for i, line in enumerate(lines):
+        blocks.append((line, fit_font(draw, line, REGULAR, inner, 34) if line else line_font, fg,
+                       10 if i < len(lines) - 1 else 26))
+    if cta_word:
+        cta = f'COMMENT "{cta_word}" FOR FULL DETAILS'
+        blocks.append((cta, fit_font(draw, cta, BOLD, inner, 42), accent, 0))
+
+    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(out_path, "PNG")
     return out_path

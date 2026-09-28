@@ -1,0 +1,47 @@
+# Khaya Residences focus campaign — slides for a feature carousel.
+# Facts come from the developer brief supplied by the agent (Sep 2026); {placeholders} are filled
+# at render time from the live Google Sheet rows for this project, so prices never go stale.
+project: Khaya Residences
+trigger_word: KHAYA
+
+facts:   # given to the caption writer as the only allowed claims
+  - Airbnb allowed; near Pantai Hospital
+  - Type C and Type D units are the Airbnb-suited layouts
+  - Commercial title (HTA)
+  - Nearest LRT stations Abdullah Hukum and Kerinchi, Kelana Jaya Line
+  - 18,000 sqft for Anytime Fitness and a grocery store
+  - 9 ground-level shoplot units
+  - 3.88 acres, 61 floors; levels 10 to 59 are residential floors
+  - 10 lifts in total
+  - 90% of units have an unblocked view of KL city and the TNB tower
+  - Same landscape architect as TRX (Land Art)
+
+slides:
+  - photo: tower.jpg
+    hook: Khaya Residences, Bangsar
+    tiles: [["61", "FLOORS"], ["3.88", "ACRES"], ["10", "LIFTS"]]
+    lines: ["Swipe >> everything you need to know"]
+  - photo: living.jpg
+    hook: Airbnb allowed
+    lines: ["• Near Pantai Hospital", "• Type C & Type D built for short stays", "• Commercial title (HTA)"]
+  - photo: aerial.jpg
+    hook: 2 LRT stations nearby
+    lines: ["• Abdullah Hukum", "• Kerinchi", "Kelana Jaya Line"]
+  - photo: view.jpg
+    hook: 90% unblocked KL view
+    lines: ["90% of units face KL city skyline & TNB tower"]
+  - photo: model.jpg
+    hook: Gym & grocery downstairs
+    tiles: [["18,000", "SQFT RETAIL"], ["9", "SHOPLOTS"], ["G", "LEVEL"]]
+    lines: ["Anytime Fitness + grocery store on site"]
+  - photo: pool.jpg
+    hook: Same landscape architect as TRX
+    lines: ["Designed by Land Art"]
+  - photo: terrace.jpg
+    hook: 50 floors of homes
+    tiles: [["L10-59", "RESIDENCES"], ["10", "LIFTS"], ["61", "STOREYS"]]
+  - photo: interior.jpg
+    hook: "From {from_price}"
+    tiles: [["{psf_min}", "LOWEST /SQFT"], ["{min_size}", "SQFT FROM"], ["{unit_count}", "UNIT TYPES"]]
+    lines: ["• {rebate}"]
+    cta: true
