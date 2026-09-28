@@ -46,3 +46,12 @@ jobs:
           else
             python agents/hulk/scripts/daily_posts.py --profile senang-homes --count 1 --yes
           fi
+      - name: Save posting history
+        # Runs even if a platform failed, so whatever DID post is remembered and not reposted.
+        if: always()
+        run: |
+          git add agents/hulk/scripts/state/senang-homes-posted.json
+          git diff --cached --quiet && exit 0
+          git commit -m "hulk: senang-homes posting history"
+          git pull --rebase origin main
+          git push origin HEAD:main

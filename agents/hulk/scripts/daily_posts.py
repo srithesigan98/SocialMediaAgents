@@ -50,12 +50,28 @@ def commit_poster(path: Path) -> None:
             ["git", "commit", "-m", f"hulk: poster for {path.stem}"],
             cwd=repo_root, capture_output=True, text=True,
         )
-        if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
+        if commit.returncode != 0 and "nothing" not in commit.stdout:  # "nothing to/added to commit"
             raise RuntimeError(f"git commit failed: {commit.stdout}\n{commit.stderr}")
         if commit.returncode == 0:
+            # Other jobs (metrics snapshots etc.) push to main too — rebase first or the push
+            # gets rejected and the poster URL 404s when Meta tries to fetch it.
+            subprocess.run(["git", "pull", "--rebase", "origin", branch], cwd=repo_root, check=True)
             subprocess.run(["git", "push", "origin", branch], cwd=repo_root, check=True)
     except Exception as e:
         print(f"  ! could not commit poster to git: {e}")
+
+
+def draft(generate, *args, tries: int = 3) -> str:
+    """Retry a caption generator: the model occasionally overshoots the platform's character
+    limit (or comes back empty/truncated), which generate() rejects with ValueError — a fresh
+    attempt almost always lands, instead of failing the whole scheduled run."""
+    for attempt in range(tries):
+        try:
+            return generate(*args)
+        except ValueError as exc:
+            if attempt == tries - 1:
+                raise
+            print(f"  (retrying draft: {exc})")
 
 
 def poster_url(cfg: dict, listing: dict, dry_run: bool = False) -> str | None:
@@ -127,7 +143,7 @@ def run_area_post(cfg: dict, platform_list: list[str], args) -> None:
     failures = 0
     for platform in platform_list:
         try:
-            text = area_drafter.generate(stats, platform, cfg)
+            text = draft(area_drafter.generate, stats, platform, cfg)
         except Exception as exc:
             failures += 1
             print(f"  ! draft failed for {platform}: {exc}")
@@ -204,7 +220,7 @@ def main() -> None:
 
         for platform in platform_list:
             try:
-                text = drafter.generate(listing, args.framework, platform, cfg)
+                text = draft(drafter.generate, listing, args.framework, platform, cfg)
             except Exception as exc:  # drafting failure shouldn't kill the whole run
                 failures += 1
                 print(f"  ! draft failed for {platform}: {exc}")

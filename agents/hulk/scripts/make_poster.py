@@ -22,6 +22,7 @@ import argparse
 import io
 import re
 import textwrap
+import zlib
 from pathlib import Path
 
 import requests
@@ -81,21 +82,58 @@ def trigger_word(title: str) -> str:
     return words[0].upper() if words else "THIS"
 
 
-def hook_text(listing: dict) -> str:
-    """The single boldest, shortest fact for this listing — what someone scrolling past should
-    get without reading the caption. Prefers the rental-gap number (the same figure the caption
-    leads with) since it's the most concrete "why this matters" fact; falls back to the
-    highlight, then the price, then just the location, so there's always something to show."""
-    instalment = common.parse_number(listing.get("monthly_instalment", ""))
-    rental = common.parse_number(listing.get("monthly_rental_estimate", ""))
-    if instalment and rental and rental > instalment:
-        return f"RM{round(rental - instalment):,} monthly rental gap"
-    if listing.get("highlight"):
-        return listing["highlight"]
-    price = common.parse_number(listing.get("price", ""))
+def listing_facts(listing: dict) -> dict[str, tuple[str, str]]:
+    """Every hard number the sheet row supports, as key -> (value, label) — the data that goes
+    on the poster itself so it reads at a glance. Only computed from sheet fields; a missing
+    field just means that fact is skipped, never guessed."""
+    n = common.parse_number
+    price, size = n(listing.get("price", "")), n(listing.get("size", ""))
+    instalment, rent = n(listing.get("monthly_instalment", "")), n(listing.get("monthly_rental_estimate", ""))
+    facts = {}
+    if price and size:
+        facts["psf"] = (f"RM{price / size:,.0f}", "PER SQFT")
+    if price and rent:
+        facts["yield"] = (f"{rent * 12 / price * 100:.1f}%", "RENTAL YIELD")
+    if instalment and rent and rent > instalment:
+        facts["gap"] = (f"+RM{rent - instalment:,.0f}", "RENT VS INSTALMENT")
     if price:
-        return f"From RM{price:,.0f}"
-    return listing.get("location", "")
+        facts["price"] = (f"RM{price / 1e6:.2f}M" if price >= 1e6 else f"RM{price / 1000:,.0f}K", "PRICE")
+    if listing.get("tenure"):
+        facts["tenure"] = (listing["tenure"].split("(")[0].strip().upper(), "TENURE")
+    if listing.get("expected_vp"):
+        facts["vp"] = (listing["expected_vp"].upper(), "COMPLETION")
+    return facts
+
+
+def hook_choice(listing: dict) -> tuple[str, str]:
+    """(fact key, headline) for the big hook. Rotates between the strongest available angles,
+    keyed on the listing's ref so different listings lead with different facts — every poster
+    shouldn't scream the same "rental gap" line. Deterministic, so re-renders don't change."""
+    facts = listing_facts(listing)
+    area = common._extract_area(listing.get("location", "")).upper()
+    options = []
+    if "gap" in facts:
+        options.append(("gap", f"RENT COVERS INSTALMENT +RM{facts['gap'][0][3:]}/MO"))
+    if "yield" in facts:
+        options.append(("yield", f"{facts['yield'][0]} RENTAL YIELD IN {area}"))
+    if "psf" in facts:
+        options.append(("psf", f"{facts['psf'][0]}/SQFT IN {area}"))
+    if listing.get("highlight"):
+        options.append(("highlight", listing["highlight"]))
+    if not options:
+        return "", facts.get("price", ("", ""))[0] or listing.get("location", "")
+    return options[zlib.crc32(listing.get("ref", "").encode()) % len(options)]
+
+
+def hook_text(listing: dict) -> str:
+    return hook_choice(listing)[1]
+
+
+def stat_tiles(listing: dict, hook_key: str) -> list[tuple[str, str]]:
+    """Up to 3 supporting numbers for the tile row — whatever the hook isn't already shouting."""
+    facts = listing_facts(listing)
+    order = ["psf", "yield", "gap", "price", "tenure", "vp"]
+    return [facts[k] for k in order if k in facts and k != hook_key][:3]
 
 
 def fit_hook(draw, text: str, max_width: int, max_height: int, start: int, minimum: int = 48):
@@ -169,7 +207,8 @@ def _new_canvas(cfg: dict, photo_url: str, size=None):
     draw = ImageDraw.Draw(img)
 
     brand = pc.get("brand", cfg.get("name", "")).upper()
-    draw.text((margin, margin), brand, font=font(REGULAR, 30), fill=accent)
+    draw.text((margin, margin), brand, font=font(BOLD, 34), fill=accent,
+              stroke_width=2, stroke_fill="#000000")
 
     return img, draw, width, height, margin, inner, fg, accent
 
@@ -180,18 +219,27 @@ def _compose_hook_and_stack(img, draw, width: int, height: int, margin: int, inn
     brand tag and `blocks` — then the bottom detail stack itself. Shared by render() (single
     listing) and render_area() (market-comparison carousel): same visual language, different
     content feeding it."""
-    content_height = sum(f.size + gap for _, f, _, gap in blocks)
+    content_height = sum(_block_height(b) for b in blocks)
     bottom_y = max(margin + 70, height - margin - content_height)
 
+    # Dark panel behind the whole detail stack so it stays legible over any photo — the scrim
+    # alone fades in too low once the stack grows (tiles + perks), leaving text on bright sky.
+    panel = Image.new("RGBA", (width, height - bottom_y + 30), (0, 0, 0, 150))
+    img.paste(panel, (0, bottom_y - 30), panel)
+    draw = ImageDraw.Draw(img)
+
     hook_top = margin + 90
-    hook_bottom = bottom_y - 30
+    hook_bottom = bottom_y - 30  # = top of the detail panel
     if hook_bottom > hook_top and hook:
+        # -40: the band adds 20px padding above and below the text; budget for it here or the
+        # band overruns into the detail stack.
         hook_lines, hook_font_obj = fit_hook(
-            draw, hook.upper(), inner, hook_bottom - hook_top, start=int(width * 0.15)
+            draw, hook.upper(), inner, hook_bottom - hook_top - 40, start=int(width * 0.13)
         )
         line_h = hook_font_obj.size + 14
         band_height = len(hook_lines) * line_h + 40
-        band_top = hook_top + max(0, (hook_bottom - hook_top - band_height) // 2)
+        # Sits directly on the detail panel — one continuous dark block, photo clear above it.
+        band_top = hook_bottom - band_height
         band = Image.new("RGBA", (width, band_height), (0, 0, 0, 165))
         img.paste(band, (0, band_top), band)
         draw = ImageDraw.Draw(img)
@@ -201,9 +249,43 @@ def _compose_hook_and_stack(img, draw, width: int, height: int, margin: int, inn
             y += line_h
 
     y = bottom_y
-    for text, f, fill, gap in blocks:
-        draw.text((margin, y), text, font=f, fill=fill)
-        y += f.size + gap
+    for block in blocks:
+        text, f, fill, gap = block
+        if isinstance(text, list):
+            _draw_tiles(draw, text, f, fill, fg, margin, y, inner)
+        else:
+            draw.text((margin, y), text, font=f, fill=fill)
+        y += _block_height(block)
+
+
+# A block whose text is a list of (value, label) pairs is a stat-tile row: big accent number
+# over a small label, in outlined boxes — how the poster shows several data points at a glance.
+TILE_GAP, TILE_PAD, TILE_LABEL = 18, 22, 22
+
+
+def _block_height(block: tuple) -> int:
+    text, f, _, gap = block
+    extra = TILE_PAD * 2 + TILE_LABEL + 8 if isinstance(text, list) else 0
+    return f.size + extra + gap
+
+
+def tile_block(draw, tiles: list[tuple[str, str]], inner: int, accent: str, gap: int = 26) -> tuple:
+    tile_w = (inner - TILE_GAP * (len(tiles) - 1)) // len(tiles)
+    longest = max((v for v, _ in tiles), key=len)
+    return (tiles, fit_font(draw, longest, BOLD, tile_w - 24, 56), accent, gap)
+
+
+def _draw_tiles(draw, tiles, value_font, accent, fg, x0: int, y: int, inner: int) -> None:
+    tile_w = (inner - TILE_GAP * (len(tiles) - 1)) // len(tiles)
+    tile_h = value_font.size + TILE_PAD * 2 + TILE_LABEL + 8
+    label_font = font(REGULAR, TILE_LABEL)
+    for i, (value, label) in enumerate(tiles):
+        x = x0 + i * (tile_w + TILE_GAP)
+        draw.rounded_rectangle([x, y, x + tile_w, y + tile_h], radius=18,
+                               fill="#0E1A16", outline=accent, width=3)
+        cx = x + tile_w // 2
+        draw.text((cx, y + TILE_PAD), value, font=value_font, fill=accent, anchor="ma")
+        draw.text((cx, y + TILE_PAD + value_font.size + 8), label, font=label_font, fill=fg, anchor="ma")
 
 
 def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) -> Path:
@@ -232,18 +314,28 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
 
     monthly = listing.get("monthly_instalment") or listing.get("price")
     if monthly:
-        price_text = f"{group_digits(monthly)}/mo"
-        blocks.append((price_text, fit_font(draw, price_text, BOLD, inner, int(width * 0.1)), fg, 22))
+        price_text = f"{group_digits(monthly).replace('.00', '')}/mo"
+        blocks.append((price_text, fit_font(draw, price_text, BOLD, inner, int(width * 0.085)), fg, 22))
 
-    hook = hook_text(listing)
-    # Skip re-showing the highlight down here if it's already the big hook headline above —
-    # same fact shouldn't appear twice.
-    if listing.get("highlight") and listing["highlight"] != hook:
-        highlight_font = font(REGULAR, 34)
-        chars = max(18, int(inner / draw.textlength("n", font=highlight_font)))
-        lines = textwrap.wrap(listing["highlight"], width=chars, break_long_words=False, break_on_hyphens=False)[:3]
+    hook_key, hook = hook_choice(listing)
+    tiles = stat_tiles(listing, hook_key)
+    if tiles:
+        blocks.append(tile_block(draw, tiles, inner, accent))
+
+    # "What's the best thing about it" — rebate and freebies, skipped if the hook already says it.
+    perks = [p for p in (listing.get("highlight"), listing.get("legal_fees_freebies")) if p and p != hook]
+    if perks:
+        perk_font = font(REGULAR, 30)
+        chars = max(18, int(inner / draw.textlength("n", font=perk_font)))
+        lines = []
+        for perk in perks:  # one bullet per perk; Open Sans has no ✓ glyph, • it is
+            wrapped = textwrap.wrap(perk, width=chars - 2, break_long_words=False, break_on_hyphens=False)
+            lines += ["• " + wrapped[0]] + ["   " + w for w in wrapped[1:]]
+        if len(lines) > 3:
+            lines = lines[:3]
+            lines[-1] = lines[-1].rstrip(" ,.(") + "…"
         for i, line in enumerate(lines):
-            blocks.append((line, highlight_font, fg, 10 if i < len(lines) - 1 else 30))
+            blocks.append((line, perk_font, fg, 8 if i < len(lines) - 1 else 26))
 
     # Themed comment-trigger word (not the full title) — the pattern validated by watching
     # @therumahouse's reels: a specific keyword tied to the property reads as more particular/
@@ -269,14 +361,17 @@ def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = N
     img, draw, width, height, margin, inner, fg, accent = _new_canvas(cfg, photo_url, size)
 
     area_line = stat["area"].upper()
-    detail = (f"{stat['project_count']} project(s)   ·   "
-              f"RM{stat['min_price_per_sqft']:,}-{stat['max_price_per_sqft']:,}/sqft range")
+    tiles = [
+        (f"RM{stat['min_price_per_sqft']:,}", "LOWEST /SQFT"),
+        (f"RM{stat['max_price_per_sqft']:,}", "HIGHEST /SQFT"),
+        (str(stat["listing_count"]), "UNITS LISTED"),
+    ]
     blocks = [
-        (area_line, fit_font(draw, area_line, BOLD, inner, 46), fg, 20),
-        (detail, fit_font(draw, detail, REGULAR, inner, 32), fg, 0),
+        (area_line, fit_font(draw, area_line, BOLD, inner, 46), fg, 22),
+        tile_block(draw, tiles, inner, accent, gap=0),
     ]
 
-    hook = f"RM{stat['avg_price_per_sqft']:,}/sqft"
+    hook = f"RM{stat['avg_price_per_sqft']:,}/sqft average"
     _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
 
     if out_path is None:

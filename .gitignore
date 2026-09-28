@@ -20,6 +20,9 @@ agents/hulk/scripts/drafts/*
 !agents/hulk/scripts/drafts/.gitkeep
 agents/hulk/scripts/state/*
 !agents/hulk/scripts/state/.gitkeep
+# Posting history is committed by the cron so each run knows what's already been posted —
+# without it every GitHub Actions run starts blank and reposts the first sheet row.
+!agents/hulk/scripts/state/*-posted.json
 # posters/ is intentionally NOT gitignored — daily_posts.py commits each rendered poster so
 # Threads/Instagram can fetch it from its raw.githubusercontent.com URL (same pattern as the
 # old hulk-daily.yml's posted_assets/).

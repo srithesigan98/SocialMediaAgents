@@ -309,18 +309,30 @@ def pick_listings(cfg: dict, count: int) -> list[dict]:
     cooldown = int(cfg["schedule"]["cooldown_days"])
     cutoff = days_ago(cooldown)
 
-    candidates = []
-    for item in active_listings(cfg):
-        last = posted.get(item["ref"], {}).get("last_posted")
-        last_dt = datetime.fromisoformat(last) if last else None
-        if last_dt and last_dt > cutoff:
-            continue  # still cooling down
-        candidates.append((last_dt or datetime.min.replace(tzinfo=timezone.utc), item))
+    never = datetime.min.replace(tzinfo=timezone.utc)
+    items = active_listings(cfg)
+    ref_last = {
+        i["ref"]: datetime.fromisoformat(posted[i["ref"]]["last_posted"])
+        for i in items if posted.get(i["ref"], {}).get("last_posted")
+    }
+    # Rotate by project first, then unit: several rows are sizes of the same building, and
+    # posting "Khaya 683" then "Khaya 772" back to back reads as the same post twice.
+    project_last: dict[str, datetime] = {}
+    for i in items:
+        if i["ref"] in ref_last:
+            project_last[i["title"]] = max(project_last.get(i["title"], never), ref_last[i["ref"]])
 
-    if not candidates:
-        return []
-    candidates.sort(key=lambda pair: pair[0])
-    return [item for _, item in candidates[:count]]
+    candidates = [i for i in items if ref_last.get(i["ref"], never) <= cutoff]
+    candidates.sort(key=lambda i: (project_last.get(i["title"], never), ref_last.get(i["ref"], never)))
+
+    picked, seen_projects = [], set()
+    for i in candidates:  # never two units of the same project in one run
+        if i["title"] not in seen_projects:
+            picked.append(i)
+            seen_projects.add(i["title"])
+        if len(picked) == count:
+            break
+    return picked
 
 
 def mark_posted(cfg: dict, listing_ref: str, platform: str, post_id: str) -> None:

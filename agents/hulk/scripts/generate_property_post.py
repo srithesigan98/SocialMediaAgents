@@ -64,7 +64,8 @@ def build_prompt(cfg: dict, listing: dict, framework: str | None, platform: str,
         "",
         f"Platform: {platform}. Hard limit: {LIMITS[platform]} characters, of which the last "
         f"{len(cta)} are reserved for a closing WhatsApp CTA that gets appended automatically "
-        f"after your text — so budget for at most {LIMITS[platform] - len(cta) - 2} characters.",
+        f"after your text — so aim for about {int((LIMITS[platform] - len(cta)) * 0.8)} characters "
+        f"(hard maximum {LIMITS[platform] - len(cta) - 2}; going over gets the post rejected).",
         "",
         "Do NOT write a WhatsApp link, phone number, or any closing call-to-action yourself — "
         "just end after your last content sentence.",
