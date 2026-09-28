@@ -303,6 +303,12 @@ def days_ago(n: int) -> datetime:
     return now_utc() - timedelta(days=n)
 
 
+def project_of(listing: dict) -> str:
+    """The development a row belongs to: "Bangsar Hill Park (Tower C - Talisa II)" -> "Bangsar
+    Hill Park". Towers/phases of one development rotate as a single project."""
+    return re.sub(r"\s*\(.*\)", "", listing.get("title", "")).strip().lower()
+
+
 def pick_listings(cfg: dict, count: int) -> list[dict]:
     """Choose the least-recently-posted active listings, respecting the cooldown."""
     posted = read_state(cfg, "posted").get("listings", {})
@@ -320,16 +326,17 @@ def pick_listings(cfg: dict, count: int) -> list[dict]:
     project_last: dict[str, datetime] = {}
     for i in items:
         if i["ref"] in ref_last:
-            project_last[i["title"]] = max(project_last.get(i["title"], never), ref_last[i["ref"]])
+            p = project_of(i)
+            project_last[p] = max(project_last.get(p, never), ref_last[i["ref"]])
 
     candidates = [i for i in items if ref_last.get(i["ref"], never) <= cutoff]
-    candidates.sort(key=lambda i: (project_last.get(i["title"], never), ref_last.get(i["ref"], never)))
+    candidates.sort(key=lambda i: (project_last.get(project_of(i), never), ref_last.get(i["ref"], never)))
 
     picked, seen_projects = [], set()
     for i in candidates:  # never two units of the same project in one run
-        if i["title"] not in seen_projects:
+        if project_of(i) not in seen_projects:
             picked.append(i)
-            seen_projects.add(i["title"])
+            seen_projects.add(project_of(i))
         if len(picked) == count:
             break
     return picked
