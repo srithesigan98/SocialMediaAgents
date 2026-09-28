@@ -455,3 +455,34 @@ Hulk's invalidated access token (plus its missing `pages_read_engagement` scope)
 document the blocked state rather than manufacturing a tweak.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-09-28.
+
+## Performance review — 2026-09-28 (loop iteration 8)
+
+Eighth weekly firing. `post_log.jsonl` for this profile (tansri-millionaires) is still exactly 54
+posts, days 739827–739845 — scheduled posting has now been off for six consecutive weekly cycles
+(iterations 3 through 8). No new post exists to compare against the iteration 7 baseline; every
+framework's `n` is unchanged and the ranking order is identical, reach still drifting slightly on
+the same posts as every prior iteration.
+
+Note: `senang-homes` (the separate real-estate profile added in PR #23) got its first posting
+history committed this week (`agents/hulk/scripts/state/senang-homes-posted.json`, 15 lines). This
+is a different brand/profile with its own workflow and does not touch `tansri-millionaires`'s
+`post_log.jsonl`, `history.jsonl`, `daily_post.py`, `FRAMEWORK_WEIGHTS`, or `ROTATION` — confirmed
+via `git show --stat` on the commit (single file, scoped to `senang-homes` state only). No effect
+on this loop's tracking.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as the last five
+iterations — zero new post data for this profile, nothing to promote or demote.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist — `pages_read_engagement` remains
+missing. `post_log.jsonl` is still stuck at 24 posts, last one 2026-08-24 (day 739852) — now 35
+consecutive missed days, confirmed via the daily workflow's run history (still failing at the
+publish step on the invalidated `FB_PAGE_ACCESS_TOKEN`). Nothing new to fold into either the
+deferred poster-vs-text-only comparison or the 2026-08-10 external-evidence bet.
+
+**Standing blocker, unchanged for the sixth iteration running:** this loop remains blocked on the
+same two user-side fixes — Hulk's (tansri-millionaires) scheduled posting staying off, and Blue
+Hulk's invalidated access token (plus its missing `pages_read_engagement` scope). Continuing to
+document the blocked state rather than manufacturing a tweak.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-10-05.
