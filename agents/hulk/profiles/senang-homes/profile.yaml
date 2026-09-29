@@ -116,13 +116,13 @@ replies:
       reply: "{name} it's {price} for {title} — {size_line}. Full breakdown + instalment on WhatsApp 👉 {link}"
     loan:
       keywords: [loan, financing, instalment, installment, ansuran, mortgage, deposit, downpayment]
-      reply: "{name} happy to run the loan + down payment numbers for {ref} with you. Send me your details here 👉 {link}"
+      reply: "{name} happy to run the loan + down payment numbers for {title} with you. Send me your details here 👉 {link}"
     viewing:
       keywords: [view, viewing, visit, appointment, tengok, survey]
       reply: "{name} viewings are open this week for {title}. Pick a slot with me here 👉 {link}"
     availability:
       keywords: [available, still, sold, rented, ada lagi]
-      reply: "{name} yes — {ref} is still {status}. Grab the full details before it moves 👉 {link}"
+      reply: "{name} yes — {title} still has units available. Grab the full details before they move 👉 {link}"
     default:
       keywords: []
-      reply: "{name} thanks for the interest in {title} ({ref}) — sending you the full details, floor plan and pricing here 👉 {link}"
+      reply: "{name} thanks for the interest in {title} — here are the full details, floor plan and pricing 👉 {link}"

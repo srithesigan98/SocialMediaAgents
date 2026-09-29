@@ -168,6 +168,9 @@ def run_area_post(cfg: dict, platform_list: list[str], args) -> None:
             failures += 1
             print(f"  ! publish to {platform} failed:\n{traceback.format_exc()}")
             continue
+        # Recorded so reply_bot.py watches this post's comments too.
+        common.mark_posted(cfg, "area-" + "-".join(s["area"].lower().replace(" ", "-") for s in stats),
+                           platform, post_id)
         print(f"  published carousel to {platform}: {post_id}")
 
     if failures:

@@ -22,8 +22,8 @@ import argparse
 import re
 import sys
 import time
-import traceback
 
+import yaml
 from dotenv import load_dotenv
 
 import common
@@ -69,6 +69,25 @@ def render_reply(cfg: dict, intent: dict, listing: dict, username: str) -> str:
     )
 
 
+def listing_for_post(cfg: dict, ref: str, listings: list[dict]) -> dict:
+    """The listing a post is about, for the reply text and WhatsApp prefill. Campaign posts
+    ("campaign-khaya", "campaign-khaya-reel-...") map to their project; area carousels and rows
+    since removed from the sheet get a generic stand-in — never common.find_listing(), whose
+    SystemExit on an unknown ref killed the whole run on the first campaign post."""
+    for item in listings:
+        if item["ref"] == ref:
+            return item
+    if ref.startswith("campaign-"):
+        name = ref.split("-")[1]
+        path = common.profile_path(cfg, f"campaigns/{name}.yaml")
+        if path.exists():
+            project = yaml.safe_load(path.read_text(encoding="utf-8"))["project"].lower()
+            match = next((i for i in listings if common.project_of(i) == project), None)
+            if match:
+                return match
+    return {"title": "our listings", "ref": ""}
+
+
 def fetch_comments(cfg: dict, platform: str, post_id: str) -> list[dict]:
     if platform == "threads":
         return [
@@ -85,21 +104,25 @@ def fetch_comments(cfg: dict, platform: str, post_id: str) -> list[dict]:
 def send(cfg: dict, platform: str, comment_id: str, text: str, dry_run: bool) -> list[str]:
     """Return a list of human-readable descriptions of what was (or would be) sent."""
     rc = cfg["replies"]
-    actions = []
     if platform == "threads":
-        if rc.get("threads_public_reply", True):
-            if not dry_run:
-                platforms.threads_reply(cfg, comment_id, text)
-            actions.append("threads public reply")
+        planned = [("threads public reply", rc.get("threads_public_reply", True), platforms.threads_reply)]
     else:
-        if rc.get("instagram_private_reply", True):
+        planned = [
+            ("instagram DM", rc.get("instagram_private_reply", True), platforms.instagram_private_reply),
+            ("instagram public reply", rc.get("instagram_public_reply", True), platforms.instagram_reply),
+        ]
+    actions = []
+    for label, enabled, fn in planned:
+        if not enabled:
+            continue
+        # Each action on its own: a failed DM (e.g. missing messaging permission) must not
+        # block the public reply, or the commenter gets nothing at all.
+        try:
             if not dry_run:
-                platforms.instagram_private_reply(cfg, comment_id, text)
-            actions.append("instagram DM")
-        if rc.get("instagram_public_reply", True):
-            if not dry_run:
-                platforms.instagram_reply(cfg, comment_id, text)
-            actions.append("instagram public reply")
+                fn(cfg, comment_id, text)
+            actions.append(label)
+        except Exception as exc:
+            print(f"  ! {label} failed: {exc}")
     return actions
 
 
@@ -118,16 +141,17 @@ def run_once(cfg: dict, dry_run: bool) -> int:
     state = common.read_state(cfg, "replied")
     done = set(state.get("comment_ids", []))
     handled = 0
+    listings = common.load_listings(cfg)
 
     for post in common.recent_posts(cfg):
         platform, post_id = post["platform"], post["post_id"]
         try:
             comments = fetch_comments(cfg, platform, post_id)
-        except Exception:
-            print(f"! could not read comments on {platform} {post_id}:\n{traceback.format_exc()}")
+        except Exception as exc:  # e.g. the post was deleted — skip it, keep going
+            print(f"! could not read comments on {platform} {post_id}: {str(exc)[:160]}")
             continue
 
-        listing = common.find_listing(cfg, post["ref"])
+        listing = listing_for_post(cfg, post["ref"], listings)
         for comment in comments:
             key = f"{platform}:{comment['id']}"
             if key in done:
@@ -142,13 +166,10 @@ def run_once(cfg: dict, dry_run: bool) -> int:
             print(f"\n[{platform}] @{comment['username']}: {comment['text'][:80]}")
             print(f"  intent={intent['name']}\n  -> {text}")
 
-            try:
-                actions = send(cfg, platform, comment["id"], text, dry_run)
-            except Exception:
-                print(f"  ! reply failed:\n{traceback.format_exc()}")
-                continue
-
-            print(f"  {'would send' if dry_run else 'sent'}: {', '.join(actions) or 'nothing (all reply modes off)'}")
+            actions = send(cfg, platform, comment["id"], text, dry_run)
+            if not actions:
+                continue  # everything failed — leave it unanswered so the next run retries
+            print(f"  {'would send' if dry_run else 'sent'}: {', '.join(actions)}")
             handled += 1
             if not dry_run:
                 done.add(key)
