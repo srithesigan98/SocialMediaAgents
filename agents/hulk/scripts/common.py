@@ -267,7 +267,9 @@ def whatsapp_link(cfg: dict, listing: dict) -> str:
     prefill = cfg["whatsapp"]["prefill"].format(
         ref=listing.get("ref", ""), title=listing.get("title", "your listing")
     )
-    return f"https://wa.me/{number}?text={urllib.parse.quote(prefill)}"
+    # api.whatsapp.com rather than wa.me: Threads rejects text-only posts (every comment reply)
+    # containing a wa.me link — "Invalid Link Attachment" — while this form publishes fine.
+    return f"https://api.whatsapp.com/send?phone={number}&text={urllib.parse.quote(prefill)}"
 
 
 def cta_line(cfg: dict, listing: dict) -> str:
