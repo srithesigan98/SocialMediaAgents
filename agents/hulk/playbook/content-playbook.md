@@ -486,3 +486,55 @@ Hulk's invalidated access token (plus its missing `pages_read_engagement` scope)
 document the blocked state rather than manufacturing a tweak.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-10-05.
+
+## Performance review — 2026-10-05 (loop iteration 9)
+
+Ninth weekly firing. `post_log.jsonl` for this profile (tansri-millionaires) is still exactly 54
+posts, days 739827–739845 — scheduled posting has now been off for seven consecutive weekly
+cycles (iterations 3 through 9). No new post exists to compare against the iteration 8 baseline.
+
+**New wrinkle, separate from the posting freeze:** the Threads metrics *collector itself* broke on
+2026-09-28, the day after the 60-day Threads-token-expiry reminder fired. Every collection round
+since then — 7 in a row as of this firing (2026-09-28 through 2026-10-04) — has come back with
+`views`/`likes`/`replies`/`reposts`/`quotes` all `null` for all 54 posts
+(`fetch_insights()` in `collect_metrics.py` swallows the underlying auth error and returns nulls
+rather than crashing, so the workflow step shows "success" even though nothing useful was
+collected). This was diagnosed and flagged to the operator directly on 2026-09-28, with brief
+status pings on 2026-09-29/09-30/10-01, then handled quietly per the dashboard-refresh routine's
+own rule once nothing new developed. **Practical effect on this loop:** the per-framework table
+below is frozen at the last valid snapshot (2026-09-27) — not just because there are no new posts,
+but because there is no new *reach data* either. The "old posts maturing" drift noted in every
+prior iteration has itself stopped.
+
+| Framework | n | avg views | likes/post | replies/post |
+|---|---|---|---|---|
+| historical_compounding_reveal | 7 | 332 | 1.14 | 0.00 |
+| progress_reveal | 8 | 76 | 0.88 | 0.12 |
+| STRIKER | 7 | 75 | 0.29 | 0.00 |
+| listicle_breakdown | 5 | 73 | 0.40 | 0.20 |
+| call_reasoning_risk | 7 | 62 | 0.14 | 0.14 |
+| contrarian_reframe | 5 | 58 | 0.40 | 0.20 |
+| standalone_aphorism | 6 | 44 | 0.67 | 0.00 |
+| audience_question | 5 | 36 | 0.20 | 0.00 |
+| confession_lesson | 4 | 30 | 0.25 | 0.00 |
+
+(Recomputed directly from the last valid snapshot, 2026-09-27 — the 7 null rounds since are
+excluded rather than treated as zero engagement. `progress_reveal` and `listicle_breakdown` have
+drifted up a couple of spots since iteration 4's table, the same "old posts maturing" effect noted
+every iteration; ranking order is otherwise the same.)
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Zero new post data, and now zero new reach
+data either — there is nothing to tune on.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist — `pages_read_engagement` remains
+missing. `post_log.jsonl` is still stuck at 24 posts, last one 2026-08-24 (day 739852) — now 42
+consecutive missed days, confirmed via the daily workflow's run history (still failing at the
+publish step on the invalidated `FB_PAGE_ACCESS_TOKEN`). Nothing new to fold into either the
+deferred poster-vs-text-only comparison or the 2026-08-10 external-evidence bet.
+
+**Standing blocker, now three-deep:** Hulk's scheduled posting staying off, Blue Hulk's invalidated
+access token (plus its missing `pages_read_engagement` scope), and — new as of this iteration —
+Hulk's own Threads token needing a manual refresh before metrics collection recovers. All three
+are user-side fixes; none have moved since first flagged.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-10-12.
