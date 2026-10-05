@@ -270,3 +270,22 @@ tracked here.
 **Same fix needed as every iteration so far, still outstanding:** regenerate
 `FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
 new action taken this iteration since the underlying blocker hasn't moved.
+
+## Performance review — 2026-10-05 (loop iteration 9)
+
+Ninth weekly firing. Both problems from iteration 4 are still open and unchanged:
+`pages_read_engagement` is still missing from the token, and the invalidated
+`FB_PAGE_ACCESS_TOKEN` (`OAuthException` code 190, subcode 460) is still blocking every scheduled
+post. `post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 (day 739852) — now 42
+consecutive missed days. Nothing to analyze; the deferred poster-vs-text-only comparison and the
+2026-08-10 external-evidence bet both carry forward unchanged for the seventh iteration in a row.
+
+Separately, the sibling Hulk (Threads) agent's own metrics collector has been broken since
+2026-09-28 — a different token (`THREADS_ACCESS_TOKEN`), different platform, different failure
+mode (collector swallows the auth error and writes nulls instead of crashing). Flagged to the
+operator directly when found; unrelated to Blue Hulk's token or `pages_read_engagement` gap, noted
+here only so the two outages aren't conflated.
+
+**Same fix needed as every iteration so far, still outstanding:** regenerate
+`FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
+new action taken this iteration since the underlying blocker hasn't moved.
