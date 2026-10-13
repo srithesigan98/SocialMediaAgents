@@ -176,7 +176,9 @@ def fetch_photo(url: str, size: tuple[int, int]) -> Image.Image | None:
         if Path(url).is_file():  # campaign photos live in the repo, not at a URL
             photo = ImageOps.exif_transpose(Image.open(url))
         else:
-            resp = requests.get(url, timeout=15)
+            # Some developer sites (Quill, Sutera, Atas) 403/406 python-requests' default UA but
+            # serve the same image to a browser UA — without this those posters lost their photo.
+            resp = requests.get(url, timeout=15, headers={"User-Agent": BROWSER_UA})
             resp.raise_for_status()
             photo = Image.open(io.BytesIO(resp.content))
         photo.seek(0)  # first frame if it's a GIF
@@ -202,6 +204,8 @@ def scrim(size: tuple[int, int]) -> Image.Image:
     return overlay
 
 
+BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 ZOOM = 1.12  # photo kept this much larger than the frame so the video can push in without edges
 
 
