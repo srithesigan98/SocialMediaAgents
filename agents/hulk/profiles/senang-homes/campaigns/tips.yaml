@@ -1,0 +1,35 @@
+# Weekly off-sheet posts (weekly_posts.py --tip): general buyer education, not about one listing.
+# Bullets go on the poster verbatim; the caption may only expand on them. Keep claims general and
+# true for Malaysian property — no specific bank rates, legal promises or market predictions.
+cta_word: GUIDE
+topics:
+  - key: offplan-checklist
+    hook: 5 checks before buying off-plan
+    bullets: ["• Developer's track record", "• Expected completion (VP) date", "• Freehold or leasehold title",
+              "• Maintenance fee per sqft", "• Nett price after rebates"]
+  - key: rental-yield
+    hook: Rental yield in 10 seconds
+    bullets: ["Yearly rent ÷ price × 100", "e.g. RM3,000/mo on a RM600K unit = 6%",
+              "Compare projects on yield, not just price"]
+  - key: price-per-sqft
+    hook: Compare homes by price per sqft
+    bullets: ["Price ÷ built-up size", "Compare within the same area",
+              "Bigger units often cost less per sqft"]
+  - key: hidden-costs
+    hook: Costs on top of the price
+    bullets: ["• Legal fees (SPA & loan)", "• Stamp duty (transfer & loan)", "• Valuation, furnishing, renovation",
+              "Many new launches cover legal fees — ask"]
+  - key: airbnb-check
+    hook: Airbnb unit? Check these first
+    bullets: ["• Does the building allow short stays?", "• Land title & strata by-laws",
+              "• Management rules for guests"]
+  - key: dsr
+    hook: Why banks reject home loans
+    bullets: ["Banks check your DSR:", "monthly debts ÷ net income", "Lower DSR, better approval odds"]
+  - key: offplan-vs-completed
+    hook: Off-plan or completed?
+    bullets: ["Off-plan: rebates, pay as it's built", "Completed: see it, rent it out now",
+              "Choose by when you need the keys"]
+  - key: location-checks
+    hook: 3 location checks before you buy
+    bullets: ["• Walk to LRT / MRT?", "• Hospitals, schools, groceries nearby", "• What's being built around it"]

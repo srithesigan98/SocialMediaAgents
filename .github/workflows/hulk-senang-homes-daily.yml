@@ -1,26 +1,23 @@
 name: Hulk (Senang Homes) daily post
 
-# Posts one Senang Homes listing to Threads + Instagram, twice a day (matching
-# agents/hulk/profiles/senang-homes/profile.yaml's schedule.times: 09:30 and 19:30 Malaysia time).
-# Every Monday, the 09:00 MYT slot posts an area/market-comparison carousel instead (see the
-# `if` in the Generate and post step) — a different format so the feed isn't only single listings.
+# ONE post a day at 19:30 MYT (11:30 UTC) to Threads + Instagram. What goes out depends on the day:
+#   Monday    — weekly recap carousel of the last 7 days' listings (weekly_posts.py --recap)
+#   Thursday  — off-sheet buyer tip, e.g. "rental yield in 10 seconds" (weekly_posts.py --tip)
+#   other days — a sheet listing as an animated poster (Reel / Threads video, still-image fallback).
+#                Until KHAYA_UNTIL, every other day is Khaya Residences (reels + unit posts).
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
 
 on:
   schedule:
-    # Cron is always UTC. Malaysia is UTC+8, so 09:30 MYT = 01:30 UTC and 19:30 MYT = 11:30 UTC.
-    # GitHub may start scheduled runs a few minutes late under load — that's normal.
-    - cron: "30 1 * * *"
-    - cron: "30 11 * * *"
-    - cron: "0 1 * * 1"    # 09:00 MYT Monday — area/market comparison carousel
-  workflow_dispatch: {}   # adds a manual "Run workflow" button for testing
+    - cron: "30 11 * * *"   # GitHub may start scheduled runs a few minutes late under load
+  workflow_dispatch: {}     # manual "Run workflow" button for testing
 
 permissions:
-  contents: write   # needed to commit/push each post's poster PNG (see commit_poster())
+  contents: write   # needed to commit/push each post's poster (see commit_poster())
 
 jobs:
   post:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # ships with ffmpeg, which the animated posters need
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -42,17 +39,18 @@ jobs:
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
         run: |
           cd agents/hulk/scripts
-          # Khaya Residences focus month (to 2026-10-28): every other post is Khaya — the morning
-          # slot alternates Khaya reels and unit posts, the evening slot rotates everything else.
           KHAYA_UNTIL=2026-10-28
-          if [ "${{ github.event.schedule }}" = "0 1 * * 1" ]; then
-            python daily_posts.py --profile senang-homes --area-post --area-count 2 --yes
-          elif [ "$(date -u +%F)" \< "$KHAYA_UNTIL" ] || [ "$(date -u +%F)" = "$KHAYA_UNTIL" ]; then
-            if [ "${{ github.event.schedule }}" = "30 1 * * *" ]; then
-              python campaign_post.py khaya --profile senang-homes --next --yes
-            else
-              python daily_posts.py --profile senang-homes --count 1 --exclude-project "Khaya Residences" --yes
-            fi
+          TODAY=$(date -u +%F)
+          DOW=$(date -u +%u)                  # 1 = Monday ... 7 = Sunday
+          ODD_DAY=$(( 10#$(date -u +%j) % 2 ))
+          if [ "$DOW" = 1 ]; then
+            python weekly_posts.py --profile senang-homes --recap --yes
+          elif [ "$DOW" = 4 ]; then
+            python weekly_posts.py --profile senang-homes --tip --yes
+          elif [ ! "$TODAY" \> "$KHAYA_UNTIL" ] && [ "$ODD_DAY" = 1 ]; then
+            python campaign_post.py khaya --profile senang-homes --next --yes
+          elif [ ! "$TODAY" \> "$KHAYA_UNTIL" ]; then
+            python daily_posts.py --profile senang-homes --count 1 --exclude-project "Khaya Residences" --yes
           else
             python daily_posts.py --profile senang-homes --count 1 --yes
           fi

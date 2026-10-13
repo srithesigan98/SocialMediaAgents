@@ -70,6 +70,8 @@ poster:
   background: "#0E1A16"
   accent: "#14B87A"
   text: "#F5F7F6"
+  headline: "#FFD400"   # the big hook + stat values — striking yellow over the real photo
+  animate: true         # also render a 7s animated version and post it as a Reel / Threads video
   muted: "#8FA39B"
   brand: "SENANG HOMES"
   size: [1080, 1350]        # 4:5 — the tallest ratio Instagram shows in full
@@ -79,8 +81,8 @@ poster:
 
 schedule:
   # Two posts a day, as asked. Times are local to the machine running the scheduler.
-  posts_per_day: 2
-  times: ["09:30", "19:30"]
+  posts_per_day: 1
+  times: ["19:30"]   # the real schedule lives in .github/workflows/hulk-senang-homes-daily.yml
   # Don't repost the same property until this many days have passed.
   cooldown_days: 14
   # Post to these platforms. Remove one to disable it.

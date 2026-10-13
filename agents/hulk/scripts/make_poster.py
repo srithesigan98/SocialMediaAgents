@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import io
 import re
+import subprocess
 import textwrap
 import zlib
 from pathlib import Path
@@ -31,7 +32,7 @@ from dotenv import load_dotenv
 import common
 
 try:
-    from PIL import Image, ImageDraw, ImageFont, ImageOps
+    from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 except ImportError:  # pragma: no cover
     raise SystemExit("make_poster.py needs Pillow — run: pip install Pillow")
 
@@ -110,7 +111,9 @@ def hook_choice(listing: dict) -> tuple[str, str]:
     keyed on the listing's ref so different listings lead with different facts — every poster
     shouldn't scream the same "rental gap" line. Deterministic, so re-renders don't change."""
     facts = listing_facts(listing)
-    area = common._extract_area(listing.get("location", "")).upper()
+    # Brackets are sheet notes ("Jalan Tun Razak (Next to TRX)") — fine in a caption, clutter
+    # in a 4-word headline.
+    area = re.sub(r"\s*\(.*?\)", "", common._extract_area(listing.get("location", ""))).upper()
     options = []
     if "gap" in facts:
         options.append(("gap", f"RENT COVERS INSTALMENT +RM{facts['gap'][0][3:]}/MO"))
@@ -118,7 +121,9 @@ def hook_choice(listing: dict) -> tuple[str, str]:
         options.append(("yield", f"{facts['yield'][0]} RENTAL YIELD IN {area}"))
     if "psf" in facts:
         options.append(("psf", f"{facts['psf'][0]}/SQFT IN {area}"))
-    if listing.get("highlight"):
+    # Only short rebate lines make a headline; long sheet text ("15% (Partial Furnished) / 11%
+    # (Fully Furnished).") reads as noise at headline size — it still shows as a perk below.
+    if listing.get("highlight") and len(listing["highlight"]) <= 32:
         options.append(("highlight", listing["highlight"]))
     if not options:
         return "", facts.get("price", ("", ""))[0] or listing.get("location", "")
@@ -197,71 +202,131 @@ def scrim(size: tuple[int, int]) -> Image.Image:
     return overlay
 
 
-def _new_canvas(cfg: dict, photo_url: str, size=None):
-    """Photo (or brand-colour fallback) + scrim + brand tag — the base every poster starts
-    from, whether it's a single listing or one area of a market-comparison carousel."""
-    pc = cfg.get("poster", {})
-    width, height = size or tuple(pc.get("size", [1080, 1350]))
-    bg, accent = pc.get("background", "#0E1A16"), pc.get("accent", "#14B87A")
-    fg = pc.get("text", "#F5F7F6")
-    margin = int(width * 0.08)
-    inner = width - margin * 2
-
-    photo = fetch_photo(photo_url, (width, height))
-    base = photo if photo else Image.new("RGB", (width, height), bg)
-    img = Image.alpha_composite(base.convert("RGBA"), scrim((width, height))).convert("RGB")
-    draw = ImageDraw.Draw(img)
-
-    brand = pc.get("brand", cfg.get("name", "")).upper()
-    draw.text((margin, margin), brand, font=font(BOLD, 34), fill=accent,
-              stroke_width=2, stroke_fill="#000000")
-
-    return img, draw, width, height, margin, inner, fg, accent
+ZOOM = 1.12  # photo kept this much larger than the frame so the video can push in without edges
 
 
-def _compose_hook_and_stack(img, draw, width: int, height: int, margin: int, inner: int,
-                             fg: str, hook: str, blocks: list[tuple]) -> None:
-    """Draws the big hook headline — sized to fill whatever vertical space is left between the
-    brand tag and `blocks` — then the bottom detail stack itself. Shared by render() (single
-    listing) and render_area() (market-comparison carousel): same visual language, different
-    content feeding it."""
-    content_height = sum(_block_height(b) for b in blocks)
-    bottom_y = max(margin + 70, height - margin - content_height)
+def _ease(t: float) -> float:
+    t = min(max(t, 0.0), 1.0)
+    return 1 - (1 - t) ** 3  # ease-out cubic: fast start, soft landing
 
-    # Dark panel behind the whole detail stack so it stays legible over any photo — the scrim
-    # alone fades in too low once the stack grows (tiles + perks), leaving text on bright sky.
-    panel = Image.new("RGBA", (width, height - bottom_y + 30), (0, 0, 0, 150))
-    img.paste(panel, (0, bottom_y - 30), panel)
-    draw = ImageDraw.Draw(img)
 
-    hook_top = margin + 90
-    hook_bottom = bottom_y - 30  # = top of the detail panel
-    if hook_bottom > hook_top and hook:
-        # -40: the band adds 20px padding above and below the text; budget for it here or the
-        # band overruns into the detail stack.
-        hook_lines, hook_font_obj = fit_hook(
-            draw, hook.upper(), inner, hook_bottom - hook_top - 40, start=int(width * 0.13)
-        )
-        line_h = hook_font_obj.size + 14
-        band_height = len(hook_lines) * line_h + 40
-        # Sits directly on the detail panel — one continuous dark block, photo clear above it.
-        band_top = hook_bottom - band_height
-        band = Image.new("RGBA", (width, band_height), (0, 0, 0, 165))
-        img.paste(band, (0, band_top), band)
-        draw = ImageDraw.Draw(img)
-        y = band_top + 20
-        for line in hook_lines:
-            draw.text((margin, y), line, font=hook_font_obj, fill=fg)
-            y += line_h
+class Canvas:
+    """One poster, kept as separate layers — photo, brand, hook headline, detail stack — so the
+    same design renders both as a still PNG and as an animated MP4 (photo slowly pushes in,
+    headline and details slide up into place)."""
 
-    y = bottom_y
-    for block in blocks:
-        text, f, fill, gap = block
-        if isinstance(text, list):
-            _draw_tiles(draw, text, f, fill, fg, margin, y, inner)
-        else:
-            draw.text((margin, y), text, font=f, fill=fill)
-        y += _block_height(block)
+    def __init__(self, cfg: dict, photo_url: str, size=None):
+        pc = cfg.get("poster", {})
+        self.width, self.height = size or tuple(pc.get("size", [1080, 1350]))
+        self.accent = pc.get("accent", "#14B87A")
+        self.fg = pc.get("text", "#F5F7F6")
+        self.headline = pc.get("headline", "#FFD400")
+        self.margin = int(self.width * 0.08)
+        self.inner = self.width - self.margin * 2
+        big = (int(self.width * ZOOM), int(self.height * ZOOM))
+        self.photo = fetch_photo(photo_url, big) or Image.new("RGB", big, pc.get("background", "#0E1A16"))
+        self.scrim = scrim((self.width, self.height))
+        self.layers = {k: Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
+                       for k in ("brand", "hook", "details")}
+        self.draw = ImageDraw.Draw(self.layers["details"])  # also what fit_font() measures with
+        brand = pc.get("brand", cfg.get("name", "")).upper()
+        ImageDraw.Draw(self.layers["brand"]).text(
+            (self.margin, self.margin), brand, font=font(BOLD, 34), fill=self.accent,
+            stroke_width=2, stroke_fill="#000000")
+
+    def corner(self, text: str) -> None:
+        cf = font(BOLD, 30)
+        d = ImageDraw.Draw(self.layers["brand"])
+        d.text((self.width - self.margin - d.textlength(text, font=cf), self.margin), text,
+               font=cf, fill=self.fg, stroke_width=2, stroke_fill="#000000")
+
+    def compose(self, hook: str, blocks: list[tuple]) -> None:
+        """Hook headline sized to fill the space above `blocks`, then the detail stack."""
+        w, h, m = self.width, self.height, self.margin
+        content_height = sum(_block_height(b) for b in blocks)
+        bottom_y = max(m + 70, h - m - content_height)
+
+        # Detail panel: fades in from transparent so the photo flows into it, no hard edge.
+        d = ImageDraw.Draw(self.layers["details"])
+        fade_top = bottom_y - 140
+        for y in range(max(fade_top, 0), h):
+            a = 175 if y >= bottom_y - 30 else int(175 * (y - fade_top) / 110)
+            d.line([(0, y), (w, y)], fill=(0, 0, 0, max(a, 0)))
+        y = bottom_y
+        for block in blocks:
+            text, f, fill, gap = block
+            if isinstance(text, list):
+                _draw_tiles(d, text, f, fill, self.fg, m, y, self.inner)
+            else:
+                d.text((m, y), text, font=f, fill=fill)
+            y += _block_height(block)
+
+        hook_top, hook_bottom = m + 90, bottom_y - 150
+        if not hook or hook_bottom <= hook_top:
+            return
+        lines, hf = fit_hook(self.draw, hook.upper(), self.inner, hook_bottom - hook_top,
+                             start=int(w * 0.14))
+        line_h = hf.size + 10
+        top = hook_bottom - len(lines) * line_h  # bottom-aligned: sits just above the details
+        layer = self.layers["hook"]
+        # Soft shadow (blurred dark copy) + black outline: yellow reads on bright sky and
+        # dark interiors alike, with no solid band hiding the photo.
+        shadow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        sd = ImageDraw.Draw(shadow)
+        for i, line in enumerate(lines):
+            sd.text((m + 6, top + i * line_h + 8), line, font=hf, fill=(0, 0, 0, 200))
+        layer.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(10)))
+        hd = ImageDraw.Draw(layer)
+        for i, line in enumerate(lines):
+            hd.text((m, top + i * line_h), line, font=hf, fill=self.headline,
+                    stroke_width=max(3, hf.size // 28), stroke_fill="#000000")
+
+    def _frame(self, zoom: float, alphas: dict, offsets: dict) -> Image.Image:
+        """zoom 0 = whole oversized photo (widest), 1 = pushed in to the frame size."""
+        pw, ph = self.photo.size
+        cw, ch = pw - (pw - self.width) * zoom, ph - (ph - self.height) * zoom
+        x0, y0 = (pw - cw) / 2, (ph - ch) / 2
+        img = self.photo.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch)))
+        img = img.resize((self.width, self.height), Image.LANCZOS).convert("RGBA")
+        img.alpha_composite(self.scrim)
+        for name in ("brand", "hook", "details"):
+            a, dy = alphas.get(name, 1.0), offsets.get(name, 0)
+            if a <= 0:
+                continue
+            layer = self.layers[name]
+            if a < 1:
+                layer = layer.copy()
+                layer.putalpha(layer.getchannel("A").point(lambda v: int(v * a)))
+            img.alpha_composite(layer, (0, int(dy)))
+        return img.convert("RGB")
+
+    def save_png(self, out_path: Path) -> Path:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        self._frame(0.0, {}, {}).save(out_path, "PNG")
+        return out_path
+
+    def save_mp4(self, out_path: Path, seconds: float = 7.0, fps: int = 30) -> Path:
+        """Photo pushes in over the whole clip; brand fades in, hook slides up (0.25-0.95s),
+        details follow (0.9-1.5s), then it holds so there's time to read."""
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
+               "-s", f"{self.width}x{self.height}", "-r", str(fps), "-i", "-",
+               "-c:v", "libx264", "-preset", "medium", "-crf", "26", "-pix_fmt", "yuv420p",
+               "-movflags", "+faststart", str(out_path)]
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        for n in range(int(seconds * fps)):
+            t = n / fps
+            hook_p, det_p = _ease((t - 0.25) / 0.7), _ease((t - 0.9) / 0.6)
+            frame = self._frame(
+                zoom=t / seconds,
+                alphas={"brand": _ease(t / 0.4), "hook": hook_p, "details": det_p},
+                offsets={"hook": 70 * (1 - hook_p), "details": 40 * (1 - det_p)},
+            )
+            proc.stdin.write(frame.tobytes())
+        proc.stdin.close()
+        if proc.wait() != 0:
+            raise RuntimeError("ffmpeg failed to encode the poster video")
+        return out_path
 
 
 # A block whose text is a list of (value, label) pairs is a stat-tile row: big accent number
@@ -295,14 +360,25 @@ def _draw_tiles(draw, tiles, value_font, accent, fg, x0: int, y: int, inner: int
 
 
 def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) -> Path:
+    out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.png"
+    return listing_canvas(cfg, listing, size).save_png(out_path)
+
+
+def render_video(cfg: dict, listing: dict, out_path: Path | None = None) -> Path:
+    """The same poster, animated, in 9:16 for Reels/Threads video — the layout re-flows for the
+    taller frame on its own since everything is sized from the available space."""
+    out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.mp4"
+    return listing_canvas(cfg, listing, (1080, 1920)).save_mp4(out_path)
+
+
+def listing_canvas(cfg: dict, listing: dict, size=None) -> Canvas:
     # photo_url is a raw source photo to composite into the poster (e.g. found via search).
     # image_url means a finished, ready-to-post image and is handled upstream in daily_posts.py's
     # poster_url(), which uses it as-is instead of calling render() at all — the two are
     # deliberately different fields so a bare source photo never gets posted without the price/
     # location/CTA text overlay.
-    img, draw, width, height, margin, inner, fg, accent = _new_canvas(
-        cfg, listing.get("photo_url", "") or listing.get("image_url", ""), size
-    )
+    c = Canvas(cfg, listing.get("photo_url", "") or listing.get("image_url", ""), size)
+    draw, width, inner, fg, accent = c.draw, c.width, c.inner, c.fg, c.accent
 
     # Deliberately minimal and deliberately missing the title/ref/WhatsApp link — the title is
     # withheld on purpose (the CTA asks viewers to comment it), and everything else lives in the
@@ -326,7 +402,7 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     hook_key, hook = hook_choice(listing)
     tiles = stat_tiles(listing, hook_key)
     if tiles:
-        blocks.append(tile_block(draw, tiles, inner, accent))
+        blocks.append(tile_block(draw, tiles, inner, c.headline))
 
     # "What's the best thing about it" — rebate and freebies, skipped if the hook already says it.
     perks = [p for p in (listing.get("highlight"), listing.get("legal_fees_freebies")) if p and p != hook]
@@ -351,12 +427,8 @@ def render(cfg: dict, listing: dict, out_path: Path | None = None, size=None) ->
     cta_font = fit_font(draw, cta_text, BOLD, inner, 42)
     blocks.append((cta_text, cta_font, accent, 0))
 
-    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
-
-    out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.png"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out_path, "PNG")
-    return out_path
+    c.compose(hook, blocks)
+    return c
 
 
 def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = None, size=None) -> Path:
@@ -364,56 +436,46 @@ def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = N
     the hook is the area's price/sqft (the fact these posts are actually about) instead of a
     listing's rental gap, and there's no per-listing comment-trigger CTA since a carousel slide
     isn't tied to one specific unit."""
-    img, draw, width, height, margin, inner, fg, accent = _new_canvas(cfg, photo_url, size)
-
+    c = Canvas(cfg, photo_url, size)
     area_line = stat["area"].upper()
     tiles = [
         (f"RM{stat['min_price_per_sqft']:,}", "LOWEST /SQFT"),
         (f"RM{stat['max_price_per_sqft']:,}", "HIGHEST /SQFT"),
         (str(stat["listing_count"]), "UNITS LISTED"),
     ]
-    blocks = [
-        (area_line, fit_font(draw, area_line, BOLD, inner, 46), fg, 22),
-        tile_block(draw, tiles, inner, accent, gap=0),
-    ]
-
-    hook = f"RM{stat['avg_price_per_sqft']:,}/sqft average"
-    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
-
+    c.compose(f"RM{stat['avg_price_per_sqft']:,}/sqft average", [
+        (area_line, fit_font(c.draw, area_line, BOLD, c.inner, 46), c.fg, 22),
+        tile_block(c.draw, tiles, c.inner, c.headline, gap=0),
+    ])
     if out_path is None:
         slug = re.sub(r"[^a-z0-9]+", "-", stat["area"].lower()).strip("-")
         out_path = common.POSTERS_DIR / f"{cfg['_profile']}-area-{slug}.png"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out_path, "PNG")
-    return out_path
+    return c.save_png(out_path)
 
 
 def render_slide(cfg: dict, photo: str, hook: str, out_path: Path, tiles=(), lines=(),
                  cta_word: str | None = None, page: int = 0, total: int = 0) -> Path:
     """One slide of a feature carousel (see campaign_post.py): photo + big hook + optional stat
     tiles, bullet lines and comment-trigger CTA — same visual language as render()."""
-    img, draw, width, height, margin, inner, fg, accent = _new_canvas(cfg, photo)
-    if total:
-        counter = f"{page}/{total}"
-        cf = font(BOLD, 30)
-        draw.text((width - margin - draw.textlength(counter, font=cf), margin), counter,
-                  font=cf, fill=fg, stroke_width=2, stroke_fill="#000000")
+    return slide_canvas(cfg, photo, hook, tiles, lines, cta_word, page, total).save_png(out_path)
 
+
+def slide_canvas(cfg: dict, photo: str, hook: str, tiles=(), lines=(), cta_word: str | None = None,
+                 page: int = 0, total: int = 0, size=None) -> Canvas:
+    c = Canvas(cfg, photo, size)
+    if total:
+        c.corner(f"{page}/{total}")
     blocks: list[tuple] = []
     if tiles:
-        blocks.append(tile_block(draw, [tuple(t) for t in tiles], inner, accent))
-    line_font = font(REGULAR, 34)
+        blocks.append(tile_block(c.draw, [tuple(t) for t in tiles], c.inner, c.headline))
     for i, line in enumerate(lines):
-        blocks.append((line, fit_font(draw, line, REGULAR, inner, 34) if line else line_font, fg,
+        blocks.append((line, fit_font(c.draw, line, REGULAR, c.inner, 34), c.fg,
                        10 if i < len(lines) - 1 else 26))
     if cta_word:
         cta = f'COMMENT "{cta_word}" FOR FULL DETAILS'
-        blocks.append((cta, fit_font(draw, cta, BOLD, inner, 42), accent, 0))
-
-    _compose_hook_and_stack(img, draw, width, height, margin, inner, fg, hook, blocks)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out_path, "PNG")
-    return out_path
+        blocks.append((cta, fit_font(c.draw, cta, BOLD, c.inner, 42), c.accent, 0))
+    c.compose(hook, blocks)
+    return c
 
 
 def public_url(cfg: dict, path: Path) -> str | None:

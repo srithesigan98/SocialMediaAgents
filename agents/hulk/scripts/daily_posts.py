@@ -104,7 +104,34 @@ def poster_url(cfg: dict, listing: dict, dry_run: bool = False) -> str | None:
     raise ValueError(f"Unknown poster.mode: {mode!r}")
 
 
-def publish(cfg: dict, platform: str, text: str, image_url: str | None) -> str | None:
+def video_url(cfg: dict, listing: dict, dry_run: bool = False) -> str | None:
+    """Animated version of the poster (poster.animate), posted as a Reel / Threads video.
+    None when animation is off or the sheet supplies its own finished image."""
+    pc = cfg.get("poster", {})
+    if not pc.get("animate") or pc.get("mode") != "auto" or listing.get("image_url"):
+        return None
+    try:
+        path = make_poster.render_video(cfg, listing)
+    except Exception as exc:  # e.g. no ffmpeg — the still poster still goes out
+        print(f"  ! animated poster failed, posting the still: {exc}")
+        return None
+    url = make_poster.public_url(cfg, path)
+    if url and not dry_run:
+        commit_poster(path)
+    return url
+
+
+def publish(cfg: dict, platform: str, text: str, image_url: str | None,
+            video: str | None = None) -> str | None:
+    if video:
+        # Video first (more reach); any failure falls back to the still so the day's post
+        # still goes out.
+        try:
+            if platform == "threads":
+                return platforms.threads_publish_video(cfg, text, video)
+            return platforms.instagram_publish_reel(cfg, text, video)
+        except Exception as exc:
+            print(f"  ! {platform} video failed, falling back to the still poster: {str(exc)[:200]}")
     if platform == "threads":
         return platforms.threads_publish(cfg, text, image_url=image_url)
     if platform == "instagram":
@@ -230,6 +257,9 @@ def post_listing(cfg: dict, listing: dict, platform_list: list[str], args) -> in
         image_url = None
     if image_url:
         print(f"  image: {image_url}")
+    video = video_url(cfg, listing, dry_run=args.dry_run)
+    if video:
+        print(f"  video: {video}")
 
     for platform in platform_list:
         try:
@@ -248,7 +278,7 @@ def post_listing(cfg: dict, listing: dict, platform_list: list[str], args) -> in
             print("  skipped.")
             continue
         try:
-            post_id = publish(cfg, platform, text, image_url)
+            post_id = publish(cfg, platform, text, image_url, video)
         except Exception:
             failures += 1
             print(f"  ! publish to {platform} failed:\n{traceback.format_exc()}")
