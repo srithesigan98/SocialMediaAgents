@@ -1,35 +1,64 @@
 # Weekly off-sheet posts (weekly_posts.py --tip): general buyer education, not about one listing.
-# Bullets go on the poster verbatim; the caption may only expand on them. Keep claims general and
-# true for Malaysian property — no specific bank rates, legal promises or market predictions.
+# Rendered as the editorial CHECKLIST layout — 3-4 items, each a short heading + one line. The
+# caption may only expand on these items. Keep claims general and true for Malaysian property —
+# no specific bank rates, legal promises or market predictions.
 cta_word: GUIDE
 topics:
   - key: offplan-checklist
-    hook: 5 checks before buying off-plan
-    bullets: ["• Developer's track record", "• Expected completion (VP) date", "• Freehold or leasehold title",
-              "• Maintenance fee per sqft", "• Nett price after rebates"]
+    label: Buyer's checklist
+    headline: Four checks before buying off-plan
+    items:
+      - {title: "The developer's track record", line: "Look at how their past projects were delivered."}
+      - {title: "The completion date", line: "Note the expected vacant possession date."}
+      - {title: "Freehold or leasehold", line: "Know the tenure before you sign."}
+      - {title: "The nett price", line: "Compare prices after rebates, not before."}
   - key: rental-yield
-    hook: Rental yield in 10 seconds
-    bullets: ["Yearly rent ÷ price × 100", "e.g. RM3,000/mo on a RM600K unit = 6%",
-              "Compare projects on yield, not just price"]
+    label: Investor basics
+    headline: Rental yield, in one line
+    items:
+      - {title: "The formula", line: "Yearly rent divided by price, times 100."}
+      - {title: "An example", line: "RM3,000 a month on a RM600K unit is 6%."}
+      - {title: "How to use it", line: "Compare projects on yield, not price alone."}
   - key: price-per-sqft
-    hook: Compare homes by price per sqft
-    bullets: ["Price ÷ built-up size", "Compare within the same area",
-              "Bigger units often cost less per sqft"]
+    label: Comparing homes
+    headline: Compare by price per sqft
+    items:
+      - {title: "The formula", line: "Price divided by built-up size."}
+      - {title: "Like with like", line: "Compare units within the same area."}
+      - {title: "Size matters", line: "Bigger units often cost less per sqft."}
   - key: hidden-costs
-    hook: Costs on top of the price
-    bullets: ["• Legal fees (SPA & loan)", "• Stamp duty (transfer & loan)", "• Valuation, furnishing, renovation",
-              "Many new launches cover legal fees — ask"]
+    label: Budgeting
+    headline: Costs on top of the price
+    items:
+      - {title: "Legal fees", line: "For the sale agreement and the loan."}
+      - {title: "Stamp duty", line: "On the transfer and on the loan."}
+      - {title: "Moving in", line: "Valuation, furnishing and renovation."}
+      - {title: "Ask about packages", line: "Some new launches cover legal fees."}
   - key: airbnb-check
-    hook: Airbnb unit? Check these first
-    bullets: ["• Does the building allow short stays?", "• Land title & strata by-laws",
-              "• Management rules for guests"]
+    label: Short stays
+    headline: Planning an Airbnb unit?
+    items:
+      - {title: "Building rules", line: "Check that short stays are allowed."}
+      - {title: "Title and by-laws", line: "Read the land title and strata by-laws."}
+      - {title: "Guest management", line: "Ask how the management handles guests."}
   - key: dsr
-    hook: Why banks reject home loans
-    bullets: ["Banks check your DSR:", "monthly debts ÷ net income", "Lower DSR, better approval odds"]
+    label: Home loans
+    headline: Why banks reject home loans
+    items:
+      - {title: "Your DSR", line: "Monthly debts divided by net income."}
+      - {title: "Lower is better", line: "A lower DSR improves approval odds."}
+      - {title: "Check before you buy", line: "Know your number before you book a unit."}
   - key: offplan-vs-completed
-    hook: Off-plan or completed?
-    bullets: ["Off-plan: rebates, pay as it's built", "Completed: see it, rent it out now",
-              "Choose by when you need the keys"]
+    label: Choosing well
+    headline: Off-plan or completed?
+    items:
+      - {title: "Off-plan", line: "Rebates, and you pay as it is built."}
+      - {title: "Completed", line: "See it today and rent it out sooner."}
+      - {title: "Your timing", line: "Choose by when you need the keys."}
   - key: location-checks
-    hook: 3 location checks before you buy
-    bullets: ["• Walk to LRT / MRT?", "• Hospitals, schools, groceries nearby", "• What's being built around it"]
+    label: Neighbourhood
+    headline: Three location checks
+    items:
+      - {title: "Transport", line: "Is there an LRT or MRT within walking distance?"}
+      - {title: "Daily needs", line: "Hospitals, schools and groceries nearby."}
+      - {title: "What's coming", line: "New developments planned around it."}

@@ -235,10 +235,15 @@ def load_photo_overrides(cfg: dict) -> dict[str, str]:
     if not path.exists():
         return {}
     rows = _rows_from_csv_text(path.read_text(encoding="utf-8-sig"))
-    return {
-        r["title"].strip(): r["photo_url"].strip()
-        for r in rows if r.get("title", "").strip() and r.get("photo_url", "").strip()
-    }
+    out = {}
+    for r in rows:
+        title, src = r.get("title", "").strip(), r.get("photo_url", "").strip()
+        if title and src:
+            # A non-URL value is a photo kept in the repo (relative to the profile folder) —
+            # developer sites block or bot-check hotlinks, so local copies are what the cron
+            # can rely on.
+            out[title] = src if src.startswith("http") else str(cfg["_dir"] / src)
+    return out
 
 
 def find_listing(cfg: dict, ref: str) -> dict:

@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 
 import common
 import daily_posts
+import editorial
 import generate_property_post as drafter
 import make_poster
 import platforms
@@ -57,19 +58,24 @@ def sheet_data(cfg: dict, project: str) -> tuple[dict, list[dict]]:
 
 
 def render_slides(cfg: dict, name: str, camp: dict, data: dict) -> list:
+    """Editorial carousel (see editorial.py): one Poster per slide spec in the campaign yaml."""
     folder = common.profile_path(cfg, f"campaigns/{name}")
     slides = camp["slides"]
+    fill = lambda t: t.format(**data)  # noqa: E731
     paths = []
     for i, s in enumerate(slides, 1):
-        fill = lambda t: t.format(**data)  # noqa: E731
-        paths.append(make_poster.render_slide(
-            cfg, str(folder / s["photo"]), fill(s["hook"]),
-            common.POSTERS_DIR / f"{cfg['_profile']}-campaign-{name}-{i}.png",
-            tiles=[[fill(v), l] for v, l in s.get("tiles", [])],
-            lines=[fill(l) for l in s.get("lines", []) if fill(l).strip("• ")],
-            cta_word=camp.get("trigger_word") if s.get("cta") else None,
-            page=i, total=len(slides),
-        ))
+        poster = editorial.Poster(
+            s.get("kind", "info"),
+            label=fill(s.get("label", "")), headline=fill(s["headline"]),
+            photo=str(folder / s["photo"]) if s.get("photo") else "",
+            # A filled line that's empty or just punctuation (e.g. "{rebate}." with no rebate in
+            # the sheet) is dropped rather than printed as a stray dot.
+            copy=[c for c in (fill(x) for x in s.get("copy", [])) if c.strip(" .•")],
+            items=s.get("items", []), cta=fill(s.get("cta", "")),
+            location=camp.get("location", "Kuala Lumpur"), page=i, total=len(slides),
+            swipe=s.get("swipe", False),
+        )
+        paths.append(poster.save_png(common.POSTERS_DIR / f"{cfg['_profile']}-campaign-{name}-{i}.png"))
     return paths
 
 

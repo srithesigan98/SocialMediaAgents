@@ -31,32 +31,51 @@ reels:
   - {file: Khaya_Master_Highlight_Reel.mp4, angle: "Highlights: kitchen, master suite, spa bathroom"}
   - {file: Khaya_Unit_A_Tour.mp4, angle: "Full Unit A tour, room by room"}
 
+location: Bangsar   # footer: "SENANG HOMES / BANGSAR"
+
+# Slides follow the SenangHomes editorial brief: cover -> information / checklist -> closing.
+# Every claim is one of the facts above; {placeholders} come from the live sheet.
 slides:
-  - photo: tower.jpg
-    hook: Khaya Residences, Bangsar
-    tiles: [["61", "FLOORS"], ["3.88", "ACRES"], ["10", "LIFTS"]]
-    lines: ["Swipe >> everything you need to know"]
-  - photo: living.jpg
-    hook: Airbnb allowed
-    lines: ["• Near Pantai Hospital", "• Type C & Type D built for short stays", "• Commercial title (HTA)"]
-  - photo: aerial.jpg
-    hook: 2 LRT stations nearby
-    lines: ["• Abdullah Hukum", "• Kerinchi", "Kelana Jaya Line"]
-  - photo: view.jpg
-    hook: 90% unblocked KL view
-    lines: ["90% of units face KL city skyline & TNB tower"]
-  - photo: model.jpg
-    hook: Gym & grocery downstairs
-    tiles: [["18,000", "SQFT RETAIL"], ["9", "SHOPLOTS"], ["G", "LEVEL"]]
-    lines: ["Anytime Fitness + grocery store on site"]
-  - photo: pool.jpg
-    hook: Same landscape architect as TRX
-    lines: ["Designed by Land Art"]
-  - photo: terrace.jpg
-    hook: 50 floors of homes
-    tiles: [["L10-59", "RESIDENCES"], ["10", "LIFTS"], ["61", "STOREYS"]]
-  - photo: interior.jpg
-    hook: "From {from_price}"
-    tiles: [["{psf_min}", "LOWEST /SQFT"], ["{min_size}", "SQFT FROM"], ["{unit_count}", "UNIT TYPES"]]
-    lines: ["• {rebate}"]
-    cta: true
+  - kind: cover
+    photo: tower.jpg
+    label: Khaya Residences
+    headline: A 61-storey address in Bangsar
+    swipe: true
+  - kind: info
+    photo: living.jpg
+    label: Short stays
+    headline: Airbnb allowed, near Pantai Hospital
+    copy: ["Type C and Type D units are the layouts suited to short stays.", "Commercial title (HTA)."]
+  - kind: info
+    photo: aerial.jpg
+    label: Getting around
+    headline: Two LRT stations nearby
+    copy: ["Abdullah Hukum and Kerinchi, both on the Kelana Jaya Line."]
+  - kind: info
+    photo: view.jpg
+    label: The view
+    headline: Unblocked views for 90% of units
+    copy: ["Looking out over the Kuala Lumpur city skyline and the TNB tower."]
+  - kind: checklist
+    photo: model.jpg
+    label: At a glance
+    headline: Built at scale
+    items:
+      - {title: "61 floors on 3.88 acres", line: "Residences from level 10 to level 59."}
+      - {title: "10 lifts", line: "Serving the tower."}
+      - {title: "9 shoplots", line: "On the ground level."}
+      - {title: "18,000 sqft for daily needs", line: "Anytime Fitness and a grocery store."}
+  - kind: info
+    photo: pool.jpg
+    label: Landscape
+    headline: By the landscape team behind TRX
+    copy: ["Grounds designed by Land Art."]
+  - kind: info
+    photo: interior.jpg
+    label: Pricing
+    headline: "From {from_price}"
+    copy: ["From {psf_min} per sqft, based on current listed units.", "{rebate}."]
+  - kind: closing
+    headline: See the full details
+    copy: ["Floor plans, unit types and the latest pricing."]
+    cta: 'Comment "KHAYA" and we will send them over'

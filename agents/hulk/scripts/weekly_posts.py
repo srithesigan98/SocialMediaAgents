@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 
 import common
 import daily_posts
+import editorial
 import generate_property_post as drafter
 import make_poster
 import platforms
@@ -41,10 +42,10 @@ def tip_caption(cfg: dict, topic: dict, platform: str) -> str:
     cta = common.cta_line(cfg, GENERIC)
     budget = drafter.LIMITS[platform] - len(cta) - 2
     prompt = "\n".join([
-        f"Write one {platform} post for Malaysian home buyers on: {topic['hook']}.",
+        f"Write one {platform} post for Malaysian home buyers on: {topic['headline']}.",
         "It must only explain and expand these points — no bank rates, laws, prices or market "
         "predictions beyond them, and nothing about a specific project:",
-        *topic["bullets"],
+        *[f"- {i['title']}: {i['line']}" for i in topic["items"]],
         "",
         f"End by inviting people to comment \"{cfg['_tips']['cta_word']}\" for help with their own purchase.",
         f"Aim for about {int(budget * 0.8)} characters (hard maximum {budget}). Do NOT write a "
@@ -73,15 +74,13 @@ def run_tip(cfg: dict, platform_list: list[str], args) -> int:
     topic = min(topics, key=lambda t: posted.get(f"tip-{t['key']}", {}).get("last_posted", ""))
     pool = photo_pool(cfg)
     photo = pool[topics.index(topic) * 3 % len(pool)] if pool else ""
-    print(f"Tip: {topic['hook']}  (photo: {photo})")
+    print(f"Tip: {topic['headline']}  (photo: {photo})")
 
     stem = common.POSTERS_DIR / f"{cfg['_profile']}-tip-{topic['key']}"
-
-    def canvas(size=None):
-        return make_poster.slide_canvas(cfg, photo, topic["hook"], lines=topic["bullets"],
-                                        cta_word=tips["cta_word"], size=size)
-    png = canvas().save_png(stem.with_suffix(".png"))
-    mp4 = canvas((1080, 1920)).save_mp4(stem.with_suffix(".mp4"))
+    poster = editorial.Poster("checklist", label=topic["label"], headline=topic["headline"],
+                              photo=photo, items=topic["items"])
+    png = poster.save_png(stem.with_suffix(".png"))
+    mp4 = poster.save_mp4(stem.with_suffix(".mp4"))
     image_url, video = (make_poster.public_url(cfg, p) for p in (png, mp4))
     if not args.dry_run:
         daily_posts.commit_poster(png)
@@ -152,21 +151,27 @@ def recap_caption(items: list[dict], platform: str, cfg: dict) -> str:
 
 
 def run_recap(cfg: dict, platform_list: list[str], args) -> int:
-    items = week_listings(cfg)[:9]  # cover + 9 = Meta's 10-slide carousel limit
+    items = week_listings(cfg)[:8]  # cover + 8 + closing = Meta's 10-slide carousel limit
     if not items:
         print("Nothing posted this week — no recap.")
         return 0
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
-    total = len(items) + 1
-    cover = make_poster.render_slide(
-        cfg, items[0].get("photo_url", ""), "This week at Senang Homes",
-        common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}-0.png",
-        lines=[f"{len(items)} projects · swipe >>"], page=1, total=total)
-    paths = [cover]
-    for i, item in enumerate(items, 2):  # re-rendered so the whole carousel has the new style
-        c = make_poster.listing_canvas(cfg, item)
-        c.corner(f"{i}/{total}")
-        paths.append(c.save_png(common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}-{i - 1}.png"))
+    total = len(items) + 2
+    out = lambda n: common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}-{n}.png"  # noqa: E731
+    slides = [editorial.Poster(
+        "cover", label="This week", headline=f"{len(items)} homes worth a closer look",
+        photo=items[0].get("photo_url", ""), location="Kuala Lumpur", page=1, total=total, swipe=True)]
+    for i, item in enumerate(items, 2):
+        p = make_poster.listing_poster(cfg, item)
+        p.label = item["title"]  # a recap names each project, unlike the single-listing teaser
+        p.location = "Kuala Lumpur"  # one footer across the whole series
+        p.corner(f"{i}/{total}")
+        slides.append(p)
+    slides.append(editorial.Poster(
+        "closing", headline="Which one caught your eye?", location="Kuala Lumpur",
+        copy=["Floor plans, pricing and availability for any of this week's homes."],
+        cta="Comment the project name for full details", page=total, total=total))
+    paths = [s.save_png(out(n)) for n, s in enumerate(slides)]
     urls = [make_poster.public_url(cfg, p) for p in paths]
     if not args.dry_run:
         for p in paths:
