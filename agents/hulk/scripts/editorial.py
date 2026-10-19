@@ -113,6 +113,16 @@ def paper(size=(W, H), color=CREAM) -> Image.Image:
     return Image.blend(base, Image.blend(base, grain, 0.5), 0.06)
 
 
+BRAND = Path(__file__).resolve().parent.parent / "profiles" / "senang-homes" / "brand"
+
+
+def logo(kind: str, dark: bool, height: int) -> Image.Image:
+    """Official SenangHomes logo (design L3, chimney) as RGBA at `height` px. Light posters use
+    the green-orange colourway; the forest-green closing slide uses the cream 'reverse'."""
+    img = Image.open(BRAND / f"logo-{kind}-{'reverse' if dark else 'green-orange'}.png").convert("RGBA")
+    return img.resize((round(img.width * height / img.height), height), Image.LANCZOS)
+
+
 def page_text(page: int, total: int) -> str:
     return f"{page:02d} / {total:02d}" if total else ""
 
@@ -144,7 +154,12 @@ class Poster:
         d = ImageDraw.Draw(img)
 
         # A. header — identical on every poster
-        spaced(d, (M, HEADER_Y), "SENANG HOMES", font(SANS_SEMI, 30), ink, 0.22)
+        # Official logo (L3 chimney): the badge with the name beside it. The stacked lockup's
+        # name would be ~10px at header height, so the header sets the same badge + name side
+        # by side at a readable size; the full stacked logo closes every carousel.
+        badge = logo("badge", dark=dark, height=62)
+        img.paste(badge, (M, HEADER_Y - 8), badge)
+        spaced(d, (M + badge.width + 18, HEADER_Y + 4), "SENANG HOMES", font(SANS_SEMI, 30), ink, 0.22)
         d.line([(M, DIVIDER_Y), (W - M, DIVIDER_Y)], fill=GOLD, width=2)
 
         # B. section label
@@ -251,29 +266,17 @@ class Poster:
             y += row_h
 
     def _closing(self, img, d):
-        """Forest-green reverse: cream headline, a restrained gold roofline illustration, and
-        one call to action in a gold rounded panel."""
+        """Forest-green reverse: cream headline, the official stacked logo as the closing
+        mark, and one call to action in a gold rounded panel."""
         lines, hf = fit_headline(d, self.headline, INNER, hi=100)
         y = 300
         for line in lines:
             d.text((M, y), line, font=hf, fill=CREAM)
             y += int(hf.size * 1.08)
-        # gold line illustration: a simple house roofline with windows, centred
-        cx, base = W // 2, y + 300
-        g = 2
-        d.line([(cx - 190, base), (cx + 190, base)], fill=GOLD, width=g)
-        d.line([(cx - 150, base), (cx - 150, base - 120), (cx, base - 210), (cx + 150, base - 120),
-                (cx + 150, base)], fill=GOLD, width=g, joint="curve")
-        for wx in (cx - 95, cx + 45):
-            d.rectangle([wx, base - 95, wx + 50, base - 45], outline=GOLD, width=g)
-        d.rectangle([cx - 22, base - 70, cx + 22, base], outline=GOLD, width=g)
-        for sx in (-1, 1):  # two botanical sprigs either side
-            stem_x = cx + sx * 215
-            d.line([(stem_x, base), (stem_x, base - 90)], fill=GOLD, width=g)
-            for k in range(3):
-                ly = base - 25 - k * 25
-                d.arc([stem_x - 26 if sx < 0 else stem_x, ly - 14, stem_x if sx < 0 else stem_x + 26, ly + 14],
-                      90 if sx < 0 else -90, 270 if sx < 0 else 90, fill=GOLD, width=g)
+        mark = logo("stacked", dark=True, height=300)
+        top = y + 40
+        img.paste(mark, ((W - mark.width) // 2, top), mark)
+        base = top + mark.height
         if self.copy:
             cf = font(SANS, 32)
             cy = base + 50
