@@ -560,3 +560,22 @@ off, Blue Hulk's invalidated access token (plus its missing `pages_read_engageme
 Hulk's own Threads token still needing a manual refresh. None have moved since first flagged.
 
 **No `daily_post.py` changes this iteration.** Next firing: 2026-10-19.
+
+## Performance review — 2026-10-19 (loop iteration 11)
+
+Eleventh weekly firing. `post_log.jsonl` for this profile (tansri-millionaires) is still exactly
+54 posts — scheduled posting has now been off for nine consecutive weekly cycles (iterations 3
+through 11). The Threads metrics collector outage is also still unresolved: 21 consecutive null
+rounds now (2026-09-28 through 2026-10-18). Per-framework table is unchanged from iteration 9/10 —
+still frozen at the 2026-09-27 snapshot.
+
+**Decision: no `FRAMEWORK_WEIGHTS`/`ROTATION` change.** Same reasoning as the last two iterations.
+
+**Blue Hulk:** `metrics/history.jsonl` still does not exist. `post_log.jsonl` is still stuck at 24
+posts, last one 2026-08-24 — now 56 consecutive missed days.
+
+**Standing blocker, unchanged — all three still outstanding:** Hulk's scheduled posting staying
+off, Blue Hulk's invalidated access token (plus its missing `pages_read_engagement` scope), and
+Hulk's own Threads token still needing a manual refresh. None have moved since first flagged.
+
+**No `daily_post.py` changes this iteration.** Next firing: 2026-10-26.
