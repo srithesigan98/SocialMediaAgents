@@ -303,3 +303,17 @@ only for completeness.
 **Same fix needed as every iteration so far, still outstanding:** regenerate
 `FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
 new action taken this iteration since the underlying blocker hasn't moved.
+
+## Performance review — 2026-10-19 (loop iteration 11)
+
+Eleventh weekly firing. Both problems from iteration 4 are still open and unchanged.
+`post_log.jsonl` remains stuck at 24 posts, last one 2026-08-24 — now 56 consecutive missed days.
+Nothing to analyze; both deferred analyses carry forward unchanged for the ninth iteration in a
+row.
+
+The sibling Hulk (Threads) agent's metrics collector outage is also still unresolved (21
+consecutive null rounds as of this firing).
+
+**Same fix needed as every iteration so far, still outstanding:** regenerate
+`FB_PAGE_ACCESS_TOKEN` with `pages_read_engagement` included. Already flagged to the operator; no
+new action taken this iteration since the underlying blocker hasn't moved.
