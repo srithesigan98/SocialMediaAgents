@@ -20,6 +20,7 @@ import common
 import daily_posts
 import editorial
 import generate_property_post as drafter
+import magazine
 import make_poster
 import platforms
 
@@ -156,22 +157,30 @@ def run_recap(cfg: dict, platform_list: list[str], args) -> int:
         print("Nothing posted this week — no recap.")
         return 0
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
-    total = len(items) + 2
-    out = lambda n: common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}-{n}.png"  # noqa: E731
-    slides = [editorial.Poster(
-        "cover", label="This week", headline=f"{len(items)} homes worth a closer look",
-        photo=items[0].get("photo_url", ""), location="Kuala Lumpur", page=1, total=total, swipe=True)]
-    for i, item in enumerate(items, 2):
-        p = make_poster.listing_poster(cfg, item)
-        p.label = item["title"]  # a recap names each project, unlike the single-listing teaser
-        p.location = "Kuala Lumpur"  # one footer across the whole series
-        p.corner(f"{i}/{total}")
-        slides.append(p)
-    slides.append(editorial.Poster(
-        "closing", headline="Which one caught your eye?", location="Kuala Lumpur",
-        copy=["Floor plans, pricing and availability for any of this week's homes."],
-        cta="Comment the project name for full details", page=total, total=total))
-    paths = [s.save_png(out(n)) for n, s in enumerate(slides)]
+
+    def key_fact(item):
+        f = make_poster.listing_facts(item)
+        v = f.get("yield") or f.get("psf") or f.get("price")
+        if not v:
+            return make_poster.area_of(item)
+        # yield comes from the sheet's *estimated* rent — say so, never present it as fact
+        return f"{v[0]} est. rental yield" if v is f.get("yield") else f"{v[0]} {v[1].lower()}"
+
+    # Premium editorial carousel (magazine.py): cover -> one photo slide per home -> checklist.
+    slides = [dict(layout="cover", photo=items[0].get("photo_url", ""), label="This week · Kuala Lumpur",
+                   headline=f"{len(items)} homes", italic="worth a closer look",
+                   subtitle="Swipe for the numbers on each one.", sticker=f"{len(items)} picks this week")]
+    for item in items:
+        slides.append(dict(
+            layout="photo", photo=item.get("photo_url", ""), label=make_poster.area_of(item),
+            headline=item["title"], italic=key_fact(item),
+            body=" ".join(make_poster.listing_copy(item, "yield")[:2]),
+            takeaway=f'Comment "{make_poster.trigger_word(item["title"])}" for full details'))
+    slides.append(dict(layout="checklist", label="Save this", headline="This week", italic="at a glance",
+                       items=[f"{i['title']} — {key_fact(i)}" for i in items],
+                       cta="Comment the project name for details"))
+    paths = magazine.render_carousel(slides, series="Weekly picks",
+                                     out_prefix=common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}")
     urls = [make_poster.public_url(cfg, p) for p in paths]
     if not args.dry_run:
         for p in paths:

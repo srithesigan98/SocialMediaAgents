@@ -31,51 +31,94 @@ reels:
   - {file: Khaya_Master_Highlight_Reel.mp4, angle: "Highlights: kitchen, master suite, spa bathroom"}
   - {file: Khaya_Unit_A_Tour.mp4, angle: "Full Unit A tour, room by room"}
 
-location: Bangsar   # footer: "SENANG HOMES / BANGSAR"
+location: Bangsar
+series: Khaya Residences   # top-left series label on every slide
 
-# Slides follow the SenangHomes editorial brief: cover -> information / checklist -> closing.
+# Carousel in the premium editorial style (magazine.py): cover -> context -> 6 main ideas ->
+# takeaway -> checklist + CTA. Two-part headlines: `headline` in bold sans, `italic` in serif.
 # Every claim is one of the facts above; {placeholders} come from the live sheet.
 slides:
-  - kind: cover
+  - layout: cover
     photo: tower.jpg
-    label: Khaya Residences
-    headline: A 61-storey address in Bangsar
-    swipe: true
-  - kind: info
+    label: Khaya Residences · Bangsar
+    headline: A new address
+    italic: in Bangsar
+    subtitle: Ten things to know before your viewing.
+    sticker: Airbnb allowed
+  - layout: statement
+    photo: pool.jpg
+    label: Why it matters
+    headline: Built for living,
+    italic: and for short stays
+    body: Khaya allows Airbnb, sits near Pantai Hospital and close to two LRT stations. Here's what that means when you're choosing a unit.
+    takeaway: Permitted use and location are worth checking on any purchase.
+  - layout: bignumber
+    photo: tower.jpg
+    label: The building
+    headline: Tall, with
+    italic: room to breathe
+    number: "61"
+    caption: Floors on 3.88 acres. Residences from level 10 to level 59.
+    takeaway: 10 lifts serve the tower.
+  - layout: arch
     photo: living.jpg
     label: Short stays
-    headline: Airbnb allowed, near Pantai Hospital
-    copy: ["Type C and Type D units are the layouts suited to short stays.", "Commercial title (HTA)."]
-  - kind: info
+    headline: Airbnb
+    italic: allowed
+    body: Type C and Type D are the layouts suited to short stays. Commercial title (HTA).
+    aside: Near Pantai Hospital.
+    takeaway: Ask which units are Type C and Type D when you view.
+  - layout: list
     photo: aerial.jpg
     label: Getting around
-    headline: Two LRT stations nearby
-    copy: ["Abdullah Hukum and Kerinchi, both on the Kelana Jaya Line."]
-  - kind: info
+    headline: Two LRT stations,
+    italic: one line
+    items:
+      - {title: "Abdullah Hukum", line: "Kelana Jaya Line"}
+      - {title: "Kerinchi", line: "Kelana Jaya Line"}
+    takeaway: Both stations are on the Kelana Jaya Line.
+  - layout: photo
     photo: view.jpg
     label: The view
-    headline: Unblocked views for 90% of units
-    copy: ["Looking out over the Kuala Lumpur city skyline and the TNB tower."]
-  - kind: checklist
+    headline: 90% of units,
+    italic: unblocked
+    body: Views of the Kuala Lumpur city skyline and the TNB tower.
+    takeaway: Floor and facing decide the view — ask for both.
+  - layout: compare
+    photo: terrace.jpg
+    label: Choose your size
+    headline: Smallest to
+    italic: largest
+    compare:
+      - {label: "Entry unit", value: "{min_size} sqft", lines: ["From {from_price}"]}
+      - {label: "Largest unit", value: "{max_size} sqft", lines: ["Up to {max_price}"]}
+    takeaway: "{unit_count} unit types to choose from."
+  - layout: list
     photo: model.jpg
-    label: At a glance
-    headline: Built at scale
+    label: On site
+    headline: Daily needs,
+    italic: downstairs
     items:
-      - {title: "61 floors on 3.88 acres", line: "Residences from level 10 to level 59."}
-      - {title: "10 lifts", line: "Serving the tower."}
-      - {title: "9 shoplots", line: "On the ground level."}
-      - {title: "18,000 sqft for daily needs", line: "Anytime Fitness and a grocery store."}
-  - kind: info
-    photo: pool.jpg
-    label: Landscape
-    headline: By the landscape team behind TRX
-    copy: ["Grounds designed by Land Art."]
-  - kind: info
+      - {title: "9 shoplots", line: "On the ground level"}
+      - {title: "18,000 sqft for daily needs", line: "Anytime Fitness and a grocery store"}
+      - {title: "Landscape by Land Art", line: "The team behind TRX's landscape"}
+    takeaway: Everyday errands without leaving the building.
+  - layout: statement
     photo: interior.jpg
     label: Pricing
-    headline: "From {from_price}"
-    copy: ["From {psf_min} per sqft, based on current listed units.", "{rebate}."]
-  - kind: closing
-    headline: See the full details
-    copy: ["Floor plans, unit types and the latest pricing."]
-    cta: 'Comment "KHAYA" and we will send them over'
+    headline: "From {from_price},"
+    italic: "{psf_min} per sqft"
+    body: "{rebate}. Based on current listed units; prices and availability can change."
+    takeaway: Compare price per sqft, not just the headline price.
+  - layout: checklist
+    label: Save this
+    headline: Khaya
+    italic: at a glance
+    items:
+      - "Airbnb allowed — Type C and Type D"
+      - "Near Pantai Hospital"
+      - "Abdullah Hukum and Kerinchi LRT"
+      - "90% of units with unblocked views"
+      - "61 floors, 10 lifts, 3.88 acres"
+      - "From {from_price}"
+    cta: 'Comment "KHAYA" for full details'

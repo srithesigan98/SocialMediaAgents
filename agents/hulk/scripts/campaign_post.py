@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 
 import common
 import daily_posts
-import editorial
+import magazine
 import generate_property_post as drafter
 import make_poster
 import platforms
@@ -52,31 +52,21 @@ def sheet_data(cfg: dict, project: str) -> tuple[dict, list[dict]]:
         "psf_min": f"RM{min(psfs):,.0f}" if psfs else "",
         "psf_max": f"RM{max(psfs):,.0f}" if psfs else "",
         "min_size": f"{min(sizes):,.0f}" if sizes else "",
+        "max_size": f"{max(sizes):,.0f}" if sizes else "",
+        "max_price": money(max(prices)) if prices else "",
         "unit_count": str(len({r.get("unit_type") for r in rows if r.get("unit_type")})),
         "rebate": rebates.most_common(1)[0][0] if rebates else "",
     }, rows
 
 
 def render_slides(cfg: dict, name: str, camp: dict, data: dict) -> list:
-    """Editorial carousel (see editorial.py): one Poster per slide spec in the campaign yaml."""
-    folder = common.profile_path(cfg, f"campaigns/{name}")
-    slides = camp["slides"]
-    fill = lambda t: t.format(**data)  # noqa: E731
-    paths = []
-    for i, s in enumerate(slides, 1):
-        poster = editorial.Poster(
-            s.get("kind", "info"),
-            label=fill(s.get("label", "")), headline=fill(s["headline"]),
-            photo=str(folder / s["photo"]) if s.get("photo") else "",
-            # A filled line that's empty or just punctuation (e.g. "{rebate}." with no rebate in
-            # the sheet) is dropped rather than printed as a stray dot.
-            copy=[c for c in (fill(x) for x in s.get("copy", [])) if c.strip(" .•")],
-            items=s.get("items", []), cta=fill(s.get("cta", "")),
-            location=camp.get("location", "Kuala Lumpur"), page=i, total=len(slides),
-            swipe=s.get("swipe", False),
-        )
-        paths.append(poster.save_png(common.POSTERS_DIR / f"{cfg['_profile']}-campaign-{name}-{i}.png"))
-    return paths
+    """Carousel in the premium editorial style (magazine.py), one slide per spec in the yaml."""
+    return magazine.render_carousel(
+        camp["slides"], series=camp.get("series", camp["project"]),
+        out_prefix=common.POSTERS_DIR / f"{cfg['_profile']}-campaign-{name}",
+        photo_dir=common.profile_path(cfg, f"campaigns/{name}"),
+        fill=lambda t: t.format(**data),
+    )
 
 
 def caption(cfg: dict, camp: dict, data: dict, rows: list[dict], platform: str,
