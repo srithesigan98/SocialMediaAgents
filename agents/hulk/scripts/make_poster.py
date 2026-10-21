@@ -135,18 +135,55 @@ def listing_poster(cfg: dict, listing: dict) -> editorial.Poster:
     )
 
 
-listing_canvas = listing_poster  # weekly_posts.py recap: .corner("2/9") then .save_png()
+STYLES = ("editorial", "magazine")
 
 
-def render(cfg: dict, listing: dict, out_path: Path | None = None) -> Path:
+def style_for(cfg: dict) -> str:
+    """Which design the next post uses: alternates between the cream editorial style and the
+    premium magazine style, post by post (keyed on how many posts are recorded), so the feed
+    doesn't look the same every day."""
+    styles = cfg.get("poster", {}).get("styles") or STYLES
+    return styles[len(common.read_state(cfg, "posted").get("listings", {})) % len(styles)]
+
+
+def hook_parts(listing: dict) -> tuple[str, str]:
+    """The headline split for the magazine style: bold first phrase, italic second phrase."""
+    _, hook = hook_choice(listing)
+    for sep in (" in ", ", with "):
+        if sep in hook:
+            a, b = hook.split(sep, 1)
+            return a + ("," if sep.startswith(",") else ""), sep.strip(", ") + " " + b
+    return hook, ""
+
+
+def magazine_spec(listing: dict) -> dict:
+    """A single listing as one magazine-style slide (no pagination)."""
+    key, _ = hook_choice(listing)
+    a, b = hook_parts(listing)
+    size = f"{listing['size']} sqft" if listing.get("size") else ""
+    return dict(layout="photo", photo=listing.get("photo_url", "") or listing.get("image_url", ""),
+                label=" · ".join(x for x in (area_of(listing), size) if x), headline=a, italic=b,
+                body=" ".join(listing_copy(listing, key)[:2]),
+                takeaway=f'Comment "{trigger_word(listing.get("title", ""))}" for full details')
+
+
+def styled_listing(cfg: dict, listing: dict, style: str | None = None):
+    style = style or style_for(cfg)
+    if style == "magazine":
+        import magazine  # local: magazine imports editorial, keep make_poster import-light
+        return magazine.poster(magazine_spec(listing), style="magazine", series="Senang Homes")
+    return listing_poster(cfg, listing)
+
+
+def render(cfg: dict, listing: dict, out_path: Path | None = None, style: str | None = None) -> Path:
     out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.png"
-    return listing_poster(cfg, listing).save_png(out_path)
+    return styled_listing(cfg, listing, style).save_png(out_path)
 
 
-def render_video(cfg: dict, listing: dict, out_path: Path | None = None) -> Path:
+def render_video(cfg: dict, listing: dict, out_path: Path | None = None, style: str | None = None) -> Path:
     """Same poster as an MP4 — only the photo slowly pushes in inside its frame."""
     out_path = out_path or common.POSTERS_DIR / f"{cfg['_profile']}-{listing['ref']}.mp4"
-    return listing_poster(cfg, listing).save_mp4(out_path)
+    return styled_listing(cfg, listing, style).save_mp4(out_path)
 
 
 def render_area(cfg: dict, stat: dict, photo_url: str, out_path: Path | None = None) -> Path:

@@ -60,12 +60,13 @@ def sheet_data(cfg: dict, project: str) -> tuple[dict, list[dict]]:
 
 
 def render_slides(cfg: dict, name: str, camp: dict, data: dict) -> list:
-    """Carousel in the premium editorial style (magazine.py), one slide per spec in the yaml."""
+    """One slide per spec in the yaml, in whichever design is next in the style rotation."""
     return magazine.render_carousel(
         camp["slides"], series=camp.get("series", camp["project"]),
         out_prefix=common.POSTERS_DIR / f"{cfg['_profile']}-campaign-{name}",
         photo_dir=common.profile_path(cfg, f"campaigns/{name}"),
         fill=lambda t: t.format(**data),
+        style=make_poster.style_for(cfg), location=camp.get("location", "Kuala Lumpur"),
     )
 
 

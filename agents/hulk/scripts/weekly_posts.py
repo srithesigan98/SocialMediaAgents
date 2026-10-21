@@ -18,7 +18,6 @@ from dotenv import load_dotenv
 
 import common
 import daily_posts
-import editorial
 import generate_property_post as drafter
 import magazine
 import make_poster
@@ -78,8 +77,11 @@ def run_tip(cfg: dict, platform_list: list[str], args) -> int:
     print(f"Tip: {topic['headline']}  (photo: {photo})")
 
     stem = common.POSTERS_DIR / f"{cfg['_profile']}-tip-{topic['key']}"
-    poster = editorial.Poster("checklist", label=topic["label"], headline=topic["headline"],
-                              photo=photo, items=topic["items"])
+    # Rotates with everything else: editorial checklist, or a magazine numbered-list slide.
+    poster = magazine.poster(
+        dict(layout="list", label=topic["label"], headline=topic["headline"], photo=photo,
+             items=topic["items"], takeaway=f'Comment "{tips["cta_word"]}" for help with yours'),
+        style=make_poster.style_for(cfg), series="Buyer's guide")
     png = poster.save_png(stem.with_suffix(".png"))
     mp4 = poster.save_mp4(stem.with_suffix(".mp4"))
     image_url, video = (make_poster.public_url(cfg, p) for p in (png, mp4))
@@ -180,7 +182,8 @@ def run_recap(cfg: dict, platform_list: list[str], args) -> int:
                        items=[f"{i['title']} — {key_fact(i)}" for i in items],
                        cta="Comment the project name for details"))
     paths = magazine.render_carousel(slides, series="Weekly picks",
-                                     out_prefix=common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}")
+                                     out_prefix=common.POSTERS_DIR / f"{cfg['_profile']}-recap-{stamp}",
+                                     style=make_poster.style_for(cfg))
     urls = [make_poster.public_url(cfg, p) for p in paths]
     if not args.dry_run:
         for p in paths:

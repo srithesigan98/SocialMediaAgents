@@ -65,6 +65,7 @@ class Slide:
         if src and photo_dir and not str(src).startswith("http") and not Path(src).is_absolute():
             src = str(photo_dir / src)
         self.photo = load_photo(src) if src else None
+        self.zoom = 0.0  # 0..1 photo push-in, for the video version only
 
     # ------------------------------------------------------------ shared chrome
     def _header(self, img, d, ink, dark):
@@ -72,8 +73,9 @@ class Slide:
         img.paste(badge, (M, 46), badge)
         f = font(MED, 19)
         spaced(d, (M + badge.width + 14, 58), self.series.upper(), f, ink, 0.16)
-        pt = f"{self.page:02d} / {self.total:02d}"
-        spaced(d, (W - M - spaced_width(d, pt, f, 0.12), 58), pt, f, ink, 0.12)
+        if self.total:  # standalone posters have no pagination
+            pt = f"{self.page:02d} / {self.total:02d}"
+            spaced(d, (W - M - spaced_width(d, pt, f, 0.12), 58), pt, f, ink, 0.12)
 
     def _cue(self, d, y, ink, accent):
         last = self.page == self.total
@@ -116,8 +118,13 @@ class Slide:
 
     # ------------------------------------------------------------ visual helpers
     def _fit(self, box):
+        """Cover-crop the photo to the box; with zoom > 0 it pushes in, staying inside the box."""
         x0, y0, x1, y1 = box
-        return ImageOps.fit(self.photo, (int(x1 - x0), int(y1 - y0)), Image.LANCZOS)
+        w, h = int(x1 - x0), int(y1 - y0)
+        s = 1 + 0.08 * self.zoom
+        big = ImageOps.fit(self.photo, (int(w * s), int(h * s)), Image.LANCZOS)
+        ox, oy = (big.width - w) // 2, (big.height - h) // 2
+        return big.crop((ox, oy, ox + w, oy + h))
 
     def _arch(self, img, box):
         """Photo cropped into an architectural arch: rounded top, straight bottom."""
@@ -273,7 +280,7 @@ class Slide:
     def _cover(self) -> Image.Image:
         img = Image.new("RGB", (W, H), FOREST)
         if self.photo is not None:
-            img.paste(ImageOps.fit(self.photo, (W, H), Image.LANCZOS), (0, 0))
+            img.paste(self._fit((0, 0, W, H)), (0, 0))
         # dark-green gradient: light behind the header, deep at the bottom behind the text
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         od = ImageDraw.Draw(ov)
@@ -320,6 +327,61 @@ class Slide:
         img.paste(st, (W - M - st.width + 10, 150), st)
 
 
+    def save_png(self, out_path: Path) -> Path:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        self.render().save(out_path, "PNG")
+        return out_path
+
+    def save_mp4(self, out_path: Path, seconds: float = 7.0, fps: int = 30) -> Path:
+        """Same slide as video: only the photo slowly pushes in; text and layout stay put."""
+        import subprocess
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
+               "-r", str(fps), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "24",
+               "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_path)]
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        n = int(seconds * fps)
+        for i in range(n):
+            t = i / (n - 1)
+            self.zoom = t * t * (3 - 2 * t)
+            proc.stdin.write(self.render().tobytes())
+        self.zoom = 0.0
+        proc.stdin.close()
+        if proc.wait() != 0:
+            raise RuntimeError("ffmpeg failed to encode the slide video")
+        return out_path
+
+
+def as_editorial(spec: dict, *, page: int, total: int, location: str, photo_dir: Path | None = None):
+    """The same slide content in the cream editorial style (editorial.py), so carousels can
+    rotate between the two designs without separate copy. Two-part headlines are joined."""
+    photo = spec.get("photo", "")
+    if photo and photo_dir and not str(photo).startswith("http") and not Path(photo).is_absolute():
+        photo = str(photo_dir / photo)
+    head = " ".join(x for x in (spec.get("headline", ""), spec.get("italic", "")) if x)
+    layout = spec.get("layout", "statement")
+    common = dict(label=spec.get("label", ""), headline=head, photo=photo, location=location,
+                  page=page, total=total)
+    items = spec.get("items", [])
+    if layout == "cover":
+        return editorial.Poster("cover", swipe=bool(total), **common)
+    if layout == "checklist" and spec.get("cta"):
+        titles = [i if isinstance(i, str) else i.get("title", "") for i in items]
+        common.pop("photo")
+        return editorial.Poster("closing", copy=[" · ".join(titles[:3])], cta=spec["cta"], **common)
+    if layout in ("list", "checklist"):
+        rows = [i if isinstance(i, dict) else {"title": i, "line": ""} for i in items]
+        return editorial.Poster("checklist", items=rows[:4], **common)
+    copy = []
+    if layout == "bignumber":
+        copy.append(f"{spec.get('number', '')} — {spec.get('caption', '')}".strip(" —"))
+    if layout == "compare":
+        copy += [f"{p.get('label', '')}: {p.get('value', '')}. {' '.join(p.get('lines', []))}".strip()
+                 for p in spec.get("compare", [])]
+    copy += [x for x in (spec.get("body", ""), spec.get("takeaway", "")) if x]
+    return editorial.Poster("info", copy=copy, cta=spec.get("cta", ""), **common)
+
+
 def _fill(v, fill):
     if isinstance(v, str):
         return fill(v)
@@ -330,14 +392,22 @@ def _fill(v, fill):
     return v
 
 
+def poster(spec: dict, *, style: str, series: str, page: int = 0, total: int = 0,
+           photo_dir: Path | None = None, location: str = "Kuala Lumpur"):
+    """One slide spec in either design — 'magazine' or 'editorial'. Both have save_png/save_mp4."""
+    if style == "editorial":
+        return as_editorial(spec, page=page, total=total, location=location, photo_dir=photo_dir)
+    return Slide(spec, series=series, page=page, total=total, photo_dir=photo_dir)
+
+
 def render_carousel(slides: list[dict], *, series: str, out_prefix: Path, photo_dir: Path | None = None,
-                    fill=lambda s: s) -> list[Path]:
-    """Render every slide spec to `<out_prefix>-<n>.png`; `fill` formats {placeholders}."""
+                    fill=lambda s: s, style: str = "magazine", location: str = "Kuala Lumpur") -> list[Path]:
+    """Render every slide spec to `<out_prefix>-<n>.png` in the given style; `fill` formats
+    {placeholders}."""
     total, paths = len(slides), []
     for i, spec in enumerate(slides, 1):
         spec = {k: _fill(v, fill) for k, v in spec.items()}
         p = out_prefix.parent / f"{out_prefix.name}-{i}.png"
-        p.parent.mkdir(parents=True, exist_ok=True)
-        Slide(spec, series=series, page=i, total=total, photo_dir=photo_dir).render().save(p, "PNG")
-        paths.append(p)
+        paths.append(poster(spec, style=style, series=series, page=i, total=total,
+                            photo_dir=photo_dir, location=location).save_png(p))
     return paths
