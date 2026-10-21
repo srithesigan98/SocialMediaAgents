@@ -116,10 +116,18 @@ def paper(size=(W, H), color=CREAM) -> Image.Image:
 BRAND = Path(__file__).resolve().parent.parent / "profiles" / "senang-homes" / "brand"
 
 
+_LOGO_FILES = {  # official SenangHomes logo pack (brand/README.md): (light bg, dark bg)
+    "horizontal": ("horizontal-primary", "horizontal-reverse"),
+    "stacked": ("stacked-primary", "stacked-reverse"),
+    "icon": ("icon-gold", "icon-gold"),
+}
+
+
 def logo(kind: str, dark: bool, height: int) -> Image.Image:
-    """Official SenangHomes logo (design L3, chimney) as RGBA at `height` px. Light posters use
-    the green-orange colourway; the forest-green closing slide uses the cream 'reverse'."""
-    img = Image.open(BRAND / f"logo-{kind}-{'reverse' if dark else 'green-orange'}.png").convert("RGBA")
+    """Official logo as RGBA, `height` px tall measured on the artwork itself — the pack's PNGs
+    carry transparent padding, trimmed here so the mark sits exactly on the layout margins."""
+    img = Image.open(BRAND / "png" / f"{_LOGO_FILES[kind][dark]}@2x.png").convert("RGBA")
+    img = img.crop(img.getbbox())
     return img.resize((round(img.width * height / img.height), height), Image.LANCZOS)
 
 
@@ -154,12 +162,10 @@ class Poster:
         d = ImageDraw.Draw(img)
 
         # A. header — identical on every poster
-        # Official logo (L3 chimney): the badge with the name beside it. The stacked lockup's
-        # name would be ~10px at header height, so the header sets the same badge + name side
-        # by side at a readable size; the full stacked logo closes every carousel.
-        badge = logo("badge", dark=dark, height=62)
-        img.paste(badge, (M, HEADER_Y - 8), badge)
-        spaced(d, (M + badge.width + 18, HEADER_Y + 4), "SENANG HOMES", font(SANS_SEMI, 30), ink, 0.22)
+        # Official logo, horizontal lockup (house + Georgia wordmark) — primary on cream,
+        # reverse on forest. The stacked lockup closes every carousel.
+        mark = logo("horizontal", dark=dark, height=52)
+        img.paste(mark, (M, DIVIDER_Y - 22 - mark.height), mark)
         d.line([(M, DIVIDER_Y), (W - M, DIVIDER_Y)], fill=GOLD, width=2)
 
         # B. section label
@@ -273,7 +279,7 @@ class Poster:
         for line in lines:
             d.text((M, y), line, font=hf, fill=CREAM)
             y += int(hf.size * 1.08)
-        mark = logo("stacked", dark=True, height=300)
+        mark = logo("stacked", dark=True, height=230)
         top = y + 40
         img.paste(mark, ((W - mark.width) // 2, top), mark)
         base = top + mark.height

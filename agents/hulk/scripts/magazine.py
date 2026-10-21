@@ -69,8 +69,8 @@ class Slide:
 
     # ------------------------------------------------------------ shared chrome
     def _header(self, img, d, ink, dark):
-        badge = logo("badge", dark=dark, height=44)
-        img.paste(badge, (M, 46), badge)
+        badge = logo("icon", dark=dark, height=40)  # official gold house symbol
+        img.paste(badge, (M, 48), badge)
         f = font(MED, 19)
         spaced(d, (M + badge.width + 14, 58), self.series.upper(), f, ink, 0.16)
         if self.total:  # standalone posters have no pagination

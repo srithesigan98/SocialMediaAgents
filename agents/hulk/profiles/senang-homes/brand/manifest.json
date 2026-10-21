@@ -1,0 +1,184 @@
+[
+  {
+    "name": "horizontal-primary",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-primary",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-primary",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "horizontal-reverse",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-reverse",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-reverse",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "horizontal-forest",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-forest",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-forest",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "horizontal-gold",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-gold",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-gold",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "horizontal-black",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-black",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-black",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "horizontal-white",
+    "width": 1200,
+    "height": 240,
+    "background": null,
+    "kind": "horizontal"
+  },
+  {
+    "name": "stacked-white",
+    "width": 1000,
+    "height": 560,
+    "background": null,
+    "kind": "stacked"
+  },
+  {
+    "name": "wordmark-white",
+    "width": 1200,
+    "height": 200,
+    "background": null,
+    "kind": "wordmark"
+  },
+  {
+    "name": "icon-forest",
+    "width": 512,
+    "height": 512,
+    "background": null,
+    "kind": "icon"
+  },
+  {
+    "name": "icon-gold",
+    "width": 512,
+    "height": 512,
+    "background": null,
+    "kind": "icon"
+  },
+  {
+    "name": "icon-black",
+    "width": 512,
+    "height": 512,
+    "background": null,
+    "kind": "icon"
+  },
+  {
+    "name": "icon-white",
+    "width": 512,
+    "height": 512,
+    "background": null,
+    "kind": "icon"
+  },
+  {
+    "name": "profile-cream",
+    "width": 1080,
+    "height": 1080,
+    "background": "#F5F1E7",
+    "kind": "profile"
+  },
+  {
+    "name": "profile-forest",
+    "width": 1080,
+    "height": 1080,
+    "background": "#183E35",
+    "kind": "profile"
+  },
+  {
+    "name": "profile-icon",
+    "width": 1080,
+    "height": 1080,
+    "background": "#183E35",
+    "kind": "profile"
+  },
+  {
+    "name": "favicon",
+    "width": 100,
+    "height": 100,
+    "background": null,
+    "kind": "favicon"
+  }
+]
