@@ -1,0 +1,119 @@
+# One Seputeh Residence focus campaign — same priority as Khaya (see focus_campaigns in
+# profile.yaml). Facts are from the developer's Sales Kit (v040925) and the live sheet only.
+# NOT used: the FAQ / Sales SOP / account documents marked for internal use.
+# IMPORTANT: One Seputeh does NOT allow Airbnb — never imply short stays.
+project: One Seputeh Residence
+trigger_word: SEPUTEH
+location: Seputeh
+series: One Seputeh Residence
+
+facts:   # the only claims the caption writer may use
+  - Freehold, on Jalan Syed Putra, Seputeh, Kuala Lumpur
+  - Single tower of 383 residential units; typical floors have 10 units served by 6 lifts
+  - Typical units about 650 to 930 sqft, 2 and 3 bedrooms; DKC (705 sqft) and DKF (928 sqft) are dual-key ready
+  - 5 penthouse units on Level 48 with 6.3m double-volume floor-to-floor height (typical floors 3.45m)
+  - 23 facilities on Level 9 and Level 50, including infinity pool, sky gym, sky lounge and co-working space
+  - Thean Hou Temple 600m, Kuen Cheng High School 600m, Tun Sambanthan Monorail 850m
+  - Mid Valley City 2km, Pasar Seni MRT 2.3km, Alice Smith School 2.4km, Merdeka 118 4.2km
+  - Bus stop right at the entrance
+  - 2-bedroom units come with 1 car park; 3-bedroom TriA and TriD with 2 car parks
+  - Maintenance fee RM0.35 per sqft
+  - Current promotion, subject to terms and developer changes - up to 15% rebate; free SPA and loan legal fees, disbursements and stamp duty (panel lawyers); free partial furnishing
+  - Expected vacant possession Q4 2029 / Q1 2030
+  - Developer with about 40 years of track record
+  - NOT allowed - Airbnb or short-stay rental. Never mention or imply short stays.
+
+# Reels: showroom walkthroughs, logo-branded, hosted on the repo's "oneseputeh-reels" release.
+reel_base_url: https://github.com/srithesigan98/SocialMediaAgents/releases/download/oneseputeh-reels
+reels:
+  - {file: OneSeputeh_Type_DKC_705sqft.mp4, angle: "Showroom walkthrough of Type DKC, 705 sqft, dual-key ready"}
+  - {file: OneSeputeh_Type_TriA_804sqft.mp4, angle: "Showroom walkthrough of Type TriA, 804 sqft, 3 bedrooms"}
+
+slides:
+  - layout: cover
+    photo: tower.jpg
+    label: One Seputeh Residence · Seputeh
+    headline: A freehold address
+    italic: in Seputeh
+    subtitle: Ten things to know before your viewing.
+    sticker: Freehold
+  - layout: statement
+    photo: aerial.jpg
+    label: Why it matters
+    headline: Low density,
+    italic: central KL
+    body: A single tower of 383 homes on Jalan Syed Putra, 2km from Mid Valley City.
+    takeaway: Freehold, close to the city's main hubs.
+  - layout: bignumber
+    photo: tower.jpg
+    label: The building
+    headline: An exclusive
+    italic: single tower
+    number: "383"
+    caption: Homes in one tower. Typical floors have 10 units served by 6 lifts.
+    takeaway: Ask which floors and facings are still available.
+  - layout: list
+    photo: merdeka-view.jpg
+    label: Getting around
+    headline: Walk, ride,
+    italic: or drive
+    items:
+      - {title: "Thean Hou Temple", line: "600m"}
+      - {title: "Tun Sambanthan Monorail", line: "850m"}
+      - {title: "Mid Valley City", line: "2km"}
+      - {title: "Pasar Seni MRT", line: "2.3km"}
+    takeaway: A bus stop sits right at the entrance.
+  - layout: compare
+    photo: balcony.jpg
+    label: Choose your layout
+    headline: Two bedrooms
+    italic: or three
+    compare:
+      - {label: "2 bedrooms", value: "657-721 sqft", lines: ["From {from_price}", "1 car park"]}
+      - {label: "3 bedrooms", value: "804-928 sqft", lines: ["TriA and TriD: 2 car parks"]}
+    takeaway: "{unit_count} unit types, from 657 to 1,820 sqft."
+  - layout: arch
+    photo: showroom-bedroom.jpg
+    label: Dual-key ready
+    headline: One home,
+    italic: two doors
+    body: DKC (705 sqft) and DKF (928 sqft) are dual-key ready layouts.
+    aside: Showroom, Type DKC.
+    takeaway: Ask how the dual-key layout splits before you choose.
+  - layout: list
+    photo: merdeka-view.jpg
+    label: Level 9 and Level 50
+    headline: 23 facilities,
+    italic: two levels
+    items:
+      - {title: "Infinity pool", line: "Plus leisure and wading pools"}
+      - {title: "Sky gym and sky lounge", line: "On Level 50"}
+      - {title: "Co-working space", line: "And a reading lounge"}
+    takeaway: Maintenance fee RM0.35 per sqft.
+  - layout: bignumber
+    photo: bedroom.jpg
+    label: Penthouse
+    headline: Double volume
+    italic: on Level 48
+    number: "6.3m"
+    caption: Floor-to-floor height in the penthouses, against 3.45m on typical floors.
+    takeaway: Only 5 penthouse units, Types G and H.
+  - layout: statement
+    photo: showroom-living.jpg
+    label: Pricing
+    headline: "From {from_price},"
+    italic: "{psf_min} per sqft"
+    body: Up to 15% rebate plus free SPA and loan legal fees, subject to terms. Based on current listed units; promotions can change.
+    takeaway: Expected completion Q4 2029 / Q1 2030.
+  - layout: checklist
+    label: Save this
+    headline: One Seputeh
+    italic: at a glance
+    items:
+      - "Freehold, Jalan Syed Putra"
+      - "383 homes, 10 per floor, 6 lifts"
+      - "Monorail 850m, Mid Valley 2km"
+      - "23 facilities on Level 9 and 50"
+      - "Dual-key ready layouts"
+      - "From {from_price}"
+    cta: 'Comment "SEPUTEH" for full details'

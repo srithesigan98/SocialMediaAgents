@@ -170,7 +170,9 @@ def parse_number(text: str) -> float | None:
     """'RM729,600.00' -> 729600.0, '570' -> 570.0, '3,550 - 3,856' (a size range) -> 3703.0
     (the average — naively stripping non-digits from a range would concatenate both numbers
     into one bogus value). None if nothing numeric is in there."""
-    text = text or ""
+    # Drop currency text first: "RM 2,600 - RM 3,000" must read as a range (2800), not have its
+    # digits run together into 26,003,000.
+    text = re.sub(r"(?i)rm", "", text or "")
     range_match = re.match(r"\s*([\d,]+(?:\.\d+)?)\s*-\s*([\d,]+(?:\.\d+)?)\s*$", text)
     if range_match:
         lo, hi = (float(g.replace(",", "")) for g in range_match.groups())

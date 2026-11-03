@@ -39,20 +39,19 @@ jobs:
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
         run: |
           cd agents/hulk/scripts
-          KHAYA_UNTIL=2026-10-28
-          TODAY=$(date -u +%F)
+          # Focus projects (profile.yaml focus_campaigns: Khaya + One Seputeh, equal priority) get
+          # every other day; the other days rotate the rest of the sheet with them excluded.
           DOW=$(date -u +%u)                  # 1 = Monday ... 7 = Sunday
           ODD_DAY=$(( 10#$(date -u +%j) % 2 ))
           if [ "$DOW" = 1 ]; then
             python weekly_posts.py --profile senang-homes --recap --yes
           elif [ "$DOW" = 4 ]; then
             python weekly_posts.py --profile senang-homes --tip --yes
-          elif [ ! "$TODAY" \> "$KHAYA_UNTIL" ] && [ "$ODD_DAY" = 1 ]; then
-            python campaign_post.py khaya --profile senang-homes --next --yes
-          elif [ ! "$TODAY" \> "$KHAYA_UNTIL" ]; then
-            python daily_posts.py --profile senang-homes --count 1 --exclude-project "Khaya Residences" --yes
+          elif [ "$ODD_DAY" = 1 ]; then
+            python campaign_post.py focus --profile senang-homes --next --yes
           else
-            python daily_posts.py --profile senang-homes --count 1 --yes
+            python daily_posts.py --profile senang-homes --count 1 \
+              --exclude-project "Khaya Residences" --exclude-project "One Seputeh Residence" --yes
           fi
       - name: Save posting history
         # Runs even if a platform failed, so whatever DID post is remembered and not reposted.

@@ -79,6 +79,10 @@ poster:
   # commit_poster()) so Threads/Instagram can fetch it from here — see scripts/README.md.
   public_base_url: "https://raw.githubusercontent.com/srithesigan98/SocialMediaAgents/main/agents/hulk/scripts/posters"
 
+# Priority projects (campaigns/<name>.yaml), equal weight: every other day is a focus post —
+# reels, carousels or unit posts — going to whichever of these went longest without a post.
+focus_campaigns: [khaya, oneseputeh]
+
 schedule:
   # Two posts a day, as asked. Times are local to the machine running the scheduler.
   posts_per_day: 1

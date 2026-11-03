@@ -113,6 +113,22 @@ def caption(cfg: dict, camp: dict, data: dict, rows: list[dict], platform: str,
     return text
 
 
+def pick_focus(cfg: dict) -> str:
+    """Of the profile's focus_campaigns (equal priority), the one that went longest without a
+    post — its own campaign posts and reels, or any single post of one of its units."""
+    posted = common.read_state(cfg, "posted").get("listings", {})
+    listings = common.active_listings(cfg)
+
+    def last(name: str) -> str:
+        project = yaml.safe_load(common.profile_path(cfg, f"campaigns/{name}.yaml")
+                                 .read_text(encoding="utf-8"))["project"].lower()
+        keys = [l["ref"] for l in listings if common.project_of(l) == project]
+        keys += [k for k in posted if k.startswith(f"campaign-{name}")]
+        return last_posted(cfg, keys)
+
+    return min(cfg["focus_campaigns"], key=last)
+
+
 def last_posted(cfg: dict, keys) -> str:
     posted = common.read_state(cfg, "posted").get("listings", {})
     return max((posted[k]["last_posted"] for k in keys if k in posted), default="")
@@ -190,9 +206,15 @@ def main() -> None:
 
     load_dotenv(drafter.HERE / ".env")
     cfg = common.load_config(args.profile)
+    if args.campaign == "focus":
+        args.campaign = pick_focus(cfg)
+        print(f"Focus campaign: {args.campaign}")
     camp = yaml.safe_load(common.profile_path(cfg, f"campaigns/{args.campaign}.yaml").read_text(encoding="utf-8"))
     data, rows = sheet_data(cfg, camp["project"])
     platform_list = args.platform or cfg["schedule"]["platforms"]
+    if args.next and f"campaign-{args.campaign}" not in common.read_state(cfg, "posted").get("listings", {}):
+        args.next = False  # a project's first focus slot introduces it with the full carousel
+        print("Carousel not posted yet for this campaign — posting it first.")
     if args.reel or args.next:
         run = post_reel if args.reel else post_next
         failures = run(cfg, args.campaign, camp, data, rows, platform_list, args)
