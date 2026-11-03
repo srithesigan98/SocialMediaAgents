@@ -3,14 +3,26 @@ name: Hulk (Senang Homes) daily post
 # ONE post a day at 19:30 MYT (11:30 UTC) to Threads + Instagram. What goes out depends on the day:
 #   Monday    — weekly recap carousel of the last 7 days' listings (weekly_posts.py --recap)
 #   Thursday  — off-sheet buyer tip, e.g. "rental yield in 10 seconds" (weekly_posts.py --tip)
-#   other days — a sheet listing as an animated poster (Reel / Threads video, still-image fallback).
-#                Until KHAYA_UNTIL, every other day is Khaya Residences (reels + unit posts).
+#   other days — odd days: a focus project (Khaya / One Seputeh); even days: the rest of the sheet.
 # Fully automatic (no review). Runs on GitHub's servers — free, no computer needed.
+# Manual "Run workflow": leave campaign blank for the normal schedule, or pick one to post its
+# carousel now (optionally to one platform only — e.g. to finish a post that failed on one side).
 
 on:
   schedule:
     - cron: "30 11 * * *"   # GitHub may start scheduled runs a few minutes late under load
-  workflow_dispatch: {}     # manual "Run workflow" button for testing
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: "Post this campaign's carousel now (blank = normal schedule)"
+        type: choice
+        options: ["", khaya, oneseputeh]
+        default: ""
+      platform:
+        description: "Only this platform (with a campaign)"
+        type: choice
+        options: [both, threads, instagram]
+        default: both
 
 permissions:
   contents: write   # needed to commit/push each post's poster (see commit_poster())
@@ -37,8 +49,18 @@ jobs:
           SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
+          CAMPAIGN: ${{ inputs.campaign }}   # via env, never interpolated into the script
+          PLATFORM: ${{ inputs.platform }}
         run: |
           cd agents/hulk/scripts
+          if [ -n "$CAMPAIGN" ]; then
+            if [ "$PLATFORM" = both ] || [ -z "$PLATFORM" ]; then
+              python campaign_post.py "$CAMPAIGN" --profile senang-homes --yes
+            else
+              python campaign_post.py "$CAMPAIGN" --profile senang-homes --platform "$PLATFORM" --yes
+            fi
+            exit
+          fi
           # Focus projects (profile.yaml focus_campaigns: Khaya + One Seputeh, equal priority) get
           # every other day; the other days rotate the rest of the sheet with them excluded.
           DOW=$(date -u +%u)                  # 1 = Monday ... 7 = Sunday
