@@ -70,6 +70,10 @@ def threads_publish_carousel(cfg: dict, text: str, image_urls: list[str]) -> str
                     "access_token": token},
             timeout=30,
         ))["id"])
+    # Each item processes asynchronously; combining one that isn't FINISHED fails with
+    # "Invalid Carousel Children" (seen on a 10-slide carousel).
+    for item in item_ids:
+        _wait_until_ready(f"{THREADS_BASE}/{item}", token, "status", timeout=300)
 
     carousel_id = _check(requests.post(
         f"{THREADS_BASE}/{user_id}/threads",
