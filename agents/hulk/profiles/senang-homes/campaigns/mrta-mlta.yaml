@@ -1,0 +1,106 @@
+# Buyer-education carousel: MRTA vs MLTA. Not a listing and not in focus_campaigns, so the
+# scheduler never picks it up; it's rendered and posted by hand. Kept general on purpose:
+# no insurer names, no premium rates, no legal promises. The RM figures are a labelled illustration.
+# Photos are diagrams drawn by scripts/mrta_illustrations.py into campaigns/mrta-mlta/.
+series: Buyer's guide
+location: Kuala Lumpur
+trigger_word: MRTA
+
+slides:
+  - layout: cover
+    photo: cover.png
+    label: Home loans · Buyer's guide
+    headline: MRTA or MLTA?
+    italic: Know before you sign
+    subtitle: What each one covers, who gets paid, and which one suits you.
+  - layout: statement
+    photo: flow.png
+    label: First, the basics
+    headline: Both protect
+    italic: your home loan
+    body: If you pass away or become totally and permanently disabled, the policy pays the bank, so your family isn't left with the loan.
+    takeaway: "Islamic versions: MRTT and MLTT."
+  - layout: list
+    label: MRTA
+    headline: Mortgage Reducing
+    italic: Term Assurance
+    items:
+      - {title: "Cover shrinks", line: "The amount covered drops as your loan balance falls."}
+      - {title: "Usually paid once", line: "A single premium, often added into your loan."}
+      - {title: "The bank is paid", line: "The payout goes to the bank to settle the loan."}
+      - {title: "Tied to this loan", line: "Refinance or sell, and the cover usually ends."}
+  - layout: list
+    label: MLTA
+    headline: Mortgage Level
+    italic: Term Assurance
+    items:
+      - {title: "Cover stays level", line: "The amount covered stays the same for the whole term."}
+      - {title: "More payment options", line: "Higher premium, paid yearly, monthly or once."}
+      - {title: "Family gets the balance", line: "After the loan is settled, the rest goes to your nominee."}
+      - {title: "Can move with you", line: "Many plans can be transferred to your next home loan."}
+  - layout: photo
+    photo: chart.png
+    label: The key difference
+    headline: How the cover
+    italic: moves over time
+  - layout: compare
+    label: Side by side
+    headline: Same loan,
+    italic: different cover
+    compare:
+      - {label: MRTA, value: Reducing, lines: ["Cover tracks your balance", "Lower cost", "Usually one premium", "Bank gets the payout", "Ends with this loan"]}
+      - {label: MLTA, value: Level, lines: ["Same cover all term", "Higher cost", "Yearly, monthly or once", "Family gets any balance", "Often transferable"]}
+  - layout: bignumber
+    photo: split.png
+    label: An illustration
+    headline: Where the
+    italic: difference shows
+    number: RM120K
+    caption: "RM500K loan, RM380K left. MLTA still pays RM500K: RM380K to the bank, RM120K to your family."
+    takeaway: MRTA would pay roughly the RM380K balance only.
+  - layout: list
+    photo: refinance.png
+    label: Which fits you
+    headline: Pick by
+    italic: your plans
+    items:
+      - {title: "MRTA", line: "You want the lowest cost and plan to keep this loan."}
+      - {title: "MLTA", line: "You may refinance or upgrade, or want cash left for family."}
+      - {title: "Either way", line: "Check the term, coverage and exclusions before signing."}
+  - layout: checklist
+    label: Save this
+    headline: Ask your banker
+    italic: these four questions
+    items:
+      - Is mortgage cover a condition of my loan?
+      - Can I use my own insurer?
+      - What happens to it if I refinance?
+      - Does it cover TPD and critical illness?
+    cta: Comment "MRTA" for help with yours
+
+# Hand-written captions; the CTA line is appended at post time (common.cta_line).
+captions:
+  threads: |-
+    MRTA or MLTA? Both settle your home loan if you pass away or become totally disabled.
+
+    MRTA: cover shrinks with the loan. Cheaper, pays the bank, ends if you refinance.
+    MLTA: cover stays level. Costs more, family gets any balance, often transferable.
+
+    Comment "MRTA" for help choosing.
+  instagram: |-
+    MRTA or MLTA? Your banker will ask. Here's what you're choosing between 👇
+
+    Both settle your home loan if you pass away or become totally and permanently disabled, so your family isn't left paying it.
+
+    MRTA (Mortgage Reducing Term Assurance)
+    The cover shrinks as your loan balance falls. Usually one premium, often added into the loan. The payout goes to the bank. Refinance or sell, and the cover usually ends.
+
+    MLTA (Mortgage Level Term Assurance)
+    The cover stays the same for the whole term. Costs more. After the loan is settled, any balance goes to your family. Many plans can move to your next home loan.
+
+    Lowest cost and keeping this loan? MRTA.
+    Might refinance or upgrade? Look at MLTA.
+
+    Islamic options: MRTT and MLTT.
+
+    Save this, and comment "MRTA" for help with yours.
