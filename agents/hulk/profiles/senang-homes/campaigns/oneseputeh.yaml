@@ -25,9 +25,13 @@ facts:   # the only claims the caption writer may use
 
 # Reels: showroom walkthroughs, logo-branded, hosted on the repo's "oneseputeh-reels" release.
 reel_base_url: https://github.com/srithesigan98/SocialMediaAgents/releases/download/oneseputeh-reels
+# Every reel gets a themed cover (scripts/reel_covers.py) — `cover` overrides the default text/photo.
+reel_cover_photo: showroom-living.jpg
 reels:
-  - {file: OneSeputeh_Type_DKC_705sqft.mp4, angle: "Showroom walkthrough of Type DKC, 705 sqft, dual-key ready"}
-  - {file: OneSeputeh_Type_TriA_804sqft.mp4, angle: "Showroom walkthrough of Type TriA, 804 sqft, 3 bedrooms"}
+  - {file: OneSeputeh_Type_DKC_705sqft.mp4, angle: "Showroom walkthrough of Type DKC, 705 sqft, dual-key ready",
+     cover: {headline: Type DKC, italic: "705 sqft, dual-key ready"}}
+  - {file: OneSeputeh_Type_TriA_804sqft.mp4, angle: "Showroom walkthrough of Type TriA, 804 sqft, 3 bedrooms",
+     cover: {headline: Type TriA, italic: "804 sqft, 3 bedrooms", photo: showroom-bedroom.jpg}}
 
 slides:
   - layout: cover

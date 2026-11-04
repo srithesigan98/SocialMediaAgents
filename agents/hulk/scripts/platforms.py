@@ -193,13 +193,17 @@ def instagram_publish_carousel(cfg: dict, caption: str, image_urls: list[str]) -
     ))["id"]
 
 
-def instagram_publish_reel(cfg: dict, caption: str, video_url: str) -> str:
-    """Reel (also shared to the main feed). Needs a publicly fetchable MP4 URL."""
+def instagram_publish_reel(cfg: dict, caption: str, video_url: str, cover_url: str | None = None) -> str:
+    """Reel (also shared to the main feed). Needs a publicly fetchable MP4 URL. `cover_url` is
+    the themed cover image shown on the grid and before play — always pass one."""
     user_id, token = _ig(cfg)
+    params = {"media_type": "REELS", "video_url": video_url, "caption": caption,
+              "share_to_feed": "true", "access_token": token}
+    if cover_url:
+        params["cover_url"] = cover_url
     container = _check(requests.post(
         f"{IG_BASE}/{user_id}/media",
-        params={"media_type": "REELS", "video_url": video_url, "caption": caption,
-                "share_to_feed": "true", "access_token": token},
+        params=params,
         timeout=60,
     ))["id"]
     _wait_until_ready(f"{IG_BASE}/{container}", token, "status_code")

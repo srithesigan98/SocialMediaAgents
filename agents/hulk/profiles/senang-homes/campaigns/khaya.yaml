@@ -20,6 +20,8 @@ facts:   # given to the caption writer as the only allowed claims
 # for git) — Meta fetches them by URL. Captions never state a starting price: the videos have
 # "FROM RM 785,000*" burned in, which differs from the sheet's nett prices.
 reel_base_url: https://github.com/srithesigan98/SocialMediaAgents/releases/download/khaya-reels
+# Every reel gets a themed cover (scripts/reel_covers.py); default photo below.
+reel_cover_photo: living.jpg
 reels:
   - {file: Khaya_Unit_B_High_Motion.mp4, angle: "Unit B walkthrough — contemporary luxury interior"}
   - {file: Khaya_Unit_A_Featured.mp4, angle: "Unit A featured tour"}

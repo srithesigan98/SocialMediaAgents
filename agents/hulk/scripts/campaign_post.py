@@ -27,6 +27,7 @@ import magazine
 import generate_property_post as drafter
 import make_poster
 import platforms
+import reel_covers
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -138,14 +139,30 @@ def reel_key(name: str, reel: dict) -> str:
     return f"campaign-{name}-reel-{reel['file']}"
 
 
+def reel_url(camp: dict, reel: dict) -> str:
+    """Reels always go out as the themed-cover version made by reel_covers.py."""
+    return f"{camp['reel_base_url'].rstrip('/')}/{reel_covers.covered_file(reel)}"
+
+
+def reachable(url: str) -> bool:
+    try:
+        return requests.head(url, allow_redirects=True, timeout=20).ok
+    except requests.RequestException:
+        return False
+
+
 def post_reel(cfg, name, camp, data, rows, platform_list, args) -> int:
     posted = common.read_state(cfg, "posted").get("listings", {})
     reel = next((r for r in camp["reels"] if reel_key(name, r) not in posted), None)
     if reel is None:
         print("All reels already posted.")
         return 0
-    url = f"{camp['reel_base_url'].rstrip('/')}/{reel['file']}"
-    print(f"Reel: {reel['file']} ({url})")
+    url = reel_url(camp, reel)
+    cover = make_poster.public_url(cfg, reel_covers.cover_png_path(cfg, reel))
+    if not (reachable(url) and reachable(cover)):
+        print(f"  ! {reel['file']} has no themed cover yet — run: python reel_covers.py {name}")
+        return 1
+    print(f"Reel: {reel['file']} ({url}, cover {cover})")
     failures = 0
     for platform in platform_list:
         try:
@@ -157,9 +174,9 @@ def post_reel(cfg, name, camp, data, rows, platform_list, args) -> int:
         print(f"--- {platform} reel ({len(text)} chars) ---\n{text}\n")
         if args.dry_run or (not args.yes and input(f"Publish reel to {platform}? [y/N] ").strip().lower() != "y"):
             continue
-        publish = platforms.threads_publish_video if platform == "threads" else platforms.instagram_publish_reel
         try:
-            post_id = publish(cfg, text, url)
+            post_id = (platforms.threads_publish_video(cfg, text, url) if platform == "threads"
+                       else platforms.instagram_publish_reel(cfg, text, url, cover_url=cover))
         except Exception as exc:
             failures += 1
             print(f"  ! publish to {platform} failed: {exc}")
@@ -177,14 +194,11 @@ def post_next(cfg, name, camp, data, rows, platform_list, args) -> int:
     last_reel = last_posted(cfg, [reel_key(name, r) for r in camp.get("reels", [])])
     last_unit = last_posted(cfg, [r["ref"] for r in rows])
     if reels_left and last_reel <= last_unit:
-        url = f"{camp['reel_base_url'].rstrip('/')}/{reels_left[0]['file']}"
-        try:
-            reachable = requests.head(url, allow_redirects=True, timeout=20).ok
-        except requests.RequestException:
-            reachable = False
-        if reachable:
+        url = reel_url(camp, reels_left[0])
+        if reachable(url):
             return post_reel(cfg, name, camp, data, rows, platform_list, args)
-        print(f"  ! reel not reachable at {url} — posting a unit instead so the slot isn't lost.")
+        print(f"  ! covered reel not reachable at {url} (run reel_covers.py {name}) — "
+              "posting a unit instead so the slot isn't lost.")
     # Least-recently-posted unit, ignoring the normal cooldown — the campaign deliberately
     # cycles this project's units faster than the general rotation would.
     posted = common.read_state(cfg, "posted").get("listings", {})

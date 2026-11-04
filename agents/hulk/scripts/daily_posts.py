@@ -127,9 +127,10 @@ def publish(cfg: dict, platform: str, text: str, image_url: str | None,
         # Video first (more reach); any failure falls back to the still so the day's post
         # still goes out.
         try:
+            # Threads has no cover parameter; the animated poster's first frame is the poster.
             if platform == "threads":
                 return platforms.threads_publish_video(cfg, text, video)
-            return platforms.instagram_publish_reel(cfg, text, video)
+            return platforms.instagram_publish_reel(cfg, text, video, cover_url=image_url)
         except Exception as exc:
             print(f"  ! {platform} video failed, falling back to the still poster: {str(exc)[:200]}")
     if platform == "threads":
