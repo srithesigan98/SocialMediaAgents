@@ -1,0 +1,62 @@
+[
+ {
+  "id": "w0",
+  "text": "Comment",
+  "start": 0.02,
+  "end": 0.495
+ },
+ {
+  "id": "w1",
+  "text": "\"COMPARE\",",
+  "start": 0.495,
+  "end": 0.91
+ },
+ {
+  "id": "w2",
+  "text": "and",
+  "start": 1.23,
+  "end": 1.417
+ },
+ {
+  "id": "w3",
+  "text": "we'll",
+  "start": 1.417,
+  "end": 1.651
+ },
+ {
+  "id": "w4",
+  "text": "run",
+  "start": 1.651,
+  "end": 1.838
+ },
+ {
+  "id": "w5",
+  "text": "the",
+  "start": 1.838,
+  "end": 1.978
+ },
+ {
+  "id": "w6",
+  "text": "numbers",
+  "start": 1.978,
+  "end": 2.305
+ },
+ {
+  "id": "w7",
+  "text": "on",
+  "start": 2.305,
+  "end": 2.446
+ },
+ {
+  "id": "w8",
+  "text": "your",
+  "start": 2.446,
+  "end": 2.632
+ },
+ {
+  "id": "w9",
+  "text": "shortlist.",
+  "start": 2.632,
+  "end": 3.1
+ }
+]

@@ -16,10 +16,9 @@ calendar:
     - {date: 2026-11-13, slug: hidden-costs, type: education, angle: how-to-steps,
        title: "Costs on top of the price", beats: [SPA legal fees, loan legal fees, stamp duty, valuation & moving in, packages that cover legal fees],
        object: "a receipt that keeps printing lines", project: videos/hidden-costs, status: ready}
-    - {date: 2026-11-17, slug: what-rm600k-buys, type: property, angle: by-the-numbers,
-       title: "What ~RM600K buys in KL right now",
-       sheet_projects: [The Shang Residence, 38 Bangsar Residensi, One Seputeh Residence, SUTERA (KL City Gateway), Riana Trees Residences],
-       object: "a map pin per project; size, tenure and VP count up per pin", status: planned}
+    - {date: 2026-11-17, slug: price-per-sqft, type: education, angle: how-to-steps,
+       title: "Compare homes by price per sqft", object: "a comparison sheet with two drawn floor plans",
+       note: "swapped in from backlog: what-rm600k-buys needs listings-sheet numbers", project: videos/price-per-sqft, status: ready}
     - {date: 2026-11-20, slug: dsr-explained, type: education, angle: how-to-steps,
        title: "Why banks reject home loans: your DSR", object: "a balance scale: debts vs net income", status: planned}
     - {date: 2026-11-24, slug: freehold-vs-leasehold, type: education, angle: before-after,
@@ -51,7 +50,6 @@ calendar:
 
 backlog:   # pull from here when a slot frees up or for January
   education:
-    - {slug: price-per-sqft, title: "Compare homes by price per sqft"}
     - {slug: lock-in-refinance, title: "Lock-in period and refinancing"}
     - {slug: maintenance-sinking-fund, title: "Maintenance fee and sinking fund"}
     - {slug: airbnb-rules, title: "Planning an Airbnb unit? Check these first"}
@@ -60,6 +58,9 @@ backlog:   # pull from here when a slot frees up or for January
     - {slug: epf-for-downpayment, title: "Using EPF for your home (FAQ)"}
     - {slug: mistakes-sellers-make, title: "Mistakes sellers make"}
   property:
+    - {slug: what-rm600k-buys, title: "What ~RM600K buys in KL right now",
+       sheet_projects: [The Shang Residence, 38 Bangsar Residensi, One Seputeh Residence, SUTERA (KL City Gateway), Riana Trees Residences],
+       object: "a map pin per project; size, tenure and VP count up per pin", note: "moved from 2026-11-17: needs the listings sheet"}
     - {slug: bangsar-under-800k, title: "Bangsar under RM800K", sheet_projects: [The Lantern Bangsar, Khaya Residences, Parkside Residences, 38 Bangsar Residensi]}
     - {slug: trx-neighbourhood, title: "Living next to TRX", sheet_projects: [Golden Crown Residence, Pavilion Square]}
     - {slug: taman-desa-pair, title: "Taman Desa: M Aspira vs The Atas", sheet_projects: [M Aspira, The Atas Residences]}

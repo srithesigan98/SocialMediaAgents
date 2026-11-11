@@ -1,0 +1,47 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+    .hw { display: inline-block; }
+    .hg { position: absolute; left: 75px; top: 205px; width: 930px; }
+    .label { font: 500 28px Outfit; letter-spacing: .16em; color: #FFAA78; text-transform: uppercase; }
+    .a { margin-top: 12px; font: 600 84px/1 Outfit; letter-spacing: -0.01em; color: #F3F0E7; }
+    .b { font: italic 500 72px/1.15 Gelasio; color: #FFAA78; margin-top: 6px; }
+  </style>
+  <div id="root" data-composition-id="heads" data-width="1080" data-height="1920">
+    <div class="hg clip" id="h0" data-start="0.0" data-duration="5.90" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">Two</span> <span class="hw">homes</span></div><div class="b"><span class="hw">which</span> <span class="hw">costs</span> <span class="hw">less?</span></div></div><div class="hg clip" id="h1" data-start="5.9" data-duration="5.10" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">Price</span> <span class="hw">per</span> <span class="hw">sqft</span></div><div class="b"><span class="hw">the</span> <span class="hw">one</span> <span class="hw">number</span></div></div><div class="hg clip" id="h2" data-start="11.0" data-duration="6.90" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">Home</span> <span class="hw">A</span></div><div class="b"><span class="hw">RM750</span> <span class="hw">per</span> <span class="hw">sqft</span></div></div><div class="hg clip" id="h3" data-start="17.9" data-duration="7.10" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">Home</span> <span class="hw">B</span></div><div class="b"><span class="hw">RM600</span> <span class="hw">per</span> <span class="hw">sqft</span></div></div><div class="hg clip" id="h4" data-start="25.0" data-duration="7.00" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">B</span> <span class="hw">costs</span> <span class="hw">more</span></div><div class="b"><span class="hw">less</span> <span class="hw">per</span> <span class="hw">sqft</span></div></div><div class="hg clip" id="h5" data-start="32.0" data-duration="5.90" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">Landed</span> <span class="hw">home?</span></div><div class="b"><span class="hw">same</span> <span class="hw">measure</span></div></div><div class="hg clip" id="h6" data-start="37.9" data-duration="7.25" data-track-index="0"><div class="label">Comparing homes</div><div class="a"><span class="hw">New</span> <span class="hw">launch?</span></div><div class="b"><span class="hw">use</span> <span class="hw">real</span> <span class="hw">prices</span></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.to(shake, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const draw = (sel, t, d = 1.0) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: "power2.inOut" }, t);
+    const pulse = (sel, t, s = 1.08) => tl.to(sel, { keyframes: [{ scale: s, duration: 0.14, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 }, immediateRender: false }, t);
+
+        words("#h1", 5.95);
+    words("#h2", 11.05);
+    words("#h3", 17.95);
+    words("#h4", 25.05);
+    words("#h5", 32.05);
+    words("#h6", 37.95);
+    window.__timelines["heads"] = tl;
+  </script>
+</template>

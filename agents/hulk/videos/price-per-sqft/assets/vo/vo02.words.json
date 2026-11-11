@@ -1,0 +1,86 @@
+[
+ {
+  "id": "w0",
+  "text": "Price",
+  "start": 0.04,
+  "end": 0.373
+ },
+ {
+  "id": "w1",
+  "text": "per",
+  "start": 0.373,
+  "end": 0.595
+ },
+ {
+  "id": "w2",
+  "text": "square",
+  "start": 0.595,
+  "end": 0.928
+ },
+ {
+  "id": "w3",
+  "text": "foot.",
+  "start": 0.928,
+  "end": 1.15
+ },
+ {
+  "id": "w4",
+  "text": "Divide",
+  "start": 1.59,
+  "end": 1.972
+ },
+ {
+  "id": "w5",
+  "text": "the",
+  "start": 1.972,
+  "end": 2.136
+ },
+ {
+  "id": "w6",
+  "text": "price",
+  "start": 2.136,
+  "end": 2.463
+ },
+ {
+  "id": "w7",
+  "text": "by",
+  "start": 2.463,
+  "end": 2.681
+ },
+ {
+  "id": "w8",
+  "text": "the",
+  "start": 2.681,
+  "end": 2.845
+ },
+ {
+  "id": "w9",
+  "text": "built-up",
+  "start": 2.845,
+  "end": 3.227
+ },
+ {
+  "id": "w10",
+  "text": "size,",
+  "start": 3.227,
+  "end": 3.5
+ },
+ {
+  "id": "w11",
+  "text": "in",
+  "start": 3.61,
+  "end": 3.775
+ },
+ {
+  "id": "w12",
+  "text": "square",
+  "start": 3.775,
+  "end": 4.105
+ },
+ {
+  "id": "w13",
+  "text": "feet.",
+  "start": 4.105,
+  "end": 4.38
+ }
+]

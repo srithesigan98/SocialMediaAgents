@@ -1,0 +1,110 @@
+[
+ {
+  "id": "w0",
+  "text": "New",
+  "start": 0.04,
+  "end": 0.269
+ },
+ {
+  "id": "w1",
+  "text": "launch?",
+  "start": 0.269,
+  "end": 0.67
+ },
+ {
+  "id": "w2",
+  "text": "Use",
+  "start": 0.8,
+  "end": 1.068
+ },
+ {
+  "id": "w3",
+  "text": "the",
+  "start": 1.068,
+  "end": 1.229
+ },
+ {
+  "id": "w4",
+  "text": "nett",
+  "start": 1.229,
+  "end": 1.443
+ },
+ {
+  "id": "w5",
+  "text": "price",
+  "start": 1.443,
+  "end": 1.765
+ },
+ {
+  "id": "w6",
+  "text": "after",
+  "start": 1.765,
+  "end": 2.033
+ },
+ {
+  "id": "w7",
+  "text": "any",
+  "start": 2.033,
+  "end": 2.248
+ },
+ {
+  "id": "w8",
+  "text": "rebates.",
+  "start": 2.248,
+  "end": 2.73
+ },
+ {
+  "id": "w9",
+  "text": "Then",
+  "start": 3.23,
+  "end": 3.481
+ },
+ {
+  "id": "w10",
+  "text": "check",
+  "start": 3.481,
+  "end": 3.796
+ },
+ {
+  "id": "w11",
+  "text": "transacted",
+  "start": 3.796,
+  "end": 4.487
+ },
+ {
+  "id": "w12",
+  "text": "prices",
+  "start": 4.487,
+  "end": 4.99
+ },
+ {
+  "id": "w13",
+  "text": "nearby,",
+  "start": 4.99,
+  "end": 5.43
+ },
+ {
+  "id": "w14",
+  "text": "not",
+  "start": 5.69,
+  "end": 5.954
+ },
+ {
+  "id": "w15",
+  "text": "just",
+  "start": 5.954,
+  "end": 6.271
+ },
+ {
+  "id": "w16",
+  "text": "asking",
+  "start": 6.271,
+  "end": 6.588
+ },
+ {
+  "id": "w17",
+  "text": "prices.",
+  "start": 6.588,
+  "end": 7.01
+ }
+]

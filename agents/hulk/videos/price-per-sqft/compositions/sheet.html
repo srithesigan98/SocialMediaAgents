@@ -1,0 +1,152 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+.ground { position: absolute; inset: 0; background: #142E2B; }
+.hw { display: inline-block; }
+
+    .sheet-wrap { position: absolute; left: 120px; top: 480px; width: 840px; height: 670px; }
+    .sheet { position: absolute; inset: 0; background: #F3F0E7; color: #142E2B; box-shadow: 0 24px 48px rgba(0,0,0,.35); }
+    .hdr { position: absolute; left: 0; right: 0; top: 24px; text-align: center; font: 600 28px Outfit; letter-spacing: .14em; }
+    .rule { position: absolute; left: 40px; right: 40px; height: 0; border-top: 3px dotted #B9B2A3; }
+    .formula { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 600 42px Outfit; white-space: nowrap; }
+    .formula .f { display: inline-block; opacity: .18; }
+    .formula .op { color: #B5531C; margin: 0 6px; }
+    .lab { position: absolute; top: 186px; width: 400px; text-align: center; font: 600 28px Outfit; letter-spacing: .16em; color: #5B6B66; }
+    .lab .ul { position: absolute; left: 140px; right: 140px; bottom: -6px; height: 5px; background: #F87947; }
+    .price { position: absolute; top: 222px; width: 400px; text-align: center; font: 600 46px Outfit; }
+    .pv { position: relative; display: inline-block; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 4px; bottom: -2px; background: #FFD84D; opacity: .55; mix-blend-mode: multiply; }
+    .sul { position: absolute; left: 0; right: 0; bottom: -6px; height: 5px; background: #F87947; }
+    .pill { position: absolute; top: 180px; padding: 0 10px; height: 38px; line-height: 36px; border-radius: 19px;
+            background: #F87947; color: #142E2B; font: 600 28px Outfit; }
+    .size { position: absolute; text-align: center; font: 600 34px Outfit; line-height: 48px; }
+    svg.plans { position: absolute; left: 0; top: 0; width: 840px; height: 670px; overflow: visible; }
+    .wall { fill: none; stroke: #142E2B; stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: 0; stroke-linejoin: miter; }
+    .wall.in { stroke-width: 4; }
+    .lot { position: absolute; left: 468px; top: 286px; width: 324px; height: 250px; border: 4px dashed #B5531C; }
+    .lotlab { position: absolute; left: 480px; top: 288px; font: 600 28px Outfit; letter-spacing: .1em; color: #B5531C; }
+    .lotlab .was { position: absolute; left: -6px; right: -6px; top: 50%; height: 5px; background: #9A3418; border-radius: 3px; }
+    .psf { position: absolute; top: 548px; width: 400px; text-align: center; font: 600 42px Outfit; }
+    .psf .num { display: inline-block; min-width: 72px; }
+    .bar { position: absolute; top: 610px; height: 24px; background: #142E2B; border-radius: 3px; }
+    #b-bar { background: #F87947; }
+    .tick { position: absolute; left: 760px; top: 548px; width: 52px; height: 52px; border-radius: 26px; background: #F87947;
+             color: #142E2B; font: 600 34px/52px Outfit; text-align: center; }
+    .note-wrap { position: absolute; left: 660px; top: 246px; width: 300px; height: 220px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 18px 22px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 44px/1.02 Caveat; color: #142E2B; }
+    .note .ln { display: block; position: relative; width: fit-content; }
+    .note .x { position: absolute; left: -4px; right: -4px; top: 52%; height: 5px; background: #9A3418; border-radius: 3px; }
+    .wstamp { position: absolute; left: 14px; top: 124px; padding: 4px 14px; border: 7px solid #9A3418;
+              color: #9A3418; font: 600 36px/1 Outfit; letter-spacing: .04em; mix-blend-mode: multiply; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="sheet" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="sheet-wrap" id="s-paper"><div class="sheet">
+      <div class="hdr">PRICE PER SQFT · ILLUSTRATION</div>
+      <div class="rule" style="top:74px"></div>
+      <div class="formula"><span class="f" id="f1">Price</span><span class="f op" id="f2">÷</span><span class="f" id="f3">built-up sqft</span><span class="f op" id="f4">=</span><span class="f" id="f5">psf</span></div>
+      <div class="rule" style="top:166px"></div>
+      <svg class="plans" viewBox="0 0 840 670"><g id="a-plan"><rect x="110" y="360" width="200" height="160" class="wall" pathLength="1"/><path d="M234 360 V436 H310" class="wall in" pathLength="1"/><path d="M110 444 H170" class="wall in" pathLength="1"/></g><g id="b-plan"><rect x="507" y="324" width="245" height="196" class="wall" pathLength="1"/><path d="M658 324 V418 H752" class="wall in" pathLength="1"/><path d="M507 426 H580" class="wall in" pathLength="1"/></g></svg>
+      <div class="lot" id="lot"></div>
+      <div class="lotlab" id="lotlab">LAND<span class="was" id="lot-was"></span></div>
+      
+      <div class="lab" id="a-lab" style="left:10px">HOME A<span class="ul" id="a-ul"></span></div>
+      <div class="price" id="a-price" style="left:10px"><span class="pv">RM600,000<span class="hl" id="a-phl"></span></span></div>
+      <div class="pill" id="a-nett" style="left:284px">nett</div>
+      <div class="size" id="a-size" style="left:110px;width:200px;top:460px"><span class="pv">800 sqft<span class="hl" id="a-shl"></span><span class="sul" id="a-sul"></span></span></div>
+      <div class="psf" id="a-psf" style="left:10px">RM<span id="a-n" class="num">???</span> psf</div>
+      <div class="bar" id="a-bar" style="left:60px;width:300px"></div>
+      
+      <div class="lab" id="b-lab" style="left:430px">HOME B<span class="ul" id="b-ul"></span></div>
+      <div class="price" id="b-price" style="left:430px"><span class="pv">RM720,000<span class="hl" id="b-phl"></span></span></div>
+      <div class="pill" id="b-nett" style="left:704px">nett</div>
+      <div class="size" id="b-size" style="left:507px;width:245px;top:460px"><span class="pv">1,200 sqft<span class="hl" id="b-shl"></span><span class="sul" id="b-sul"></span></span></div>
+      <div class="psf" id="b-psf" style="left:430px">RM<span id="b-n" class="num">???</span> psf</div>
+      <div class="bar" id="b-bar" style="left:510px;width:240px"></div>
+      <div class="tick" id="b-tick">✓</div>
+    </div></div>
+    <div class="clip" id="n1c" data-start="28.30" data-duration="4.15" data-track-index="0"><div class="note-wrap" id="n1" data-layout-allow-occlusion><div class="note">
+      <span class="ln" id="n1-a">Like with like:</span><span class="ln" id="n1-b">same area,</span><span class="ln" id="n1-c">similar homes</span></div></div></div>
+    <div class="clip" id="n2c" data-start="32.00" data-duration="6.35" data-track-index="0"><div class="note-wrap" id="n2" data-layout-allow-occlusion><div class="note">
+      <span class="ln">Land area</span><span class="ln">or built-up?</span><div class="wstamp" id="n2-stamp">DON'T MIX</div></div></div></div>
+    <div class="clip" id="n3c" data-start="37.90" data-duration="3.90" data-track-index="0"><div class="note-wrap" id="n3" data-layout-allow-occlusion><div class="note">
+      <span class="ln">Nett price =</span><span class="ln">the price</span><span class="ln" id="n3-b">minus rebates</span></div></div></div>
+    <div class="clip" id="n4c" data-start="41.30" data-duration="4.30" data-track-index="0"><div class="note-wrap" id="n4" data-layout-allow-occlusion><div class="note">
+      <span class="ln" id="n4-a">Transacted ✓</span><span class="ln" id="n4-b">nearby</span><span class="ln" id="n4-c">asking only<span class="x" id="n4-x"></span></span></div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.to(shake, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const draw = (sel, t, d = 1.0) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: "power2.inOut" }, t);
+    const pulse = (sel, t, s = 1.08) => tl.to(sel, { keyframes: [{ scale: s, duration: 0.14, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 }, immediateRender: false }, t);
+
+    // resting states (frame 0 = thumbnail: both homes, prices, plans and "RM ??? psf")
+    // hook
+    pulse("#a-plan", 0.34, 1.05); pulse("#b-plan", 0.64, 1.05);   // "Two homes"
+    sweep("#b-phl", 1.48, 0.5);                                    // "pricier"
+    pulse("#b-price", 2.85);                                       // "better deal"
+    pulse("#a-psf", 3.91, 1.12); pulse("#b-psf", 4.05, 1.12);      // "one number"
+    // formula
+    tl.to("#f1", { opacity: 1, duration: 0.25 }, 5.94);           // "Price"
+    tl.to("#f5", { opacity: 1, duration: 0.25 }, 6.30);           // "per square foot"
+    tl.to("#f2", { opacity: 1, duration: 0.2 }, 7.49); pop("#f2", 7.49);   // "Divide"
+    tl.to("#f3", { opacity: 1, duration: 0.25 }, 8.75);           // "built-up size"
+    tl.to("#a-plan .wall, #b-plan .wall", { keyframes: [{ stroke: "#F87947", duration: 0.2 }, { stroke: "#F87947", duration: 0.6 }, { stroke: "#142E2B", duration: 0.3 }] }, 8.75);
+    tl.to("#f4", { opacity: 1, duration: 0.2 }, 9.67); pop("#f4", 9.67);   // "square feet"
+    // home A
+    sweep("#a-ul", 11.06, 0.35);                                   // "Home A"
+    sweep("#a-phl", 11.78, 0.5);                                   // "six hundred thousand"
+    sweep("#a-shl", 13.15, 0.5);                                   // "eight hundred"
+    count("#a-n", 750, 15.15, 1.0); tl.fromTo("#a-bar", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 1.0, ease: "power2.out" }, 15.15);   // "750"
+    // home B
+    sweep("#b-ul", 17.96, 0.35);                                   // "Home B"
+    pulse("#b-price", 18.78);                                      // "720,000" (already highlighted)
+    sweep("#b-shl", 20.66, 0.5);                                   // "twelve hundred"
+    count("#b-n", 600, 22.74, 0.9); tl.fromTo("#b-bar", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.9, ease: "power2.out" }, 22.74);   // "600"
+    // B costs more, less per sqft
+    pulse("#b-price", 25.51);                                      // "costs more"
+    pulse("#b-psf", 27.65, 1.12); pop("#b-tick", 27.65);           // "costs less"
+    noteIn("#n1", 28.36);                                          // "Compare like with like"
+    reveal("#n1-b", 29.58, 0.45); reveal("#n1-c", 30.30, 0.5);     // "same area", "similar homes"
+    // landed
+    noteOut("#n1", 32.0); noteIn("#n2", 32.05);                    // "Landed home?"
+    stamp("#n2-stamp", 33.11, "#n2");                              // "Don't mix"
+    reveal("#lot", 33.73, 0.6); pop("#lotlab", 33.85);             // "land area"
+    pulse("#b-plan", 34.52, 1.05); sweep("#b-sul", 34.52, 0.4);    // "built-up area"
+    strike("#lot-was", 35.62); tl.to("#lot", { opacity: 0, duration: 0.4 }, 35.75);   // "Use the same"
+    sweep("#a-sul", 36.33, 0.4);                                   // "measure for both"
+    // new launch: nett, transacted
+    noteOut("#n2", 37.9); noteIn("#n3", 37.94);                    // "New launch?"
+    pop("#a-nett, #b-nett", 39.13, 0.1);                           // "nett price"
+    reveal("#n3-b", 40.15, 0.5);                                   // "rebates"
+    noteOut("#n3", 41.3); noteIn("#n4", 41.35);                    // "Then check"
+    reveal("#n4-a", 41.70, 0.5);                                   // "transacted"
+    reveal("#n4-b", 42.89, 0.4);                                   // "nearby"
+    reveal("#n4-c", 43.59, 0.4); strike("#n4-x", 44.17);           // "not just asking"
+    // close: the sheet drops away
+    tl.to("#s-paper", { y: 2000, rotation: 9, duration: 0.45, ease: "power3.in" }, 45.15);
+    tl.to("#n4", { y: 2100, rotation: -14, duration: 0.45, ease: "power3.in" }, 45.18);
+    window.__timelines["sheet"] = tl;
+  </script>
+</template>

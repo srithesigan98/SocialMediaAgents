@@ -1,0 +1,104 @@
+[
+ {
+  "id": "w0",
+  "text": "Two",
+  "start": 0.04,
+  "end": 0.336
+ },
+ {
+  "id": "w1",
+  "text": "homes.",
+  "start": 0.336,
+  "end": 0.78
+ },
+ {
+  "id": "w2",
+  "text": "The",
+  "start": 1.04,
+  "end": 1.182
+ },
+ {
+  "id": "w3",
+  "text": "pricier",
+  "start": 1.182,
+  "end": 1.56
+ },
+ {
+  "id": "w4",
+  "text": "one",
+  "start": 1.56,
+  "end": 1.749
+ },
+ {
+  "id": "w5",
+  "text": "might",
+  "start": 1.749,
+  "end": 1.986
+ },
+ {
+  "id": "w6",
+  "text": "be",
+  "start": 1.986,
+  "end": 2.175
+ },
+ {
+  "id": "w7",
+  "text": "the",
+  "start": 2.175,
+  "end": 2.317
+ },
+ {
+  "id": "w8",
+  "text": "better",
+  "start": 2.317,
+  "end": 2.554
+ },
+ {
+  "id": "w9",
+  "text": "deal.",
+  "start": 2.554,
+  "end": 2.79
+ },
+ {
+  "id": "w10",
+  "text": "Here's",
+  "start": 3.19,
+  "end": 3.455
+ },
+ {
+  "id": "w11",
+  "text": "the",
+  "start": 3.455,
+  "end": 3.614
+ },
+ {
+  "id": "w12",
+  "text": "one",
+  "start": 3.614,
+  "end": 3.826
+ },
+ {
+  "id": "w13",
+  "text": "number",
+  "start": 3.826,
+  "end": 4.144
+ },
+ {
+  "id": "w14",
+  "text": "that",
+  "start": 4.144,
+  "end": 4.356
+ },
+ {
+  "id": "w15",
+  "text": "shows",
+  "start": 4.356,
+  "end": 4.621
+ },
+ {
+  "id": "w16",
+  "text": "it.",
+  "start": 4.621,
+  "end": 4.78
+ }
+]

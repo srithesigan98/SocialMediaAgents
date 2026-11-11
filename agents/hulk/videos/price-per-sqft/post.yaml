@@ -1,0 +1,30 @@
+# Post copy for "Compare homes by price per sqft". Figures are the made-up Home A / Home B illustration
+# from SCRIPT.md (not market prices); the "Illustration only" line is required.
+# Served from raw.githubusercontent (no redirect) so Buffer/TikTok can fetch it too; Meta takes it as well.
+video_url: https://raw.githubusercontent.com/srithesigan98/SocialMediaAgents/main/agents/hulk/scripts/posters/senang-homes-video-price-per-sqft.mp4
+cover: senang-homes-video-price-per-sqft-cover.png
+captions:
+  threads: |-
+    The pricier home can be the better deal 👇
+    Home A: RM600K / 800 sqft = RM750 psf
+    Home B: RM720K / 1,200 sqft = RM600 psf
+    Compare like with like, use nett prices after rebates, check transacted prices.
+    Illustration only, not market prices.
+    Comment "COMPARE" for your shortlist.
+  instagram: |-
+    The pricier home might be the better deal. Here's the one number that shows it 👇
+
+    Price per square foot = price ÷ built-up size in sqft.
+    Home A: RM600,000 for 800 sqft = RM750 psf.
+    Home B: RM720,000 for 1,200 sqft = RM600 psf.
+    B costs more, but each square foot costs less.
+
+    Before you compare:
+    • Like with like: same area, similar homes.
+    • Landed? Don't mix land area with built-up area. Use the same measure for both.
+    • New launch? Use the nett price after any rebates.
+    • Check transacted prices nearby, not just asking prices.
+
+    Illustration only, not market prices.
+
+    Comment "COMPARE" and we'll run the numbers on your shortlist.

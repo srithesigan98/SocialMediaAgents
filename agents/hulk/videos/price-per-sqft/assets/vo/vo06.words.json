@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "Landed",
+  "start": 0.05,
+  "end": 0.476
+ },
+ {
+  "id": "w1",
+  "text": "home?",
+  "start": 0.476,
+  "end": 0.78
+ },
+ {
+  "id": "w2",
+  "text": "Don't",
+  "start": 1.11,
+  "end": 1.449
+ },
+ {
+  "id": "w3",
+  "text": "mix",
+  "start": 1.449,
+  "end": 1.731
+ },
+ {
+  "id": "w4",
+  "text": "land",
+  "start": 1.731,
+  "end": 2.014
+ },
+ {
+  "id": "w5",
+  "text": "area",
+  "start": 2.014,
+  "end": 2.296
+ },
+ {
+  "id": "w6",
+  "text": "with",
+  "start": 2.296,
+  "end": 2.522
+ },
+ {
+  "id": "w7",
+  "text": "built-up",
+  "start": 2.522,
+  "end": 2.918
+ },
+ {
+  "id": "w8",
+  "text": "area.",
+  "start": 2.918,
+  "end": 3.2
+ },
+ {
+  "id": "w9",
+  "text": "Use",
+  "start": 3.62,
+  "end": 3.895
+ },
+ {
+  "id": "w10",
+  "text": "the",
+  "start": 3.895,
+  "end": 4.06
+ },
+ {
+  "id": "w11",
+  "text": "same",
+  "start": 4.06,
+  "end": 4.335
+ },
+ {
+  "id": "w12",
+  "text": "measure",
+  "start": 4.335,
+  "end": 4.61
+ },
+ {
+  "id": "w13",
+  "text": "for",
+  "start": 4.61,
+  "end": 4.885
+ },
+ {
+  "id": "w14",
+  "text": "both.",
+  "start": 4.885,
+  "end": 5.16
+ }
+]

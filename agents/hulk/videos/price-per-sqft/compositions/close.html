@@ -1,0 +1,53 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+.ground { position: absolute; inset: 0; background: #142E2B; }
+.hw { display: inline-block; }
+
+    .label { position: absolute; left: 75px; top: 205px; font: 500 28px Outfit; letter-spacing: .16em; color: #FFAA78; text-transform: uppercase; }
+    .head { position: absolute; left: 75px; top: 257px; width: 930px; }
+    .a { font: 600 84px/1 Outfit; letter-spacing: -0.01em; color: #F3F0E7; }
+    .b { font: italic 500 72px/1.15 Gelasio; color: #FFAA78; margin-top: 6px; }
+  </style>
+  <div id="root" data-composition-id="close" data-width="1080" data-height="1920">
+    <div class="label">Comparing homes</div>
+    <div class="head" id="c-head"><div class="a"><span class="hw">Compare</span> <span class="hw">per</span> <span class="hw">sqft</span></div><div class="b"><span class="hw">not</span> <span class="hw">by</span> <span class="hw">price</span> <span class="hw">alone</span></div></div>
+    <div id="c-list" style="position:absolute;left:75px;top:520px;font:500 40px/1.5 Outfit;color:#F3F0E7">
+      <div class="li">Price ÷ built-up sqft</div><div class="li">Like with like</div><div class="li">Same size measure</div><div class="li">Nett, transacted prices</div></div>
+    <div id="c-cta" style="position:absolute;left:75px;top:860px;width:760px;height:130px;background:#F87947;display:flex;align-items:center;padding-left:40px;font:600 62px Outfit;color:#142E2B"><span id="c-ctat" style="display:inline-block">Comment "COMPARE"</span></div>
+    <img id="c-logo" src="assets/horizontal-reverse.svg" style="position:absolute;left:62px;top:1030px;width:500px;height:100px" alt="Senang Homes"/>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.to(shake, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const draw = (sel, t, d = 1.0) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: "power2.inOut" }, t);
+    const pulse = (sel, t, s = 1.08) => tl.to(sel, { keyframes: [{ scale: s, duration: 0.14, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 }, immediateRender: false }, t);
+
+    words("#c-head", 0.3);
+    tl.fromTo("#c-list .li", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out", stagger: 0.15 }, 0.6);
+    reveal("#c-cta", 1.07, 0.45);                            // "Comment"
+    tl.fromTo("#c-ctat", { scale: 1 }, { keyframes: [{ scale: 1.1, duration: 0.12, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, 1.54);  // "COMPARE"
+    tl.fromTo("#c-logo", { opacity: 0, x: -70 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 2.65);
+    window.__timelines["close"] = tl;
+  </script>
+</template>
