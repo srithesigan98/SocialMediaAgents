@@ -1,0 +1,80 @@
+[
+ {
+  "id": "w0",
+  "text": "That's",
+  "start": 0,
+  "end": 0.32
+ },
+ {
+  "id": "w1",
+  "text": "over",
+  "start": 0.32,
+  "end": 0.56
+ },
+ {
+  "id": "w2",
+  "text": "RM73,000",
+  "start": 0.56,
+  "end": 1.68
+ },
+ {
+  "id": "w3",
+  "text": "before",
+  "start": 1.68,
+  "end": 2
+ },
+ {
+  "id": "w4",
+  "text": "you",
+  "start": 2,
+  "end": 2.16
+ },
+ {
+  "id": "w5",
+  "text": "move",
+  "start": 2.16,
+  "end": 2.48
+ },
+ {
+  "id": "w6",
+  "text": "in.",
+  "start": 2.48,
+  "end": 2.96
+ },
+ {
+  "id": "w7",
+  "text": "Then",
+  "start": 2.96,
+  "end": 3.28
+ },
+ {
+  "id": "w8",
+  "text": "furnishing,",
+  "start": 3.28,
+  "end": 4
+ },
+ {
+  "id": "w9",
+  "text": "renovation,",
+  "start": 4.16,
+  "end": 4.8
+ },
+ {
+  "id": "w10",
+  "text": "and",
+  "start": 4.8,
+  "end": 4.96
+ },
+ {
+  "id": "w11",
+  "text": "utility",
+  "start": 4.96,
+  "end": 5.44
+ },
+ {
+  "id": "w12",
+  "text": "deposits.",
+  "start": 5.44,
+  "end": 6.08
+ }
+]

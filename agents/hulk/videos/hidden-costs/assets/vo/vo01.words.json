@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "The",
+  "start": 0,
+  "end": 0.16
+ },
+ {
+  "id": "w1",
+  "text": "price",
+  "start": 0.16,
+  "end": 0.4
+ },
+ {
+  "id": "w2",
+  "text": "says",
+  "start": 0.4,
+  "end": 0.72
+ },
+ {
+  "id": "w3",
+  "text": "RM500,000,",
+  "start": 0.72,
+  "end": 2.08
+ },
+ {
+  "id": "w4",
+  "text": "but",
+  "start": 2.08,
+  "end": 2.32
+ },
+ {
+  "id": "w5",
+  "text": "that's",
+  "start": 2.32,
+  "end": 2.56
+ },
+ {
+  "id": "w6",
+  "text": "not",
+  "start": 2.56,
+  "end": 2.72
+ },
+ {
+  "id": "w7",
+  "text": "all",
+  "start": 2.72,
+  "end": 2.88
+ },
+ {
+  "id": "w8",
+  "text": "you'll",
+  "start": 2.88,
+  "end": 3.2
+ },
+ {
+  "id": "w9",
+  "text": "pay.",
+  "start": 3.2,
+  "end": 3.68
+ },
+ {
+  "id": "w10",
+  "text": "Here's",
+  "start": 3.68,
+  "end": 4
+ },
+ {
+  "id": "w11",
+  "text": "what",
+  "start": 4,
+  "end": 4.16
+ },
+ {
+  "id": "w12",
+  "text": "goes",
+  "start": 4.16,
+  "end": 4.4
+ },
+ {
+  "id": "w13",
+  "text": "on",
+  "start": 4.4,
+  "end": 4.64
+ },
+ {
+  "id": "w14",
+  "text": "top.",
+  "start": 4.64,
+  "end": 4.96
+ }
+]

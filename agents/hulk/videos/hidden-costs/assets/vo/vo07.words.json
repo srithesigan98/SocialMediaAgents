@@ -1,0 +1,80 @@
+[
+ {
+  "id": "w0",
+  "text": "And",
+  "start": 0,
+  "end": 0.24
+ },
+ {
+  "id": "w1",
+  "text": "many",
+  "start": 0.24,
+  "end": 0.48
+ },
+ {
+  "id": "w2",
+  "text": "new",
+  "start": 0.48,
+  "end": 0.64
+ },
+ {
+  "id": "w3",
+  "text": "launches",
+  "start": 0.64,
+  "end": 1.28
+ },
+ {
+  "id": "w4",
+  "text": "cover",
+  "start": 1.28,
+  "end": 1.6
+ },
+ {
+  "id": "w5",
+  "text": "your",
+  "start": 1.6,
+  "end": 1.76
+ },
+ {
+  "id": "w6",
+  "text": "legal",
+  "start": 1.76,
+  "end": 2.08
+ },
+ {
+  "id": "w7",
+  "text": "fees.",
+  "start": 2.08,
+  "end": 2.8
+ },
+ {
+  "id": "w8",
+  "text": "Ask",
+  "start": 2.8,
+  "end": 3.2
+ },
+ {
+  "id": "w9",
+  "text": "what",
+  "start": 3.2,
+  "end": 3.36
+ },
+ {
+  "id": "w10",
+  "text": "the",
+  "start": 3.36,
+  "end": 3.52
+ },
+ {
+  "id": "w11",
+  "text": "package",
+  "start": 3.52,
+  "end": 3.92
+ },
+ {
+  "id": "w12",
+  "text": "includes.",
+  "start": 3.92,
+  "end": 4.48
+ }
+]

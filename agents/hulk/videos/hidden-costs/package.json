@@ -1,0 +1,11 @@
+{
+  "name": "hidden-costs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.32 preview",
+    "check": "npx --yes hyperframes@0.9.32 check",
+    "render": "npx --yes hyperframes@0.9.32 render",
+    "publish": "npx --yes hyperframes@0.9.32 publish"
+  }
+}

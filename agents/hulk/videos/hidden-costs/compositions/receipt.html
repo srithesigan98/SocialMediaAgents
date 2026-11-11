@@ -1,0 +1,130 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+.ground { position: absolute; inset: 0; background: #142E2B; }
+.hw { display: inline-block; }
+.ch { display: inline-block; white-space: pre; }
+
+    .slot { position: absolute; left: 150px; top: 446px; width: 780px; height: 34px; background: #0B1D1A;
+            border-radius: 17px; box-shadow: inset 0 -6px 0 #2B4A45; }
+    .paper-wrap { position: absolute; left: 190px; top: 466px; width: 700px; height: 694px; }
+    .paper { position: absolute; inset: 0; background: #F3F0E7; color: #142E2B;
+             clip-path: polygon(0 0, 100% 0, 100% 97.6%, 0% 100%, 5% 97.6%, 10% 100%, 15% 97.6%, 20% 100%, 25% 97.6%, 30% 100%, 35% 97.6%, 40% 100%, 45% 97.6%, 50% 100%, 55% 97.6%, 60% 100%, 65% 97.6%, 70% 100%, 75% 97.6%, 80% 100%, 85% 97.6%, 90% 100%, 95% 97.6%, 100% 100%, 0 97.6%);
+             box-shadow: 0 24px 48px rgba(0,0,0,.35); }
+    .hdr { position: absolute; left: 0; right: 0; top: 30px; text-align: center; font: 600 28px Outfit; letter-spacing: .14em; }
+    .rule { position: absolute; left: 40px; right: 40px; height: 0; border-top: 3px dotted #B9B2A3; }
+    .row { position: absolute; left: 40px; right: 40px; display: flex; justify-content: space-between; align-items: baseline; }
+    .row .k { font: 400 30px Outfit; color: #3F504C; }
+    .row .v { font: 600 32px Outfit; color: #142E2B; position: relative; }
+    .split { position: absolute; left: 40px; right: 40px; top: 214px; height: 40px; display: flex; font: 600 28px Outfit; }
+    .split .b { flex: 0 0 90%; background: #142E2B; color: #F3F0E7; display: flex; align-items: center; padding-left: 14px; }
+    .split .y { flex: 1; background: #F87947; color: #142E2B; display: flex; align-items: center; justify-content: center; }
+    .scale { position: absolute; left: 40px; top: 382px; font: italic 500 28px Gelasio; color: #5B6B66; }
+    .total { position: absolute; left: 40px; right: 40px; top: 566px; display: flex; justify-content: space-between; align-items: center; }
+    .total .k { font: 600 30px Outfit; }
+    .odo { font: 600 48px/58px Outfit; color: #142E2B; display: inline-flex; align-items: flex-start; height: 58px; }
+    .dg { display: inline-block; width: 29px; text-align: center; height: 58px; overflow: hidden; font-variant-numeric: tabular-nums; }
+    .strip { display: block; }
+    .strip div { height: 58px; }
+    .comma { display: inline-block; width: 13px; }
+    .foot { position: absolute; left: 40px; top: 638px; font: 400 28px Outfit; color: #5B6B66; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 2px; bottom: -4px; background: #FFD84D; opacity: .55; mix-blend-mode: multiply; }
+    .was { position: absolute; left: -6px; right: -6px; top: 50%; height: 6px; background: #9A3418; border-radius: 3px; }
+    .now { position: absolute; right: 150px; top: 0; color: #B5531C; font: 600 32px Outfit; }
+    .note-wrap { position: absolute; left: 680px; top: 300px; width: 300px; height: 210px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 20px 22px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 42px/1 Caveat; color: #142E2B; }
+    .wstamp { position: absolute; left: 52px; top: 118px; padding: 4px 16px; border: 7px solid #B5531C;
+              color: #B5531C; font: 600 46px/1 Outfit; letter-spacing: .08em; mix-blend-mode: multiply; }
+  </style>
+  <div id="root" data-composition-id="receipt" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="paper-wrap" id="r-paper"><div class="paper">
+      <div class="hdr">HOME PURCHASE · ILLUSTRATION</div>
+      <div class="rule" style="top:82px"></div>
+      <div class="row" id="r0" style="top:96px"><span class="k">Home price</span><span class="v" id="r0-v">RM500,000<span class="hl" id="r0-hl"></span></span></div>
+      <div class="rule" style="top:152px"></div>
+      <div class="row" id="r1" style="top:166px"><span class="k">Down payment (10%)</span><span class="v" id="r1-v">RM50,000</span></div>
+      <div class="split" id="r1-split"><span class="b" id="r1-b">Bank lends 90%</span><span class="y" id="r1-y">10%</span></div>
+      <div class="row" id="r2" style="top:272px"><span class="k">Legal fee: sale agreement</span><span class="v" id="r2-v">RM6,250<span class="hl" id="r2-hl"></span></span></div>
+      <div class="row" id="r3" style="top:330px"><span class="k">Legal fee: loan</span><span class="v" id="r3-v">RM5,625<span class="hl" id="r3-hl"></span></span></div>
+      <div class="scale" id="r-scale">Scale: 1.25% of the first RM500K</div>
+      <div class="row" id="r4" style="top:430px"><span class="k">Stamp duty: transfer</span><span class="v" id="r4-v">RM9,000<span class="was" id="r4-was"></span></span><span class="now" id="r4-now">RM0</span></div>
+      <div class="row" id="r5" style="top:488px"><span class="k">Stamp duty: loan (0.5%)</span><span class="v" id="r5-v">RM2,250<span class="was" id="r5-was"></span></span><span class="now" id="r5-now">RM0</span></div>
+      <div class="rule" id="r-rule2" style="top:548px;border-top:3px dashed #142E2B"></div>
+      <div class="total" id="r-total"><span class="k">On top of the loan</span><span class="odo" id="tot" data-layout-allow-overflow>RM<span class="dg"><span class="strip" id="tot-d0"><div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></span></span><span class="dg"><span class="strip" id="tot-d1"><div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></span></span><span class="comma">,</span><span class="dg"><span class="strip" id="tot-d2"><div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></span></span><span class="dg"><span class="strip" id="tot-d3"><div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></span></span><span class="dg"><span class="strip" id="tot-d4"><div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div></span></span></span></div>
+      <div class="foot" id="r-foot">Fees before SST &amp; disbursements</div>
+    </div></div>
+    <div class="slot" id="r-slot"></div>
+    <div class="clip" id="n1c" data-start="28.2" data-duration="4.9" data-track-index="0"><div class="note-wrap" id="n1" data-layout-allow-occlusion><div class="note">+ furnishing<br>+ renovation<br>+ utility deposits</div></div></div>
+    <div class="clip" id="n2c" data-start="32.65" data-duration="7.05" data-track-index="0"><div class="note-wrap" id="n2" data-layout-allow-occlusion><div class="note">First home,<br>RM500K or less?<div style="font-size:29px;margin-top:4px;white-space:nowrap">*if eligible, to 2027</div><div class="wstamp" id="n2-stamp" style="top:150px;font-size:40px">WAIVED*</div></div></div></div>
+    <div class="clip" id="n3c" data-start="41.95" data-duration="3.55" data-track-index="0"><div class="note-wrap" id="n3" data-layout-allow-occlusion><div class="note">Ask: are legal<br>fees included?</div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const print = (sel, t) => tl.fromTo(sel, { clipPath: "inset(0 0 100% 0)", y: -10 }, { clipPath: "inset(0 0 0% 0)", y: 0, duration: 0.35, ease: "power2.out" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.to(shake, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 } }, t);
+
+    const odo = (value, t) => {
+      const s = String(value).padStart(5, "0");
+      for (let i = 0; i < 5; i++)
+        tl.to("#tot-d" + i, { y: -Number(s[i]) * 58, duration: 0.7, ease: "power3.inOut" }, t + i * 0.06);
+    };
+    // resting states
+    tl.set("#tot [id^=tot-d]", { y: 0 }, 0);
+    // hook: the price, then "not all you'll pay"
+    sweep("#r0-hl", 1.0, 0.5);                                     // "RM500,000"
+    tl.to("#r-slot", { keyframes: [{ y: -3, duration: 0.05 }, { y: 2, duration: 0.05 }, { y: 0, duration: 0.06 }] }, 2.86);   // "not all"
+    print("#r-rule2", 3.98);                                       // "what goes on top"
+    // down payment
+    print("#r1", 7.1); print("#r-total", 11.0);                     // "down payment"
+    reveal("#r1-b", 8.9, 0.6); pop("#r1-y", 10.3);                 // "90%" ... "bring 10"
+    odo(50000, 11.25);                                             // "50,000"
+    // legal fees
+    print("#r2", 14.85); print("#r3", 15.6);                       // "sale agreement", "loan"
+    reveal("#r-scale", 16.6, 0.6);                                 // "fixed scale"
+    odo(61875, 17.8);                                              // "about 12,000"
+    // stamp duty
+    print("#r4", 20.3); odo(70875, 21.3);                          // "stamp duty", "9,000"
+    print("#r5", 23.25); odo(73125, 24.0);                         // "half a percent"
+    // the total, then moving-in costs
+    tl.to("#r-total", { keyframes: [{ scale: 1.06, duration: 0.15, ease: "power2.out" }, { scale: 1, duration: 0.3 }] }, 25.9);  // "RM73,000"
+    reveal("#r-foot", 26.4, 0.6);
+    noteIn("#n1", 28.3);                                           // "Then furnishing"
+    // first home: stamp duties waived if you qualify
+    noteOut("#n1", 32.6); noteIn("#n2", 32.7);                     // "First home"
+    stamp("#n2-stamp", 37.8, "#n2");                               // "waived"
+    strike("#r4-was", 37.85); strike("#r5-was", 37.95);
+    pop("#r4-now", 38.05); pop("#r5-now", 38.15);
+    odo(61875, 38.3);
+    // packages
+    noteOut("#n2", 39.2);
+    sweep("#r2-hl", 40.55, 0.45); sweep("#r3-hl", 40.75, 0.45);    // "cover your legal fees"
+    noteIn("#n3", 42.0);                                           // "Ask what the package includes"
+    // close: the receipt drops away
+    tl.to("#r-paper", { y: 2000, rotation: 9, duration: 0.45, ease: "power3.in" }, 44.9);
+    tl.to("#n3", { y: 2100, rotation: -14, duration: 0.45, ease: "power3.in" }, 44.93);
+    tl.to("#r-slot", { opacity: 0, duration: 0.3 }, 44.9);
+    window.__timelines["receipt"] = tl;
+  </script>
+</template>

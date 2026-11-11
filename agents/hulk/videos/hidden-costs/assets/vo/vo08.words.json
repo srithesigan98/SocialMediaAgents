@@ -1,0 +1,68 @@
+[
+ {
+  "id": "w0",
+  "text": "Comment",
+  "start": 0,
+  "end": 0.48
+ },
+ {
+  "id": "w1",
+  "text": "COST,",
+  "start": 0.48,
+  "end": 0.96
+ },
+ {
+  "id": "w2",
+  "text": "and",
+  "start": 0.96,
+  "end": 1.12
+ },
+ {
+  "id": "w3",
+  "text": "we'll",
+  "start": 1.12,
+  "end": 1.36
+ },
+ {
+  "id": "w4",
+  "text": "work",
+  "start": 1.36,
+  "end": 1.52
+ },
+ {
+  "id": "w5",
+  "text": "out",
+  "start": 1.52,
+  "end": 1.68
+ },
+ {
+  "id": "w6",
+  "text": "the",
+  "start": 1.68,
+  "end": 1.84
+ },
+ {
+  "id": "w7",
+  "text": "numbers",
+  "start": 1.84,
+  "end": 2.08
+ },
+ {
+  "id": "w8",
+  "text": "for",
+  "start": 2.08,
+  "end": 2.24
+ },
+ {
+  "id": "w9",
+  "text": "your",
+  "start": 2.24,
+  "end": 2.4
+ },
+ {
+  "id": "w10",
+  "text": "home.",
+  "start": 2.4,
+  "end": 2.8
+ }
+]

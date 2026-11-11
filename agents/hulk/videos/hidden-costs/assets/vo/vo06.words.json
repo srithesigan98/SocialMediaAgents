@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "First",
+  "start": 0,
+  "end": 0.4
+ },
+ {
+  "id": "w1",
+  "text": "home",
+  "start": 0.4,
+  "end": 0.72
+ },
+ {
+  "id": "w2",
+  "text": "at",
+  "start": 0.72,
+  "end": 0.88
+ },
+ {
+  "id": "w3",
+  "text": "RM500,000",
+  "start": 0.88,
+  "end": 1.84
+ },
+ {
+  "id": "w4",
+  "text": "or",
+  "start": 1.84,
+  "end": 2
+ },
+ {
+  "id": "w5",
+  "text": "less.",
+  "start": 2,
+  "end": 2.64
+ },
+ {
+  "id": "w6",
+  "text": "If",
+  "start": 2.64,
+  "end": 2.8
+ },
+ {
+  "id": "w7",
+  "text": "you",
+  "start": 2.8,
+  "end": 2.96
+ },
+ {
+  "id": "w8",
+  "text": "qualify,",
+  "start": 2.96,
+  "end": 3.68
+ },
+ {
+  "id": "w9",
+  "text": "both",
+  "start": 3.68,
+  "end": 4
+ },
+ {
+  "id": "w10",
+  "text": "stamp",
+  "start": 4,
+  "end": 4.32
+ },
+ {
+  "id": "w11",
+  "text": "duties",
+  "start": 4.48,
+  "end": 4.88
+ },
+ {
+  "id": "w12",
+  "text": "can",
+  "start": 4.88,
+  "end": 5.04
+ },
+ {
+  "id": "w13",
+  "text": "be",
+  "start": 5.04,
+  "end": 5.12
+ },
+ {
+  "id": "w14",
+  "text": "waived.",
+  "start": 5.12,
+  "end": 5.52
+ }
+]

@@ -76,9 +76,10 @@ facts:                         # non-negotiable for any money/legal topic
   - no insurer/bank names, no live rates, no legal promises; example numbers are labelled "Illustration"
   - property facts come only from the listings sheet row (prices, tenure, VP, rebates) — never estimated
 
-publish:
-  render: "npx hyperframes render -q delivery --keyframe-interval 2 --max-bitrate 10M"
-  host_video: "GitHub release 'explainer-videos' (Meta fetches by URL; too big for git)"
-  cover: "frame 0 snapshot -> scripts/posters/<profile>-video-<slug>-cover.png, sent as Instagram cover_url; Threads shows frame 0"
-  caption: "hook line + 3–4 short fact lines + any required disclaimer + 'Comment \"<WORD>\"' + the profile CTA line"
-  record_as: "tip-<slug>-video in state/senang-homes-posted.json (reply bot answers comments)"
+publish:                       # auto-approved by the user 2026-11-11: no review gate, fact-check still mandatory
+  render: "npx hyperframes render -q delivery --keyframe-interval 2 --max-bitrate 10M; then ffmpeg loudnorm I=-15 TP=-1.5"
+  cover: "scripts/video_cover.py --title <topic> --hook <hook> --frame <still of the full stage> -> posters/<profile>-video-<slug>-cover.png (topic title, brand theme, inside the 3:4 grid band)"
+  first_frame: "reel_covers.prepend_cover(cover, video) — 0.5 s cover at the start so Threads shows the topic too"
+  host_video: "gh release upload explainer-videos <slug>.mp4 (Meta fetches by URL; too big for git)"
+  post_copy: "videos/<slug>/post.yaml: video_url, cover, captions.threads (<=500 with CTA) and captions.instagram, incl. any required disclaimer"
+  hand_off: "set the slot's status to ready in video_plan.yaml and push; .github/workflows/hulk-senang-homes-videos.yml posts it Tue/Fri 20:30 MYT (post_video.py) and marks it posted"

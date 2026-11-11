@@ -1,0 +1,46 @@
+name: Hulk (Senang Homes) animated videos
+
+# Tue + Fri at 20:30 MYT (12:30 UTC), an hour after the daily post: publish the next video in
+# agents/hulk/profiles/senang-homes/video_plan.yaml that is status "ready" and due (post_video.py).
+# Videos are produced ahead of time (script, render, topic cover, upload to the explainer-videos
+# release) — this job only posts, so it needs no laptop and no rendering tools. Auto-approved by the
+# user (2026-11-11): no review step. Manual "Run workflow" posts the next due video now.
+
+on:
+  schedule:
+    - cron: "30 12 * * 2,5"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit the posting history + plan status
+
+jobs:
+  post-video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Post the next ready video
+        env:
+          SENANG_THREADS_USER_ID: ${{ secrets.SENANG_THREADS_USER_ID }}
+          SENANG_THREADS_ACCESS_TOKEN: ${{ secrets.SENANG_THREADS_ACCESS_TOKEN }}
+          SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
+          SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
+          SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
+        run: |
+          cd agents/hulk/scripts
+          python post_video.py --profile senang-homes --yes
+      - name: Save posting history and plan status
+        if: always()
+        run: |
+          git config user.name "hulk-bot"
+          git config user.email "hulk-bot@users.noreply.github.com"
+          git add agents/hulk/scripts/state/senang-homes-posted.json agents/hulk/profiles/senang-homes/video_plan.yaml
+          git diff --cached --quiet && exit 0
+          git commit -m "hulk: senang-homes video posted"
+          git pull --rebase origin main
+          git push origin HEAD:main

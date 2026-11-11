@@ -1,5 +1,5 @@
 # Weekly animated video plan — Senang Homes (format: formats/animated-explainer.yaml)
-# Cadence: 2 videos a week (Tue + Fri, 19:30 MYT) = 8–9 a month, leaving 1–2 of the monthly
+# Cadence: 2 videos a week (Tue + Fri, 20:30 MYT) = 8–9 a month, leaving 1–2 of the monthly
 # 10 agent runs as spares for a redo or a timely topic. One agent run = one finished, posted video.
 # Mix per month: ~60% buyer education (drawn diagrams), ~40% property videos built only from the
 # listings sheet (+ the project's own campaign photos where they exist).
@@ -7,7 +7,7 @@
 # status: planned -> scripted -> approved -> posted
 
 monthly_budget: 10
-cadence: {days: [Tue, Fri], time: "19:30", per_week: 2}
+cadence: {days: [Tue, Fri], time: "20:30", per_week: 2}   # posted by .github/workflows/hulk-senang-homes-videos.yml
 
 calendar:
   2026-11:
@@ -15,7 +15,7 @@ calendar:
        title: "MRTA vs MLTA: 4 myths", status: posted}
     - {date: 2026-11-13, slug: hidden-costs, type: education, angle: how-to-steps,
        title: "Costs on top of the price", beats: [SPA legal fees, loan legal fees, stamp duty, valuation & moving in, packages that cover legal fees],
-       object: "a receipt that keeps printing lines", status: planned}
+       object: "a receipt that keeps printing lines", project: videos/hidden-costs, status: ready}
     - {date: 2026-11-17, slug: what-rm600k-buys, type: property, angle: by-the-numbers,
        title: "What ~RM600K buys in KL right now",
        sheet_projects: [The Shang Residence, 38 Bangsar Residensi, One Seputeh Residence, SUTERA (KL City Gateway), Riana Trees Residences],

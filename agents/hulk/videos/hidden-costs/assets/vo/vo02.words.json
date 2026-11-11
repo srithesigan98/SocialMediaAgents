@@ -1,0 +1,86 @@
+[
+ {
+  "id": "w0",
+  "text": "First,",
+  "start": 0,
+  "end": 0.4
+ },
+ {
+  "id": "w1",
+  "text": "the",
+  "start": 0.4,
+  "end": 0.56
+ },
+ {
+  "id": "w2",
+  "text": "down",
+  "start": 0.56,
+  "end": 0.8
+ },
+ {
+  "id": "w3",
+  "text": "payment.",
+  "start": 0.96,
+  "end": 1.68
+ },
+ {
+  "id": "w4",
+  "text": "Banks",
+  "start": 1.68,
+  "end": 2.16
+ },
+ {
+  "id": "w5",
+  "text": "usually",
+  "start": 2.16,
+  "end": 2.48
+ },
+ {
+  "id": "w6",
+  "text": "lend",
+  "start": 2.48,
+  "end": 2.8
+ },
+ {
+  "id": "w7",
+  "text": "90%,",
+  "start": 2.8,
+  "end": 3.52
+ },
+ {
+  "id": "w8",
+  "text": "so",
+  "start": 3.52,
+  "end": 3.76
+ },
+ {
+  "id": "w9",
+  "text": "you",
+  "start": 3.76,
+  "end": 3.92
+ },
+ {
+  "id": "w10",
+  "text": "bring",
+  "start": 3.92,
+  "end": 4.24
+ },
+ {
+  "id": "w11",
+  "text": "10,",
+  "start": 4.24,
+  "end": 4.8
+ },
+ {
+  "id": "w12",
+  "text": "that's",
+  "start": 4.8,
+  "end": 5.12
+ },
+ {
+  "id": "w13",
+  "text": "50,000.",
+  "start": 5.12,
+  "end": 6
+ }
+]
