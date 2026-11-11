@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Thin wrappers over the Threads and Instagram Graph APIs: publish, read comments, reply.
+"""Thin wrappers over the Threads and Instagram Graph APIs (publish, read comments, reply), plus
+TikTok video publishing through Buffer.
 
 Every call takes the profile config and reads that profile's credentials through
 common.credential(), so a script can never post one brand's content with another
@@ -248,3 +249,51 @@ def instagram_me(cfg: dict) -> dict:
     _, token = _ig(cfg)
     return _check(requests.get(f"{IG_BASE}/me",
                                params={"fields": "id,username", "access_token": token}, timeout=30))
+
+
+# --------------------------------------------------------------------------- TikTok (via Buffer)
+# TikTok's own Content Posting API forces every post from an unaudited app to private (SELF_ONLY)
+# until a multi-week audit passes; Buffer's TikTok integration is already audited, so posts go
+# out public. Schema checked by introspecting https://api.buffer.com (2026-11-11).
+
+BUFFER_API = "https://api.buffer.com"
+
+_BUFFER_CREATE = """mutation($input: CreatePostInput!) { createPost(input: $input) {
+  __typename ... on PostActionSuccess { post { id } } ... on MutationError { message } } }"""
+_BUFFER_STATUS = """query($input: PostInput!) { post(input: $input) {
+  status externalLink error { message } } }"""
+
+
+def _buffer(cfg: dict, query: str, variables: dict) -> dict:
+    token = common.credential(cfg, "buffer_api_key")
+    data = _check(requests.post(BUFFER_API, json={"query": query, "variables": variables},
+                                headers={"Authorization": f"Bearer {token}"}, timeout=60))
+    if data.get("errors"):
+        raise RuntimeError(f"Buffer: {data['errors']}")
+    return data["data"]
+
+
+def tiktok_publish_video(cfg: dict, caption: str, video_url: str) -> str:
+    """Publish now and wait until TikTok has it. `video_url` must serve the file directly — Buffer
+    rejects redirects, so a GitHub release download link (302) won't do; raw.githubusercontent will.
+    Frame 0-0.5 s is the topic cover (reel_covers.prepend_cover), so the thumbnail is taken there."""
+    created = _buffer(cfg, _BUFFER_CREATE, {"input": {
+        "channelId": common.credential(cfg, "tiktok_channel_id"),
+        "text": caption, "schedulingType": "automatic", "mode": "shareNow",
+        "assets": [{"video": {"url": video_url, "metadata": {"thumbnailOffset": 250}}}],
+        # The narration is a synthetic (TTS) voice — TikTok asks for AI-generated disclosure.
+        "metadata": {"tiktok": {"isAiGenerated": True}},
+    }})["createPost"]
+    if "post" not in created:
+        raise RuntimeError(f"Buffer refused the post ({created['__typename']}): {created.get('message')}")
+    post_id = created["post"]["id"]
+
+    deadline = time.time() + 600
+    while time.time() < deadline:
+        post = _buffer(cfg, _BUFFER_STATUS, {"input": {"id": post_id}})["post"]
+        if post["status"] == "sent":
+            return post.get("externalLink") or post_id
+        if post["status"] == "error":
+            raise RuntimeError(f"TikTok publish failed: {post['error']}")
+        time.sleep(10)
+    raise RuntimeError(f"Buffer post {post_id} still sending after 10 min. Check Buffer before reposting.")

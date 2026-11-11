@@ -1,6 +1,7 @@
 # Post copy for "Costs on top of the price". Figures are the RM500K / 90% loan illustration from
 # SCRIPT.md; the disclaimer line is required (fees before SST and disbursements; exemption conditions).
-video_url: https://github.com/srithesigan98/SocialMediaAgents/releases/download/explainer-videos/hidden-costs.mp4
+# Served from raw.githubusercontent (no redirect) so Buffer/TikTok can fetch it too; Meta takes it as well.
+video_url: https://raw.githubusercontent.com/srithesigan98/SocialMediaAgents/main/agents/hulk/scripts/posters/senang-homes-video-hidden-costs.mp4
 cover: senang-homes-video-hidden-costs-cover.png
 captions:
   threads: |-

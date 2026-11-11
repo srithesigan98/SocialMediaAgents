@@ -145,6 +145,8 @@ def run_once(cfg: dict, dry_run: bool) -> int:
 
     for post in common.recent_posts(cfg):
         platform, post_id = post["platform"], post["post_id"]
+        if platform not in ("threads", "instagram"):  # TikTok has no comment-reply API for us
+            continue
         try:
             comments = fetch_comments(cfg, platform, post_id)
         except Exception as exc:  # e.g. the post was deleted — skip it, keep going

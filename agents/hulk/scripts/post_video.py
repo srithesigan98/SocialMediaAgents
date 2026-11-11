@@ -6,12 +6,14 @@
 
 Picks the earliest calendar entry with status "ready" whose date has arrived (Malaysia time) and that
 hasn't been posted, reads its project's post.yaml (video URL, topic cover, captions), publishes to
-Threads + Instagram (Reel with the cover as cover_url) and marks it "posted" in the plan. Producing
+the profile's video_platforms (Threads, Instagram Reel with the cover as cover_url, TikTok through
+Buffer) and marks it "posted" in the plan. Producing
 the video (script, render, cover, upload) happens earlier — see formats/animated-explainer.yaml.
 """
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -68,14 +70,21 @@ def main() -> None:
     print(f"Video: {entry['title']} ({entry['date']})\n  video {post['video_url']}\n  cover {cover}")
 
     failures, done = 0, 0
-    for platform in cfg["schedule"]["platforms"]:
-        text = post["captions"][platform].rstrip() + "\n\n" + cta
+    for platform in cfg.get("video_platforms") or cfg["schedule"]["platforms"]:
+        if platform == "tiktok" and not all(os.environ.get(cfg["credentials"][k], "").strip()
+                                            for k in ("buffer_api_key", "tiktok_channel_id")):
+            print("--- tiktok skipped: Buffer API key / TikTok channel id not set ---\n")
+            continue
+        caption = post["captions"].get(platform) or post["captions"]["instagram"]  # TikTok reuses IG's
+        text = caption.rstrip() + "\n\n" + cta
         print(f"--- {platform} ({len(text)} chars) ---\n{text}\n")
         if args.dry_run or (not args.yes and input(f"Publish to {platform}? [y/N] ").strip().lower() != "y"):
             continue
         try:
             if platform == "threads":
                 pid = platforms.threads_publish_video(cfg, text, post["video_url"])
+            elif platform == "tiktok":
+                pid = platforms.tiktok_publish_video(cfg, text, post["video_url"])
             else:
                 pid = platforms.instagram_publish_reel(cfg, text, post["video_url"], cover_url=cover)
         except Exception as exc:

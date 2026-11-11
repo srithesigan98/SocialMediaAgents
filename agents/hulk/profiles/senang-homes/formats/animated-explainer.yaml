@@ -5,7 +5,7 @@
 
 name: animated-explainer
 output: {width: 1080, height: 1920, fps: 30, length_s: [55, 65], aspect: "9:16"}
-platforms: [instagram_reel, threads_video]
+platforms: [instagram_reel, threads_video, tiktok]   # TikTok through Buffer (platforms.tiktok_publish_video)
 
 look:
   ground: "#142E2B"            # forest, flat — never a gradient or a dark void with floating bits
@@ -80,6 +80,6 @@ publish:                       # auto-approved by the user 2026-11-11: no review
   render: "npx hyperframes render -q delivery --keyframe-interval 2 --max-bitrate 10M; then ffmpeg loudnorm I=-15 TP=-1.5"
   cover: "scripts/video_cover.py --title <topic> --hook <hook> --frame <still of the full stage> -> posters/<profile>-video-<slug>-cover.png (topic title, brand theme, inside the 3:4 grid band)"
   first_frame: "reel_covers.prepend_cover(cover, video) — 0.5 s cover at the start so Threads shows the topic too"
-  host_video: "gh release upload explainer-videos <slug>.mp4 (Meta fetches by URL; too big for git)"
-  post_copy: "videos/<slug>/post.yaml: video_url, cover, captions.threads (<=500 with CTA) and captions.instagram, incl. any required disclaimer"
-  hand_off: "set the slot's status to ready in video_plan.yaml and push; .github/workflows/hulk-senang-homes-videos.yml posts it Tue/Fri 20:30 MYT (post_video.py) and marks it posted"
+  host_video: "copy the final mp4 to scripts/posters/<profile>-video-<slug>.mp4 and commit it (3-8 MB); video_url = its raw.githubusercontent URL. Not a GitHub release link: it 302-redirects and Buffer/TikTok reject redirects"
+  post_copy: "videos/<slug>/post.yaml: video_url, cover, captions.threads (<=500 with CTA) and captions.instagram, incl. any required disclaimer; TikTok reuses captions.instagram unless captions.tiktok is set"
+  hand_off: "set the slot's status to ready in video_plan.yaml and push; .github/workflows/hulk-senang-homes-videos.yml posts it Tue/Fri 20:30 MYT (post_video.py) to Threads, Instagram and TikTok and marks it posted"

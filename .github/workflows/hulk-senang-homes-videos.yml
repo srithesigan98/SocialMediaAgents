@@ -31,6 +31,8 @@ jobs:
           SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          SENANG_TIKTOK_CHANNEL_ID: ${{ secrets.SENANG_TIKTOK_CHANNEL_ID }}
         run: |
           cd agents/hulk/scripts
           python post_video.py --profile senang-homes --yes

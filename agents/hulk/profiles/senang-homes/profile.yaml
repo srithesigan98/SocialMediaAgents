@@ -15,6 +15,10 @@ credentials:
   threads_access_token: SENANG_THREADS_ACCESS_TOKEN
   ig_user_id: SENANG_IG_USER_ID
   ig_access_token: SENANG_IG_ACCESS_TOKEN
+  # TikTok posts go through Buffer (TikTok-audited, so posts are public). One Buffer key per account;
+  # the channel id is this brand's TikTok in Buffer (list_channels / Buffer API channels query).
+  buffer_api_key: BUFFER_API_KEY
+  tiktok_channel_id: SENANG_TIKTOK_CHANNEL_ID
 
 listings:
   # Where the property spreadsheet comes from. One of:
@@ -91,6 +95,10 @@ schedule:
   cooldown_days: 14
   # Post to these platforms. Remove one to disable it.
   platforms: [threads, instagram]
+
+# The Tue/Fri animated videos (post_video.py) also go to TikTok. TikTok is skipped, not failed,
+# while BUFFER_API_KEY / SENANG_TIKTOK_CHANNEL_ID are unset.
+video_platforms: [threads, instagram, tiktok]
 
 whatsapp:
   # Your closing number in full international format, digits only (no +, no spaces).
