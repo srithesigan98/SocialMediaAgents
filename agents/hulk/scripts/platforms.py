@@ -273,7 +273,7 @@ def _buffer(cfg: dict, query: str, variables: dict) -> dict:
     return data["data"]
 
 
-def tiktok_publish_video(cfg: dict, caption: str, video_url: str) -> str:
+def tiktok_publish_video(cfg: dict, caption: str, video_url: str, ai_generated: bool = True) -> str:
     """Publish now and wait until TikTok has it. `video_url` must serve the file directly — Buffer
     rejects redirects, so a GitHub release download link (302) won't do; raw.githubusercontent will.
     Frame 0-0.5 s is the topic cover (reel_covers.prepend_cover), so the thumbnail is taken there."""
@@ -281,8 +281,8 @@ def tiktok_publish_video(cfg: dict, caption: str, video_url: str) -> str:
         "channelId": common.credential(cfg, "tiktok_channel_id"),
         "text": caption, "schedulingType": "automatic", "mode": "shareNow",
         "assets": [{"video": {"url": video_url, "metadata": {"thumbnailOffset": 250}}}],
-        # The narration is a synthetic (TTS) voice — TikTok asks for AI-generated disclosure.
-        "metadata": {"tiktok": {"isAiGenerated": True}},
+        # Explainers are narrated by a synthetic (TTS) voice — TikTok asks for AI disclosure.
+        "metadata": {"tiktok": {"isAiGenerated": ai_generated}},
     }})["createPost"]
     if "post" not in created:
         raise RuntimeError(f"Buffer refused the post ({created['__typename']}): {created.get('message')}")

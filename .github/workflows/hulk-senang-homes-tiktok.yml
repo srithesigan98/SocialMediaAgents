@@ -1,0 +1,42 @@
+name: Hulk (Senang Homes) TikTok backlog
+
+# Sun, Mon, Wed, Thu, Sat at 20:30 MYT (12:30 UTC): post the next earlier Instagram/Threads post to
+# TikTok from agents/hulk/profiles/senang-homes/tiktok_queue.yaml (tiktok_backlog.py), oldest first.
+# Tue + Fri are the new animated videos (hulk-senang-homes-videos.yml), so TikTok gets one post a day.
+# Queue items are pre-rendered 9:16 videos with a cover frame and music (build_tiktok_queue.py).
+
+on:
+  schedule:
+    - cron: "30 12 * * 0,1,3,4,6"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit the posting history
+
+jobs:
+  post-tiktok:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Post the next queued post to TikTok
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          SENANG_TIKTOK_CHANNEL_ID: ${{ secrets.SENANG_TIKTOK_CHANNEL_ID }}
+        run: |
+          cd agents/hulk/scripts
+          python tiktok_backlog.py --profile senang-homes
+      - name: Save posting history
+        if: always()
+        run: |
+          git config user.name "hulk-bot"
+          git config user.email "hulk-bot@users.noreply.github.com"
+          git add agents/hulk/scripts/state/senang-homes-posted.json
+          git diff --cached --quiet && exit 0
+          git commit -m "hulk: senang-homes TikTok backlog post"
+          git pull --rebase origin main
+          git push origin HEAD:main
