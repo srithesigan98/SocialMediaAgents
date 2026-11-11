@@ -44,3 +44,8 @@ agents/black-panther/scripts/venv/
 agents/black-panther/scripts/.env
 agents/black-panther/scripts/drafts/*
 !agents/black-panther/scripts/drafts/.gitkeep
+
+# HyperFrames project caches and review stills (local only)
+agents/hulk/videos/*/.hyperframes/
+agents/hulk/videos/*/snaps/
+agents/hulk/videos/*/renders/
