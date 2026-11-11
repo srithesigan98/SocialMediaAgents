@@ -1,0 +1,65 @@
+# Weekly animated video plan — Senang Homes (format: formats/animated-explainer.yaml)
+# Cadence: 2 videos a week (Tue + Fri, 19:30 MYT) = 8–9 a month, leaving 1–2 of the monthly
+# 10 agent runs as spares for a redo or a timely topic. One agent run = one finished, posted video.
+# Mix per month: ~60% buyer education (drawn diagrams), ~40% property videos built only from the
+# listings sheet (+ the project's own campaign photos where they exist).
+# Every education topic goes through the adversarial fact-check before its script is written.
+# status: planned -> scripted -> approved -> posted
+
+monthly_budget: 10
+cadence: {days: [Tue, Fri], time: "19:30", per_week: 2}
+
+calendar:
+  2026-11:
+    - {date: 2026-11-11, slug: mrta-mlta-myths, type: education, angle: myths-vs-facts,
+       title: "MRTA vs MLTA: 4 myths", status: posted}
+    - {date: 2026-11-13, slug: hidden-costs, type: education, angle: how-to-steps,
+       title: "Costs on top of the price", beats: [SPA legal fees, loan legal fees, stamp duty, valuation & moving in, packages that cover legal fees],
+       object: "a receipt that keeps printing lines", status: planned}
+    - {date: 2026-11-17, slug: what-rm600k-buys, type: property, angle: by-the-numbers,
+       title: "What ~RM600K buys in KL right now",
+       sheet_projects: [The Shang Residence, 38 Bangsar Residensi, One Seputeh Residence, SUTERA (KL City Gateway), Riana Trees Residences],
+       object: "a map pin per project; size, tenure and VP count up per pin", status: planned}
+    - {date: 2026-11-20, slug: dsr-explained, type: education, angle: how-to-steps,
+       title: "Why banks reject home loans: your DSR", object: "a balance scale: debts vs net income", status: planned}
+    - {date: 2026-11-24, slug: freehold-vs-leasehold, type: education, angle: before-after,
+       title: "Freehold vs leasehold", object: "a title deed with a lease clock", status: planned}
+    - {date: 2026-11-27, slug: khaya-by-the-numbers, type: property, angle: by-the-numbers,
+       title: "Khaya Residences by the numbers", sheet_projects: [Khaya Residences],
+       campaign: campaigns/khaya.yaml, status: planned}
+  2026-12:
+    - {date: 2026-12-01, slug: rental-yield, type: education, angle: by-the-numbers,
+       title: "Rental yield in one line", object: "a calculator that works one example", status: planned}
+    - {date: 2026-12-04, slug: one-seputeh-by-the-numbers, type: property, angle: by-the-numbers,
+       title: "One Seputeh by the numbers", sheet_projects: [One Seputeh Residence],
+       campaign: campaigns/oneseputeh.yaml, note: "never imply Airbnb/short stays", status: planned}
+    - {date: 2026-12-08, slug: offplan-vs-completed, type: education, angle: before-after,
+       title: "Off-plan or completed?", status: planned}
+    - {date: 2026-12-11, slug: freehold-under-800k, type: property, angle: by-the-numbers,
+       title: "Freehold homes under RM800K in KL",
+       sheet_projects: [The Shang Residence, One Seputeh Residence, The Lantern Bangsar], status: planned}
+    - {date: 2026-12-15, slug: first-buyer-mistakes, type: education, angle: mistakes-to-avoid,
+       title: "5 mistakes first-time buyers make", status: planned}
+    - {date: 2026-12-18, slug: nett-vs-spa-price, type: education, angle: how-to-steps,
+       title: "Nett price vs SPA price: how rebates work", status: planned}
+    - {date: 2026-12-22, slug: vp-and-dlp, type: education, angle: how-to-steps,
+       title: "Getting your keys: VP and the defect liability period", status: planned}
+    - {date: 2026-12-25, slug: move-in-ready-kl, type: property, angle: by-the-numbers,
+       title: "Move-in ready in KL", sheet_projects: [Cappella Embassy, Quill Residences, 38 Bangsar Residensi], status: planned}
+    - {date: 2026-12-29, slug: flexi-vs-term-loan, type: education, angle: before-after,
+       title: "Flexi vs term loan", status: planned}
+
+backlog:   # pull from here when a slot frees up or for January
+  education:
+    - {slug: price-per-sqft, title: "Compare homes by price per sqft"}
+    - {slug: lock-in-refinance, title: "Lock-in period and refinancing"}
+    - {slug: maintenance-sinking-fund, title: "Maintenance fee and sinking fund"}
+    - {slug: airbnb-rules, title: "Planning an Airbnb unit? Check these first"}
+    - {slug: location-checks, title: "Three location checks before you buy"}
+    - {slug: property-myths, title: "Property myths vs facts"}
+    - {slug: epf-for-downpayment, title: "Using EPF for your home (FAQ)"}
+    - {slug: mistakes-sellers-make, title: "Mistakes sellers make"}
+  property:
+    - {slug: bangsar-under-800k, title: "Bangsar under RM800K", sheet_projects: [The Lantern Bangsar, Khaya Residences, Parkside Residences, 38 Bangsar Residensi]}
+    - {slug: trx-neighbourhood, title: "Living next to TRX", sheet_projects: [Golden Crown Residence, Pavilion Square]}
+    - {slug: taman-desa-pair, title: "Taman Desa: M Aspira vs The Atas", sheet_projects: [M Aspira, The Atas Residences]}

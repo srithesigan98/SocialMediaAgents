@@ -1,0 +1,87 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+    @font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+    
+    .ground { position: absolute; inset: 0; background: #142E2B; }
+    .label { position: absolute; left: 75px; top: 205px; font: 500 28px Outfit; letter-spacing: .16em;
+             color: #FFAA78; text-transform: uppercase; }
+    .head { position: absolute; left: 75px; top: 245px; width: 930px; }
+    .head .a { font: 600 84px/1 Outfit; letter-spacing: -0.01em; color: #F3F0E7; }
+    .head .b { font: italic 500 72px/1.15 Gelasio; color: #FFAA78; margin-top: 6px; }
+    .hw { display: inline-block; }
+    .letter-wrap { position: absolute; left: 110px; top: 440px; width: 860px; height: 690px; }
+    .letter { position: absolute; inset: 0; background: #F3F0E7; transform: rotate(-1.5deg);
+              box-shadow: 0 24px 48px rgba(0,0,0,.35); padding: 52px 56px; color: #142E2B; }
+    .lh { border-bottom: 3px solid #142E2B; padding-bottom: 18px; }
+    .lh .t { font: 600 28px Outfit; letter-spacing: .14em; }
+    .row { display: flex; align-items: baseline; padding: 26px 0 22px; border-bottom: 1px solid #D8D1C2; }
+    .row .k { width: 250px; font: 400 28px Outfit; color: #5B6B66; }
+    .row .v { font: 600 34px Outfit; color: #142E2B; position: relative; }
+    .blank { display: inline-block; width: 300px; border-bottom: 3px solid #142E2B; height: 34px; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 4px; bottom: -4px; background: #FFD84D;
+          opacity: .55; mix-blend-mode: multiply; }
+    .fact { font: italic 500 32px Gelasio; color: #142E2B; margin-top: 14px; }
+    .note-wrap { position: absolute; left: 640px; top: 370px; width: 340px; height: 310px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 26px 28px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 50px/1 Caveat; color: #142E2B; }
+    .strike { position: absolute; left: 22px; right: 22px; top: 27%; height: 8px; background: #9A3418; border-radius: 4px; }
+    .stamp { position: absolute; left: 62px; top: 186px; padding: 6px 22px; border: 8px solid #9A3418;
+             color: #9A3418; font: 600 64px/1 Outfit; letter-spacing: .1em; mix-blend-mode: multiply; }
+    .tiny { font: 400 28px Outfit; color: #5B6B66; }
+    .tag { display: inline-block; padding: 6px 14px; border: 3px solid #142E2B; border-radius: 4px;
+           font: 600 30px Outfit; margin-right: 12px; }
+    .ch { display: inline-block; white-space: pre; }
+    
+  </style>
+  <div id="root" data-composition-id="s8" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="letter-wrap" id="s8-letter" data-layout-ignore><div class="letter">
+  <div class="lh"><span class="t">LETTER OF OFFER</span></div>
+  <div style="padding-top:30px;font:600 30px Outfit" class="cond">Conditions of offer</div>
+  <div class="row cond"><span style="font:400 28px Outfit">Valuation report on the property</span></div>
+  <div class="row cond"><span class="v" style="font:400 28px Outfit">Borrower to obtain mortgage cover<span class="hl" id="s8-hl"></span></span></div>
+  <div class="row cond"><span style="font:400 28px Outfit">Fire insurance on the building</span></div>
+  <div id="s8-margin" style="font:600 46px/1 Caveat;color:#9A3418;margin-top:26px">&#8593; a bank condition, not a law</div>
+</div></div><div class="note-wrap" id="s8-note" data-layout-ignore data-layout-allow-occlusion><div class="note">MRTA is required by law<div class="strike" id="s8-strike"></div><div class="stamp" id="s8-stamp">MYTH</div></div></div><div class="label" id="s8-label">MRTA vs MLTA</div>
+<div class="head" id="s8-head"><div class="a"><span class="hw">Know</span> <span class="hw">who</span> <span class="hw">gets</span> <span class="hw">paid</span></div><div class="b"><span class="hw">before</span> <span class="hw">you</span> <span class="hw">sign</span></div></div><div id="s8-notes" style="position:absolute;left:75px;top:450px;width:930px;height:330px"><div class="mini" style="position:absolute;left:0px;top:0px;width:210px;height:200px;background:#FFAA78;box-shadow:0 8px 14px rgba(0,0,0,.25);padding:18px;font:600 32px/1 Caveat;color:#142E2B">Pays my family<div class="ministamp" style="position:absolute;left:30px;top:96px;border:5px solid #9A3418;color:#9A3418;font:600 34px Outfit;letter-spacing:.1em;padding:2px 10px;mix-blend-mode:multiply">MYTH</div></div><div class="mini" style="position:absolute;left:215px;top:24px;width:210px;height:200px;background:#FFAA78;box-shadow:0 8px 14px rgba(0,0,0,.25);padding:18px;font:600 32px/1 Caveat;color:#142E2B">Cover stays same<div class="ministamp" style="position:absolute;left:30px;top:96px;border:5px solid #9A3418;color:#9A3418;font:600 34px Outfit;letter-spacing:.1em;padding:2px 10px;mix-blend-mode:multiply">MYTH</div></div><div class="mini" style="position:absolute;left:430px;top:0px;width:210px;height:200px;background:#FFAA78;box-shadow:0 8px 14px rgba(0,0,0,.25);padding:18px;font:600 32px/1 Caveat;color:#142E2B">Fire covers my loan<div class="ministamp" style="position:absolute;left:30px;top:96px;border:5px solid #9A3418;color:#9A3418;font:600 34px Outfit;letter-spacing:.1em;padding:2px 10px;mix-blend-mode:multiply">MYTH</div></div><div class="mini" style="position:absolute;left:645px;top:24px;width:210px;height:200px;background:#FFAA78;box-shadow:0 8px 14px rgba(0,0,0,.25);padding:18px;font:600 32px/1 Caveat;color:#142E2B">Required by law<div class="ministamp" style="position:absolute;left:30px;top:96px;border:5px solid #9A3418;color:#9A3418;font:600 34px Outfit;letter-spacing:.1em;padding:2px 10px;mix-blend-mode:multiply">MYTH</div></div></div><div id="s8-takaful" style="position:absolute;left:75px;top:810px;font:500 34px Outfit;color:#F3F0E7">Takaful versions: <b id="s8-k1" style="display:inline-block;font-weight:600;color:#FFAA78">MRTT</b> and <b id="s8-k2" style="display:inline-block;font-weight:600;color:#FFAA78">MLTT</b></div><div id="s8-cta" style="position:absolute;left:75px;top:890px;width:760px;height:130px;background:#F87947;display:flex;align-items:center;padding-left:40px;font:600 62px Outfit;color:#142E2B"><span id="s8-ctat" style="display:inline-block">Comment "MRTA"</span></div><img id="s8-logo" src="assets/horizontal-reverse.svg" style="position:absolute;left:62px;top:1050px;width:500px;height:100px" alt="Senang Homes"/>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.9, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.fromTo(shake, { x: 0 }, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0, rotation: -6 }, { scaleX: 1, rotation: -6, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const draw = (sel, t, d = 0.9) => tl.fromTo(sel, { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: d, ease: "power2.inOut" }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -560, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 } }, t);
+    const typed = (sel, t, gap = 0.045) => tl.fromTo(sel + " .ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: gap }, t);
+
+    
+    tl.set("#s8-stamp", { rotation: -12, opacity: 0.9 }, 0); tl.set("#s8-strike", { rotation: -6 }, 0);
+    tl.fromTo("#s8-letter", { y: 0, rotation: 0 }, { y: 2000, rotation: 9, duration: 0.45, ease: "power3.in" }, 0.0);
+    tl.fromTo("#s8-note", { y: 0, rotation: 0 }, { y: 2100, rotation: -14, duration: 0.45, ease: "power3.in" }, 0.03);
+    words("#s8-head", 0.45);
+    tl.fromTo("#s8-notes .mini", { y: -1000, rotation: 18 }, { y: 0, rotation: (i) => [-5, 3, -2, 5][i], duration: 0.55, ease: "back.out(1.2)", stagger: 0.12 }, 0.5);
+    tl.fromTo("#s8-notes .ministamp", { opacity: 0, scale: 1.7, rotation: -24 }, { opacity: 0.9, scale: 1, rotation: -12, duration: 0.18, ease: "power4.out", stagger: 0.12 }, 1.15);
+    reveal("#s8-takaful", 0.95, 0.6);
+    pop("#s8-k1", 1.68); pop("#s8-k2", 2.8);                       // "MRTT", "MLTT"
+    reveal("#s8-cta", 4.0, 0.45);                                  // "Comment"
+    tl.fromTo("#s8-ctat", { scale: 1 }, { keyframes: [{ scale: 1.12, duration: 0.12, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, 4.56);  // "MRTA"
+    tl.fromTo("#s8-logo", { opacity: 0, x: -70 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 5.6);
+    
+    window.__timelines["s8"] = tl;
+  </script>
+</template>

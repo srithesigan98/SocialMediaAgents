@@ -1,0 +1,98 @@
+[
+  {
+    "id": "w0",
+    "text": "Myth",
+    "start": 0,
+    "end": 0.4
+  },
+  {
+    "id": "w1",
+    "text": "3",
+    "start": 0.4,
+    "end": 0.64
+  },
+  {
+    "id": "w2",
+    "text": "Fire",
+    "start": 0.8,
+    "end": 1.2
+  },
+  {
+    "id": "w3",
+    "text": "insurance",
+    "start": 1.2,
+    "end": 1.76
+  },
+  {
+    "id": "w4",
+    "text": "protects",
+    "start": 1.76,
+    "end": 2.16
+  },
+  {
+    "id": "w5",
+    "text": "your",
+    "start": 2.16,
+    "end": 2.24
+  },
+  {
+    "id": "w6",
+    "text": "loan.",
+    "start": 2.32,
+    "end": 2.96
+  },
+  {
+    "id": "w7",
+    "text": "In",
+    "start": 2.96,
+    "end": 3.12
+  },
+  {
+    "id": "w8",
+    "text": "fact,",
+    "start": 3.12,
+    "end": 3.6
+  },
+  {
+    "id": "w9",
+    "text": "it",
+    "start": 3.6,
+    "end": 3.76
+  },
+  {
+    "id": "w10",
+    "text": "covers",
+    "start": 3.76,
+    "end": 4.16
+  },
+  {
+    "id": "w11",
+    "text": "the",
+    "start": 4.16,
+    "end": 4.24
+  },
+  {
+    "id": "w12",
+    "text": "building,",
+    "start": 4.24,
+    "end": 4.8
+  },
+  {
+    "id": "w13",
+    "text": "not",
+    "start": 4.8,
+    "end": 4.96
+  },
+  {
+    "id": "w14",
+    "text": "the",
+    "start": 4.96,
+    "end": 5.04
+  },
+  {
+    "id": "w15",
+    "text": "loan.",
+    "start": 5.04,
+    "end": 5.52
+  }
+]

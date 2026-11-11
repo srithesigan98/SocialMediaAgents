@@ -1,0 +1,84 @@
+# Senang Homes animated explainer reel — the format the user approved on 2026-11-11
+# (first use: MRTA vs MLTA, videos/mrta-mlta-myths). Reuse it for every weekly video topic.
+# Reference implementation: agents/hulk/videos/mrta-mlta-myths/ (tools/build.py writes the whole
+# composition; copy the project, change SCRIPT.md + the scene bodies/motion, rebuild).
+
+name: animated-explainer
+output: {width: 1080, height: 1920, fps: 30, length_s: [55, 65], aspect: "9:16"}
+platforms: [instagram_reel, threads_video]
+
+look:
+  ground: "#142E2B"            # forest, flat — never a gradient or a dark void with floating bits
+  paper: "#F3F0E7"             # ivory paper object (offer letter, policy card…)
+  ink: "#142E2B"
+  accent_myth: "#9A3418"       # terracotta: MYTH stamp + strike-through only
+  note: "#FFAA78"              # peach sticky note; the one highlighted caption word
+  mlta_or_positive_line: "#F87947"   # orange lines/bars; text on paper uses "#B5531C" (contrast 4.4:1)
+  highlighter: "#FFD84D"       # 55% multiply
+  fonts:
+    headline: "Outfit SemiBold 84px"           # line 1
+    headline_second: "Gelasio Medium Italic 72px, peach"   # line 2 — the brand's two-part headline
+    label: "Outfit Medium 28px, +16% tracking, peach, uppercase"
+    body_on_paper: "Outfit 28–34px"
+    handwriting: "Caveat 600 50px"             # sticky-note myths, margin notes
+  floor_px: 28                 # nothing meant to be read under 28px
+  imagery: drawn only          # diagrams, charts, cards, icons — no property photos in explainers
+                               # (property videos may use the project's own campaign photos)
+
+layout:                        # 1080x1920, platform UI safe
+  status_bar_empty: [0, 168]
+  headline: [200, 420]         # max ~12 chars line 1 / ~15 chars line 2 when a note sits right
+  stage: [430, 1130]           # the one object that rebuilds (letter / card / chart)
+  note: {x: 640, y: 370, w: 340, h: 310}
+  captions: [1190, 1310]       # burned in, centred, 900px max
+  decoration_only_below: 1330
+  no_text_right_of_x: 960      # action rail
+
+structure:                     # voice is the clock; ~19 spoken words per scene, <=155 words total
+  - {beat: hook, seconds: 6-7, rule: "frame 0 is the thumbnail + IG cover: headline + object + first myth already on screen"}
+  - {beat: point x 4, seconds: 6-9 each, rule: "note pins in -> MYTH stamp -> 'In fact' strike -> the object rebuilds to prove the fact"}
+  - {beat: support, seconds: 5-7, rule: "worked example with one illustrative number, labelled 'Illustration'"}
+  - {beat: close, seconds: 9-10, rule: "object drops away, recap notes fly in, one claim line, CTA 'Comment <WORD>', logo lands once, hold 2.5s"}
+  angles: [myths-vs-facts, how-to-steps, before-after, by-the-numbers, mistakes-to-avoid, faq]
+
+motion:                        # something new every 1–2 s, each move keyed to the word that names it
+  vocabulary:
+    words_in: "headline words blur 10px->0, 0.18s, 70ms stagger"
+    note_in: "y -560 -> 0, rotate 16 -> 0, 0.55s back.out(1.3)"
+    stamp: "scale 1.8->1, rotate -26->-12, 0.2s power4.out + 3-frame shake on the note"
+    strike: "scaleX 0->1 from left, 0.3s power2.inOut"
+    sweep: "highlighter/underline scaleX 0->1 from left, 0.4–0.7s"
+    reveal: "clip-path wipe left->right 0.45–0.9s (bars with text, fact lines, margin notes)"
+    draw: "SVG stroke-dashoffset 1->0 (pathLength=1), 0.8–1.6s power2.inOut (curves, lines, icons)"
+    count: "number counts up with the bar that carries it (snap 1)"
+    drain: "bar scaleX shrinking right->left on 'reduce/clear/pay down'"
+    pop: "scale 0.3->1 back.out(2.2) for ticks, tags, check marks"
+    typed: "letters on 45ms apart for a value filling a blank"
+    exit: "object drops y+2000 rotate 9, 0.45s power3.in"
+  continuity: "the stage object never moves between scenes; resting rotations are set by tl.set so cuts never jump"
+  banned: [breathing/floating loops, titles moving after they land, everything fading and sliding up, glow, gradients, numbered 01/04 labels, three cards in a row, logo docked in a corner]
+
+audio:
+  voice: {engine: kokoro, voice: af_heart, python: "C:/Users/User/.hyperframes/kokoro-venv/Scripts/python.exe",
+          note: "spell tricky words phonetically for TTS (Takaful -> 'Tah-kah-fool'), keep captions in real spelling; verify every line with Parakeet transcription"}
+  music: {source: "HeyGen catalog via `npx hyperframes auth login` (free with sign-in)", volume: 0.14, fade_out_s: 2.5,
+          query_hint: "warm lo-fi piano with soft beat, calm and hopeful, 90 bpm"}
+  sfx:                         # Pixabay-licensed, bundled with the media-use skill
+    stamp: [impact-bass-1, impact-bass-2]   # alternate, volume ~0.3
+    note_or_card_in: [whoosh-short, whoosh, whoosh-cinematic]
+    tag_or_badge: [pop, click-soft]
+    typing: typing
+  captions: {groups: "3–5 words, never a lone word", font: "Outfit 600 54px ivory", current_word: "#FFAA78"}
+
+facts:                         # non-negotiable for any money/legal topic
+  - every claim goes through an adversarial fact-check first (researcher + two skeptics per claim, Malaysian sources: BNM, insuranceinfo.com.my, LHDN/MOT/KPKT, bank/insurer PDS pages)
+  - keep the hedges the check requires ("mainly", "usually", "some or all", "can"); never strengthen a line
+  - no insurer/bank names, no live rates, no legal promises; example numbers are labelled "Illustration"
+  - property facts come only from the listings sheet row (prices, tenure, VP, rebates) — never estimated
+
+publish:
+  render: "npx hyperframes render -q delivery --keyframe-interval 2 --max-bitrate 10M"
+  host_video: "GitHub release 'explainer-videos' (Meta fetches by URL; too big for git)"
+  cover: "frame 0 snapshot -> scripts/posters/<profile>-video-<slug>-cover.png, sent as Instagram cover_url; Threads shows frame 0"
+  caption: "hook line + 3–4 short fact lines + any required disclaimer + 'Comment \"<WORD>\"' + the profile CTA line"
+  record_as: "tip-<slug>-video in state/senang-homes-posted.json (reply bot answers comments)"

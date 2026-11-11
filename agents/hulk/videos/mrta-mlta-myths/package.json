@@ -1,0 +1,11 @@
+{
+  "name": "mrta-mlta-myths",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.31 preview",
+    "check": "npx --yes hyperframes@0.9.31 check",
+    "render": "npx --yes hyperframes@0.9.31 render",
+    "publish": "npx --yes hyperframes@0.9.31 publish"
+  }
+}

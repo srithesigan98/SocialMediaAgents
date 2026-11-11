@@ -1,0 +1,86 @@
+[
+ {
+  "id": "w0",
+  "text": "Takaful",
+  "start": 0,
+  "end": 0.88
+ },
+ {
+  "id": "w1",
+  "text": "versions",
+  "start": 0.96,
+  "end": 1.28
+ },
+ {
+  "id": "w2",
+  "text": "are",
+  "start": 1.28,
+  "end": 1.36
+ },
+ {
+  "id": "w3",
+  "text": "called",
+  "start": 1.36,
+  "end": 1.68
+ },
+ {
+  "id": "w4",
+  "text": "MRTT",
+  "start": 1.68,
+  "end": 2.64
+ },
+ {
+  "id": "w5",
+  "text": "and",
+  "start": 2.64,
+  "end": 2.8
+ },
+ {
+  "id": "w6",
+  "text": "MLTT.",
+  "start": 2.8,
+  "end": 4
+ },
+ {
+  "id": "w7",
+  "text": "Comment",
+  "start": 4,
+  "end": 4.56
+ },
+ {
+  "id": "w8",
+  "text": "MRTA",
+  "start": 4.56,
+  "end": 5.52
+ },
+ {
+  "id": "w9",
+  "text": "and",
+  "start": 5.6,
+  "end": 5.84
+ },
+ {
+  "id": "w10",
+  "text": "we'll",
+  "start": 5.84,
+  "end": 6
+ },
+ {
+  "id": "w11",
+  "text": "help",
+  "start": 6,
+  "end": 6.24
+ },
+ {
+  "id": "w12",
+  "text": "you",
+  "start": 6.24,
+  "end": 6.4
+ },
+ {
+  "id": "w13",
+  "text": "compare.",
+  "start": 6.4,
+  "end": 6.88
+ }
+]

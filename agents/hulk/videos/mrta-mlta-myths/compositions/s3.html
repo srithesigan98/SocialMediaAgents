@@ -1,0 +1,87 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+    @font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+    
+    .ground { position: absolute; inset: 0; background: #142E2B; }
+    .label { position: absolute; left: 75px; top: 205px; font: 500 28px Outfit; letter-spacing: .16em;
+             color: #FFAA78; text-transform: uppercase; }
+    .head { position: absolute; left: 75px; top: 245px; width: 930px; }
+    .head .a { font: 600 84px/1 Outfit; letter-spacing: -0.01em; color: #F3F0E7; }
+    .head .b { font: italic 500 72px/1.15 Gelasio; color: #FFAA78; margin-top: 6px; }
+    .hw { display: inline-block; }
+    .letter-wrap { position: absolute; left: 110px; top: 440px; width: 860px; height: 690px; }
+    .letter { position: absolute; inset: 0; background: #F3F0E7; transform: rotate(-1.5deg);
+              box-shadow: 0 24px 48px rgba(0,0,0,.35); padding: 52px 56px; color: #142E2B; }
+    .lh { border-bottom: 3px solid #142E2B; padding-bottom: 18px; }
+    .lh .t { font: 600 28px Outfit; letter-spacing: .14em; }
+    .row { display: flex; align-items: baseline; padding: 26px 0 22px; border-bottom: 1px solid #D8D1C2; }
+    .row .k { width: 250px; font: 400 28px Outfit; color: #5B6B66; }
+    .row .v { font: 600 34px Outfit; color: #142E2B; position: relative; }
+    .blank { display: inline-block; width: 300px; border-bottom: 3px solid #142E2B; height: 34px; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 4px; bottom: -4px; background: #FFD84D;
+          opacity: .55; mix-blend-mode: multiply; }
+    .fact { font: italic 500 32px Gelasio; color: #142E2B; margin-top: 14px; }
+    .note-wrap { position: absolute; left: 640px; top: 370px; width: 340px; height: 310px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 26px 28px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 50px/1 Caveat; color: #142E2B; }
+    .strike { position: absolute; left: 22px; right: 22px; top: 27%; height: 8px; background: #9A3418; border-radius: 4px; }
+    .stamp { position: absolute; left: 62px; top: 186px; padding: 6px 22px; border: 8px solid #9A3418;
+             color: #9A3418; font: 600 64px/1 Outfit; letter-spacing: .1em; mix-blend-mode: multiply; }
+    .tiny { font: 400 28px Outfit; color: #5B6B66; }
+    .tag { display: inline-block; padding: 6px 14px; border: 3px solid #142E2B; border-radius: 4px;
+           font: 600 30px Outfit; margin-right: 12px; }
+    .ch { display: inline-block; white-space: pre; }
+    
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="label" id="s3-label">MRTA vs MLTA</div>
+<div class="head" id="s3-head"><div class="a"><span class="hw">With</span> <span class="hw">MLTA?</span></div><div class="b"><span class="hw">bank,</span> <span class="hw">then</span> <span class="hw">you</span></div></div><div class="letter-wrap" id="s3-letter"><div class="letter">
+  <div class="lh"><span class="t">LETTER OF OFFER</span></div>
+  <div class="row" id="s3-row"><span class="k">Mortgage cover</span><span class="v" style="color:#B5531C">MLTA</span></div>
+  <div style="margin-top:34px">
+  <div class="tiny" id="s3-cap" style="margin-bottom:12px">Illustration: RM500K cover, RM380K owed</div>
+  <div style="display:flex;height:78px;width:748px">
+    <div id="s3-bank" style="flex:0 0 76%;background:#142E2B;color:#F3F0E7;font:600 28px Outfit;display:flex;align-items:center;padding-left:22px;white-space:nowrap">Bank: RM<span id="s3-n1">380</span>K</div>
+    <div id="s3-left" style="flex:1;background:#F87947;color:#142E2B;font:600 28px Outfit;display:flex;align-items:center;justify-content:center;white-space:nowrap">RM<span id="s3-n2">120</span>K</div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;width:748px;margin-top:12px"><span class="fact" id="s3-fact" style="margin:0">usually to you or your nominee</span></div>
+</div>
+</div></div><div class="note-wrap" id="s3-note" data-layout-allow-occlusion><div class="note">MRTA pays my family<div class="strike" id="s3-strike"></div><div class="stamp" id="s3-stamp">MYTH</div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.9, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.fromTo(shake, { x: 0 }, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0, rotation: -6 }, { scaleX: 1, rotation: -6, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const draw = (sel, t, d = 0.9) => tl.fromTo(sel, { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: d, ease: "power2.inOut" }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -560, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 } }, t);
+    const typed = (sel, t, gap = 0.045) => tl.fromTo(sel + " .ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: gap }, t);
+
+    
+    tl.set("#s3-stamp", { rotation: -12, opacity: 0.9 }, 0); tl.set("#s3-strike", { rotation: -6 }, 0);
+    words("#s3-head", 0.05);
+    reveal("#s3-row", 0.2, 0.45);                                  // "MLTA"
+    reveal("#s3-cap", 0.8, 0.5);
+    reveal("#s3-bank", 1.2, 0.8); count("#s3-n1", 380, 1.2, 0.8);    // "money left after the loan"
+    reveal("#s3-left", 2.85, 0.5); count("#s3-n2", 120, 2.85, 0.5);  // "goes to you"
+    reveal("#s3-fact", 3.3, 0.7);                                  // "you, or your nominee"
+    
+    window.__timelines["s3"] = tl;
+  </script>
+</template>

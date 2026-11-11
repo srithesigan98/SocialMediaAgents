@@ -1,0 +1,89 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+    @font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+    @font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+    @font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+    
+    .ground { position: absolute; inset: 0; background: #142E2B; }
+    .label { position: absolute; left: 75px; top: 205px; font: 500 28px Outfit; letter-spacing: .16em;
+             color: #FFAA78; text-transform: uppercase; }
+    .head { position: absolute; left: 75px; top: 245px; width: 930px; }
+    .head .a { font: 600 84px/1 Outfit; letter-spacing: -0.01em; color: #F3F0E7; }
+    .head .b { font: italic 500 72px/1.15 Gelasio; color: #FFAA78; margin-top: 6px; }
+    .hw { display: inline-block; }
+    .letter-wrap { position: absolute; left: 110px; top: 440px; width: 860px; height: 690px; }
+    .letter { position: absolute; inset: 0; background: #F3F0E7; transform: rotate(-1.5deg);
+              box-shadow: 0 24px 48px rgba(0,0,0,.35); padding: 52px 56px; color: #142E2B; }
+    .lh { border-bottom: 3px solid #142E2B; padding-bottom: 18px; }
+    .lh .t { font: 600 28px Outfit; letter-spacing: .14em; }
+    .row { display: flex; align-items: baseline; padding: 26px 0 22px; border-bottom: 1px solid #D8D1C2; }
+    .row .k { width: 250px; font: 400 28px Outfit; color: #5B6B66; }
+    .row .v { font: 600 34px Outfit; color: #142E2B; position: relative; }
+    .blank { display: inline-block; width: 300px; border-bottom: 3px solid #142E2B; height: 34px; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 4px; bottom: -4px; background: #FFD84D;
+          opacity: .55; mix-blend-mode: multiply; }
+    .fact { font: italic 500 32px Gelasio; color: #142E2B; margin-top: 14px; }
+    .note-wrap { position: absolute; left: 640px; top: 370px; width: 340px; height: 310px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 26px 28px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 50px/1 Caveat; color: #142E2B; }
+    .strike { position: absolute; left: 22px; right: 22px; top: 27%; height: 8px; background: #9A3418; border-radius: 4px; }
+    .stamp { position: absolute; left: 62px; top: 186px; padding: 6px 22px; border: 8px solid #9A3418;
+             color: #9A3418; font: 600 64px/1 Outfit; letter-spacing: .1em; mix-blend-mode: multiply; }
+    .tiny { font: 400 28px Outfit; color: #5B6B66; }
+    .tag { display: inline-block; padding: 6px 14px; border: 3px solid #142E2B; border-radius: 4px;
+           font: 600 30px Outfit; margin-right: 12px; }
+    .ch { display: inline-block; white-space: pre; }
+    
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="label" id="s5-label">MRTA vs MLTA</div>
+<div class="head" id="s5-head"><div class="a"><span class="hw">Fire</span> <span class="hw">cover?</span></div><div class="b"><span class="hw">the</span> <span class="hw">building</span></div></div><div class="letter-wrap" id="s5-letter"><div class="letter">
+  <div class="lh"><span class="t">LETTER OF OFFER</span></div>
+  <div style="height:10px"></div>
+</div></div><div id="s5-fire" data-layout-allow-occlusion style="position:absolute;left:70px;top:560px;width:520px;height:520px;background:#FFFDF8;box-shadow:0 22px 40px rgba(0,0,0,.4);color:#142E2B">
+  <div style="background:#F87947;padding:22px 30px;font:600 28px Outfit;letter-spacing:.1em">FIRE / HOUSEOWNER POLICY</div>
+  <svg width="160" height="140" viewBox="0 0 160 140" style="margin:30px 0 0 30px">
+    <path id="s5-house" d="M10 70 L80 12 L150 70 L150 132 L10 132 Z" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" fill="none" stroke="#142E2B" stroke-width="8" stroke-linejoin="round"/>
+    <rect id="s5-door" x="62" y="84" width="36" height="48" fill="#142E2B"/></svg>
+  <div id="s5-r1" style="padding:10px 30px 0;font:600 36px Outfit">Covers the building <span id="s5-ok" style="display:inline-block;color:#2E7D4F">&#10003;</span></div>
+  <div id="s5-r2" style="padding:16px 30px 0;font:600 36px Outfit;color:#5B6B66">Pays your loan <span id="s5-no" style="display:inline-block;color:#9A3418">&#10007;</span></div>
+</div><div class="note-wrap" id="s5-note" data-layout-allow-occlusion><div class="note">Fire insurance protects my loan<div class="strike" id="s5-strike"></div><div class="stamp" id="s5-stamp">MYTH</div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const stamp = (sel, t, shake) => {
+      tl.fromTo(sel, { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 0.9, scale: 1, rotation: -12, duration: 0.2, ease: "power4.out" }, t);
+      if (shake) tl.fromTo(shake, { x: 0 }, { keyframes: [{ x: -7, duration: 0.033 }, { x: 6, duration: 0.033 }, { x: -3, duration: 0.033 }, { x: 0, duration: 0.05 }] }, t + 0.18);
+    };
+    const strike = (sel, t) => tl.fromTo(sel, { scaleX: 0, rotation: -6 }, { scaleX: 1, rotation: -6, duration: 0.3, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const draw = (sel, t, d = 0.9) => tl.fromTo(sel, { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: d, ease: "power2.inOut" }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -560, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const count = (sel, to, t, d) => tl.fromTo(sel, { textContent: 0 }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 } }, t);
+    const typed = (sel, t, gap = 0.045) => tl.fromTo(sel + " .ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: gap }, t);
+
+    
+    noteIn("#s5-note", 0.0);
+    words("#s5-head", 0.1);
+    stamp("#s5-stamp", 0.5, "#s5-note");                           // "Myth three"
+    tl.fromTo("#s5-fire", { x: -760, rotation: -12 }, { x: 0, rotation: 2.5, duration: 0.6, ease: "expo.out" }, 0.8);  // "Fire insurance"
+    draw("#s5-house", 1.3, 0.8);
+    pop("#s5-door", 2.0);
+    strike("#s5-strike", 2.95);                                    // "In fact"
+    reveal("#s5-r1", 4.0, 0.45); pop("#s5-ok", 4.3);                // "the building"
+    reveal("#s5-r2", 4.8, 0.45); pop("#s5-no", 5.05);               // "not the loan"
+    tl.to("#s5-fire", { keyframes: [{ x: -8, duration: 0.04 }, { x: 7, duration: 0.04 }, { x: -3, duration: 0.04 }, { x: 0, duration: 0.05 }] }, 5.2);
+    
+    window.__timelines["s5"] = tl;
+  </script>
+</template>

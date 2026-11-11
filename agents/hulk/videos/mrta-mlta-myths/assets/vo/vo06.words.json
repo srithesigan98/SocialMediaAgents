@@ -1,0 +1,116 @@
+[
+  {
+    "id": "w0",
+    "text": "If",
+    "start": 0,
+    "end": 0.16
+  },
+  {
+    "id": "w1",
+    "text": "you",
+    "start": 0.16,
+    "end": 0.32
+  },
+  {
+    "id": "w2",
+    "text": "die",
+    "start": 0.32,
+    "end": 0.64
+  },
+  {
+    "id": "w3",
+    "text": "or",
+    "start": 0.64,
+    "end": 0.8
+  },
+  {
+    "id": "w4",
+    "text": "become",
+    "start": 0.8,
+    "end": 1.2
+  },
+  {
+    "id": "w5",
+    "text": "totally",
+    "start": 1.2,
+    "end": 1.6
+  },
+  {
+    "id": "w6",
+    "text": "and",
+    "start": 1.6,
+    "end": 1.76
+  },
+  {
+    "id": "w7",
+    "text": "permanently",
+    "start": 1.76,
+    "end": 2.32
+  },
+  {
+    "id": "w8",
+    "text": "disabled,",
+    "start": 2.32,
+    "end": 3.28
+  },
+  {
+    "id": "w9",
+    "text": "MRTA",
+    "start": 3.28,
+    "end": 4.24
+  },
+  {
+    "id": "w10",
+    "text": "or",
+    "start": 4.4,
+    "end": 4.64
+  },
+  {
+    "id": "w11",
+    "text": "MLTA",
+    "start": 4.64,
+    "end": 5.52
+  },
+  {
+    "id": "w12",
+    "text": "can",
+    "start": 5.52,
+    "end": 5.68
+  },
+  {
+    "id": "w13",
+    "text": "pay",
+    "start": 5.68,
+    "end": 5.92
+  },
+  {
+    "id": "w14",
+    "text": "some",
+    "start": 5.92,
+    "end": 6.16
+  },
+  {
+    "id": "w15",
+    "text": "or",
+    "start": 6.16,
+    "end": 6.32
+  },
+  {
+    "id": "w16",
+    "text": "all",
+    "start": 6.32,
+    "end": 6.48
+  },
+  {
+    "id": "w17",
+    "text": "of",
+    "start": 6.48,
+    "end": 6.64
+  },
+  {
+    "id": "w18",
+    "text": "it.",
+    "start": 6.64,
+    "end": 6.88
+  }
+]

@@ -1,0 +1,11 @@
+# derived / cache — the final video is hosted on the "explainer-videos" GitHub release
+renders/
+snaps/
+.hyperframes/
+.thumbnails/
+.waveform-cache/
+.claude-flow/
+.media/
+assets/voice-samples/
+node_modules/
+assets/bgm/

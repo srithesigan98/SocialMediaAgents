@@ -1,0 +1,116 @@
+[
+  {
+    "id": "w0",
+    "text": "Your",
+    "start": 0,
+    "end": 0.24
+  },
+  {
+    "id": "w1",
+    "text": "banker",
+    "start": 0.24,
+    "end": 0.64
+  },
+  {
+    "id": "w2",
+    "text": "will",
+    "start": 0.64,
+    "end": 0.8
+  },
+  {
+    "id": "w3",
+    "text": "offer",
+    "start": 0.8,
+    "end": 1.04
+  },
+  {
+    "id": "w4",
+    "text": "you",
+    "start": 1.04,
+    "end": 1.28
+  },
+  {
+    "id": "w5",
+    "text": "MRTA.",
+    "start": 1.28,
+    "end": 2.4
+  },
+  {
+    "id": "w6",
+    "text": "But",
+    "start": 2.4,
+    "end": 2.56
+  },
+  {
+    "id": "w7",
+    "text": "who",
+    "start": 2.56,
+    "end": 2.8
+  },
+  {
+    "id": "w8",
+    "text": "does",
+    "start": 2.8,
+    "end": 2.96
+  },
+  {
+    "id": "w9",
+    "text": "it",
+    "start": 2.96,
+    "end": 3.12
+  },
+  {
+    "id": "w10",
+    "text": "actually",
+    "start": 3.12,
+    "end": 3.44
+  },
+  {
+    "id": "w11",
+    "text": "pay?",
+    "start": 3.44,
+    "end": 4
+  },
+  {
+    "id": "w12",
+    "text": "Here",
+    "start": 4,
+    "end": 4.24
+  },
+  {
+    "id": "w13",
+    "text": "are",
+    "start": 4.24,
+    "end": 4.4
+  },
+  {
+    "id": "w14",
+    "text": "four",
+    "start": 4.4,
+    "end": 4.64
+  },
+  {
+    "id": "w15",
+    "text": "myths",
+    "start": 4.64,
+    "end": 5.12
+  },
+  {
+    "id": "w16",
+    "text": "most",
+    "start": 5.12,
+    "end": 5.28
+  },
+  {
+    "id": "w17",
+    "text": "buyers",
+    "start": 5.28,
+    "end": 5.68
+  },
+  {
+    "id": "w18",
+    "text": "believe.",
+    "start": 5.68,
+    "end": 6.16
+  }
+]
