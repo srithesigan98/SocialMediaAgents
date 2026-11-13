@@ -15,7 +15,7 @@ calendar:
        title: "MRTA vs MLTA: 4 myths", status: posted}
     - {date: 2026-11-13, slug: hidden-costs, type: education, angle: how-to-steps,
        title: "Costs on top of the price", beats: [SPA legal fees, loan legal fees, stamp duty, valuation & moving in, packages that cover legal fees],
-       object: "a receipt that keeps printing lines", project: videos/hidden-costs, status: ready}
+       object: "a receipt that keeps printing lines", project: videos/hidden-costs, status: posted}
     - {date: 2026-11-17, slug: price-per-sqft, type: education, angle: how-to-steps,
        title: "Compare homes by price per sqft", object: "a comparison sheet with two drawn floor plans",
        note: "swapped in from backlog: what-rm600k-buys needs listings-sheet numbers", project: videos/price-per-sqft, status: ready}
