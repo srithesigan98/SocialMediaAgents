@@ -1,0 +1,68 @@
+[
+ {
+  "id": "w0",
+  "text": "Comment",
+  "start": 0.02,
+  "end": 0.555
+ },
+ {
+  "id": "w1",
+  "text": "\"DSR\",",
+  "start": 0.555,
+  "end": 1.29
+ },
+ {
+  "id": "w2",
+  "text": "and",
+  "start": 1.63,
+  "end": 1.785
+ },
+ {
+  "id": "w3",
+  "text": "we'll",
+  "start": 1.785,
+  "end": 1.98
+ },
+ {
+  "id": "w4",
+  "text": "work",
+  "start": 1.98,
+  "end": 2.174
+ },
+ {
+  "id": "w5",
+  "text": "out",
+  "start": 2.174,
+  "end": 2.33
+ },
+ {
+  "id": "w6",
+  "text": "your",
+  "start": 2.33,
+  "end": 2.485
+ },
+ {
+  "id": "w7",
+  "text": "number",
+  "start": 2.485,
+  "end": 2.718
+ },
+ {
+  "id": "w8",
+  "text": "before",
+  "start": 2.718,
+  "end": 2.99
+ },
+ {
+  "id": "w9",
+  "text": "you",
+  "start": 2.99,
+  "end": 3.146
+ },
+ {
+  "id": "w10",
+  "text": "view.",
+  "start": 3.146,
+  "end": 3.34
+ }
+]

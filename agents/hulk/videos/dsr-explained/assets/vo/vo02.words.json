@@ -1,0 +1,110 @@
+[
+ {
+  "id": "w0",
+  "text": "Debt",
+  "start": 0.04,
+  "end": 0.278
+ },
+ {
+  "id": "w1",
+  "text": "service",
+  "start": 0.278,
+  "end": 0.694
+ },
+ {
+  "id": "w2",
+  "text": "ratio.",
+  "start": 0.694,
+  "end": 1.17
+ },
+ {
+  "id": "w3",
+  "text": "Add",
+  "start": 1.65,
+  "end": 1.811
+ },
+ {
+  "id": "w4",
+  "text": "up",
+  "start": 1.811,
+  "end": 1.972
+ },
+ {
+  "id": "w5",
+  "text": "your",
+  "start": 1.972,
+  "end": 2.186
+ },
+ {
+  "id": "w6",
+  "text": "monthly",
+  "start": 2.186,
+  "end": 2.562
+ },
+ {
+  "id": "w7",
+  "text": "debts,",
+  "start": 2.562,
+  "end": 2.83
+ },
+ {
+  "id": "w8",
+  "text": "then",
+  "start": 3.11,
+  "end": 3.35
+ },
+ {
+  "id": "w9",
+  "text": "divide",
+  "start": 3.35,
+  "end": 3.77
+ },
+ {
+  "id": "w10",
+  "text": "by",
+  "start": 3.77,
+  "end": 4.01
+ },
+ {
+  "id": "w11",
+  "text": "your",
+  "start": 4.01,
+  "end": 4.25
+ },
+ {
+  "id": "w12",
+  "text": "net",
+  "start": 4.25,
+  "end": 4.49
+ },
+ {
+  "id": "w13",
+  "text": "income,",
+  "start": 4.49,
+  "end": 4.85
+ },
+ {
+  "id": "w14",
+  "text": "after",
+  "start": 5.03,
+  "end": 5.382
+ },
+ {
+  "id": "w15",
+  "text": "EPF",
+  "start": 5.382,
+  "end": 6.086
+ },
+ {
+  "id": "w16",
+  "text": "and",
+  "start": 6.086,
+  "end": 6.368
+ },
+ {
+  "id": "w17",
+  "text": "tax.",
+  "start": 6.368,
+  "end": 6.72
+ }
+]

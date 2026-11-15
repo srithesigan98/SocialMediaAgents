@@ -1,0 +1,68 @@
+[
+ {
+  "id": "w0",
+  "text": "That's",
+  "start": 0.05,
+  "end": 0.369
+ },
+ {
+  "id": "w1",
+  "text": "RM3,000",
+  "start": 0.369,
+  "end": 1.199
+ },
+ {
+  "id": "w2",
+  "text": "in",
+  "start": 1.199,
+  "end": 1.391
+ },
+ {
+  "id": "w3",
+  "text": "debts.",
+  "start": 1.391,
+  "end": 1.71
+ },
+ {
+  "id": "w4",
+  "text": "Divide",
+  "start": 2.09,
+  "end": 2.522
+ },
+ {
+  "id": "w5",
+  "text": "by",
+  "start": 2.522,
+  "end": 2.768
+ },
+ {
+  "id": "w6",
+  "text": "RM5,000:",
+  "start": 2.768,
+  "end": 3.57
+ },
+ {
+  "id": "w7",
+  "text": "60%",
+  "start": 3.86,
+  "end": 4.576
+ },
+ {
+  "id": "w8",
+  "text": "of",
+  "start": 4.576,
+  "end": 4.729
+ },
+ {
+  "id": "w9",
+  "text": "your",
+  "start": 4.729,
+  "end": 4.933
+ },
+ {
+  "id": "w10",
+  "text": "income.",
+  "start": 4.933,
+  "end": 5.24
+ }
+]

@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "A",
+  "start": 0.03,
+  "end": 0.182
+ },
+ {
+  "id": "w1",
+  "text": "credit",
+  "start": 0.182,
+  "end": 0.537
+ },
+ {
+  "id": "w2",
+  "text": "card",
+  "start": 0.537,
+  "end": 0.84
+ },
+ {
+  "id": "w3",
+  "text": "you",
+  "start": 0.84,
+  "end": 1.043
+ },
+ {
+  "id": "w4",
+  "text": "pay",
+  "start": 1.043,
+  "end": 1.246
+ },
+ {
+  "id": "w5",
+  "text": "in",
+  "start": 1.246,
+  "end": 1.398
+ },
+ {
+  "id": "w6",
+  "text": "full",
+  "start": 1.398,
+  "end": 1.6
+ },
+ {
+  "id": "w7",
+  "text": "may",
+  "start": 1.6,
+  "end": 1.803
+ },
+ {
+  "id": "w8",
+  "text": "still",
+  "start": 1.803,
+  "end": 2.056
+ },
+ {
+  "id": "w9",
+  "text": "count.",
+  "start": 2.056,
+  "end": 2.36
+ },
+ {
+  "id": "w10",
+  "text": "Here,",
+  "start": 2.85,
+  "end": 3.17
+ },
+ {
+  "id": "w11",
+  "text": "RM500",
+  "start": 3.34,
+  "end": 4.012
+ },
+ {
+  "id": "w12",
+  "text": "more:",
+  "start": 4.012,
+  "end": 4.27
+ },
+ {
+  "id": "w13",
+  "text": "now",
+  "start": 4.52,
+  "end": 4.756
+ },
+ {
+  "id": "w14",
+  "text": "70%.",
+  "start": 4.756,
+  "end": 5.64
+ }
+]

@@ -1,0 +1,98 @@
+[
+ {
+  "id": "w0",
+  "text": "To",
+  "start": 0.04,
+  "end": 0.231
+ },
+ {
+  "id": "w1",
+  "text": "bring",
+  "start": 0.231,
+  "end": 0.469
+ },
+ {
+  "id": "w2",
+  "text": "it",
+  "start": 0.469,
+  "end": 0.612
+ },
+ {
+  "id": "w3",
+  "text": "down,",
+  "start": 0.612,
+  "end": 0.85
+ },
+ {
+  "id": "w4",
+  "text": "cancel",
+  "start": 1.19,
+  "end": 1.526
+ },
+ {
+  "id": "w5",
+  "text": "cards",
+  "start": 1.526,
+  "end": 1.861
+ },
+ {
+  "id": "w6",
+  "text": "you",
+  "start": 1.861,
+  "end": 2.053
+ },
+ {
+  "id": "w7",
+  "text": "don't",
+  "start": 2.053,
+  "end": 2.34
+ },
+ {
+  "id": "w8",
+  "text": "use,",
+  "start": 2.34,
+  "end": 2.58
+ },
+ {
+  "id": "w9",
+  "text": "and",
+  "start": 2.82,
+  "end": 3.029
+ },
+ {
+  "id": "w10",
+  "text": "clear",
+  "start": 3.029,
+  "end": 3.291
+ },
+ {
+  "id": "w11",
+  "text": "small",
+  "start": 3.291,
+  "end": 3.606
+ },
+ {
+  "id": "w12",
+  "text": "loans",
+  "start": 3.606,
+  "end": 3.92
+ },
+ {
+  "id": "w13",
+  "text": "before",
+  "start": 3.92,
+  "end": 4.286
+ },
+ {
+  "id": "w14",
+  "text": "you",
+  "start": 4.286,
+  "end": 4.496
+ },
+ {
+  "id": "w15",
+  "text": "apply.",
+  "start": 4.496,
+  "end": 4.81
+ }
+]

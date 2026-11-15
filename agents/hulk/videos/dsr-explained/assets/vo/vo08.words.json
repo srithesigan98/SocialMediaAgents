@@ -1,0 +1,80 @@
+[
+ {
+  "id": "w0",
+  "text": "Cancel",
+  "start": 0.02,
+  "end": 0.411
+ },
+ {
+  "id": "w1",
+  "text": "that",
+  "start": 0.411,
+  "end": 0.635
+ },
+ {
+  "id": "w2",
+  "text": "card,",
+  "start": 0.635,
+  "end": 0.97
+ },
+ {
+  "id": "w3",
+  "text": "clear",
+  "start": 1.18,
+  "end": 1.441
+ },
+ {
+  "id": "w4",
+  "text": "the",
+  "start": 1.441,
+  "end": 1.598
+ },
+ {
+  "id": "w5",
+  "text": "car",
+  "start": 1.598,
+  "end": 1.859
+ },
+ {
+  "id": "w6",
+  "text": "loan,",
+  "start": 1.859,
+  "end": 2.12
+ },
+ {
+  "id": "w7",
+  "text": "and",
+  "start": 2.5,
+  "end": 2.715
+ },
+ {
+  "id": "w8",
+  "text": "the",
+  "start": 2.715,
+  "end": 2.876
+ },
+ {
+  "id": "w9",
+  "text": "same",
+  "start": 2.876,
+  "end": 3.144
+ },
+ {
+  "id": "w10",
+  "text": "home",
+  "start": 3.144,
+  "end": 3.413
+ },
+ {
+  "id": "w11",
+  "text": "is",
+  "start": 3.413,
+  "end": 3.574
+ },
+ {
+  "id": "w12",
+  "text": "44%.",
+  "start": 3.574,
+  "end": 4.54
+ }
+]

@@ -1,0 +1,31 @@
+# Post copy for "Why banks reject home loans: your DSR". Figures are the made-up RM5,000 net-income
+# illustration from SCRIPT.md; the "Illustration only" line is required (no DSR cap is promised).
+# Served from raw.githubusercontent (no redirect) so Buffer/TikTok can fetch it too; Meta takes it as well.
+video_url: https://raw.githubusercontent.com/srithesigan98/SocialMediaAgents/main/agents/hulk/scripts/posters/senang-homes-video-dsr-explained.mp4
+cover: senang-homes-video-dsr-explained-cover.png
+captions:
+  threads: |-
+    Bank said no? Check your DSR 👇
+    DSR = monthly debts ÷ net income (after EPF and tax)
+    RM3,000 debts ÷ RM5,000 = 60%
+    A card you pay in full may still count.
+    Each bank sets its own limit.
+    Illustration only; banks assess differently.
+    Comment "DSR" and we'll work out yours.
+  instagram: |-
+    Your salary looks fine. So why did the bank say no? Usually, it's one number: your DSR 👇
+
+    Debt service ratio = your monthly debts ÷ your net income (after EPF and tax).
+
+    Illustration, RM5,000 net a month:
+    • Car loan RM800 + PTPTN RM200 + new home loan RM2,000 = RM3,000 → 60%
+    • A credit card you pay in full may still count. Add RM500 → 70%
+    • Cancel that card and clear the car loan → the same home is 44%
+
+    Good to know:
+    • Each bank sets its own limit, and may also check what's left after your debts.
+    • To bring it down, cancel cards you don't use and clear small loans before you apply.
+
+    Illustration only. Each bank assesses differently; this isn't a loan approval.
+
+    Comment "DSR" and we'll work out your number before you view.

@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "Each",
+  "start": 0.03,
+  "end": 0.29
+ },
+ {
+  "id": "w1",
+  "text": "bank",
+  "start": 0.29,
+  "end": 0.551
+ },
+ {
+  "id": "w2",
+  "text": "sets",
+  "start": 0.551,
+  "end": 0.811
+ },
+ {
+  "id": "w3",
+  "text": "its",
+  "start": 0.811,
+  "end": 1.019
+ },
+ {
+  "id": "w4",
+  "text": "own",
+  "start": 1.019,
+  "end": 1.228
+ },
+ {
+  "id": "w5",
+  "text": "limit,",
+  "start": 1.228,
+  "end": 1.54
+ },
+ {
+  "id": "w6",
+  "text": "and",
+  "start": 1.98,
+  "end": 2.182
+ },
+ {
+  "id": "w7",
+  "text": "may",
+  "start": 2.182,
+  "end": 2.384
+ },
+ {
+  "id": "w8",
+  "text": "also",
+  "start": 2.384,
+  "end": 2.737
+ },
+ {
+  "id": "w9",
+  "text": "check",
+  "start": 2.737,
+  "end": 2.989
+ },
+ {
+  "id": "w10",
+  "text": "what's",
+  "start": 2.989,
+  "end": 3.241
+ },
+ {
+  "id": "w11",
+  "text": "left",
+  "start": 3.241,
+  "end": 3.494
+ },
+ {
+  "id": "w12",
+  "text": "after",
+  "start": 3.494,
+  "end": 3.746
+ },
+ {
+  "id": "w13",
+  "text": "your",
+  "start": 3.746,
+  "end": 3.948
+ },
+ {
+  "id": "w14",
+  "text": "debts.",
+  "start": 3.948,
+  "end": 4.2
+ }
+]

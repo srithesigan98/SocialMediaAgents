@@ -1,0 +1,104 @@
+[
+ {
+  "id": "w0",
+  "text": "Your",
+  "start": 0.05,
+  "end": 0.292
+ },
+ {
+  "id": "w1",
+  "text": "salary",
+  "start": 0.292,
+  "end": 0.715
+ },
+ {
+  "id": "w2",
+  "text": "looks",
+  "start": 0.715,
+  "end": 1.018
+ },
+ {
+  "id": "w3",
+  "text": "fine.",
+  "start": 1.018,
+  "end": 1.32
+ },
+ {
+  "id": "w4",
+  "text": "So",
+  "start": 1.62,
+  "end": 1.803
+ },
+ {
+  "id": "w5",
+  "text": "why",
+  "start": 1.803,
+  "end": 1.986
+ },
+ {
+  "id": "w6",
+  "text": "did",
+  "start": 1.986,
+  "end": 2.169
+ },
+ {
+  "id": "w7",
+  "text": "the",
+  "start": 2.169,
+  "end": 2.306
+ },
+ {
+  "id": "w8",
+  "text": "bank",
+  "start": 2.306,
+  "end": 2.534
+ },
+ {
+  "id": "w9",
+  "text": "say",
+  "start": 2.534,
+  "end": 2.717
+ },
+ {
+  "id": "w10",
+  "text": "no?",
+  "start": 2.717,
+  "end": 2.9
+ },
+ {
+  "id": "w11",
+  "text": "Usually,",
+  "start": 3.34,
+  "end": 3.898
+ },
+ {
+  "id": "w12",
+  "text": "it's",
+  "start": 3.898,
+  "end": 4.122
+ },
+ {
+  "id": "w13",
+  "text": "one",
+  "start": 4.122,
+  "end": 4.345
+ },
+ {
+  "id": "w14",
+  "text": "number:",
+  "start": 4.345,
+  "end": 4.68
+ },
+ {
+  "id": "w15",
+  "text": "your",
+  "start": 4.8,
+  "end": 4.997
+ },
+ {
+  "id": "w16",
+  "text": "DSR.",
+  "start": 4.997,
+  "end": 5.54
+ }
+]

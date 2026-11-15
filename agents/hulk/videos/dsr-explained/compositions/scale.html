@@ -1,0 +1,178 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+.ground { position: absolute; inset: 0; background: #142E2B; }
+.hw { display: inline-block; }
+
+    .sheet-wrap { position: absolute; left: 120px; top: 480px; width: 840px; height: 670px; }
+    .sheet { position: absolute; inset: 0; background: #F3F0E7; color: #142E2B; box-shadow: 0 24px 48px rgba(0,0,0,.35); }
+    .hdr { position: absolute; left: 0; right: 0; top: 24px; text-align: center; font: 600 28px Outfit; letter-spacing: .14em; }
+    .rule { position: absolute; left: 40px; right: 40px; height: 0; border-top: 3px dotted #B9B2A3; }
+    .formula { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 600 42px Outfit; white-space: nowrap; }
+    .formula .f { display: inline-block; opacity: .18; }
+    .formula .op { color: #B5531C; margin: 0 6px; }
+    .tag { position: absolute; left: 40px; top: 146px; padding: 0 12px; height: 38px; line-height: 36px; border-radius: 19px;
+            background: #F87947; color: #142E2B; font: 600 28px Outfit; }
+    .beam { position: absolute; left: 165px; top: 192px; width: 510px; height: 8px; background: #142E2B; border-radius: 4px; }
+    .cap { position: absolute; left: 406px; top: 182px; width: 28px; height: 28px; border-radius: 14px; background: #F87947; border: 5px solid #142E2B; }
+    .post { position: absolute; left: 413px; top: 206px; width: 14px; height: 226px; background: #142E2B; }
+    .base { position: absolute; left: 350px; top: 428px; width: 140px; height: 16px; background: #142E2B; border-radius: 8px 8px 0 0; }
+    .pan { position: absolute; top: 0; width: 300px; height: 440px; }
+    #epf, #tick, #lim, #leftlab, #left { opacity: 0; }
+    .str { position: absolute; left: 0; top: 0; width: 300px; height: 440px; overflow: visible; }
+    .str path { fill: none; stroke: #5B6B66; stroke-width: 3; }
+    .tray { position: absolute; left: 0; top: 430px; width: 300px; height: 10px; background: #142E2B; border-radius: 0 0 6px 6px; }
+    .blk { position: absolute; left: 4px; width: 292px; gap: 14px; height: 42px; background: #142E2B; color: #F3F0E7;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font: 600 28px Outfit; border-radius: 3px; white-space: nowrap; }
+    .blk.card { background: #F87947; color: #142E2B; }
+    .inc { position: absolute; left: 4px; top: 318px; width: 292px; height: 110px; background: #FFAA78; color: #142E2B;
+            border-radius: 3px; text-align: center; padding-top: 12px; }
+    .inc .l { font: 600 28px Outfit; letter-spacing: .12em; }
+    .inc .v { position: relative; display: inline-block; font: 600 46px Outfit; margin-top: 2px; }
+    .hl { position: absolute; left: -10px; right: -10px; top: 6px; bottom: 0; background: #FFD84D; opacity: .55; mix-blend-mode: multiply; }
+    .ro1 { position: absolute; left: 330px; right: 20px; top: 470px; text-align: center; font: 600 34px Outfit; color: #5B6B66; }
+    .ro1 b { color: #142E2B; font-weight: 600; }
+    .ro2 { position: absolute; left: 330px; right: 20px; top: 516px; text-align: center; font: 600 60px/1 Outfit; }
+    .ro2 .k { position: relative; display: inline-block; }
+    .ro2 .num { display: inline-block; min-width: 76px; color: #B5531C; }
+    .ul { position: absolute; left: 0; right: 0; bottom: -8px; height: 6px; background: #F87947; }
+    .meter { position: absolute; left: 80px; top: 626px; width: 680px; height: 26px; background: #E5DED0; border-radius: 3px; }
+    .mfill { position: absolute; left: 0; top: 0; width: 680px; height: 26px; background: #F87947; border-radius: 3px; }
+    .left { position: absolute; left: 476px; top: 0; width: 204px; height: 26px;
+             background: #FFAA78; border-left: 3px solid #142E2B; }
+    .leftlab { position: absolute; right: 80px; top: 588px; font: 600 28px Outfit; color: #142E2B; }
+    .lim { position: absolute; left: 300px; top: 586px; width: 200px; height: 80px; }
+    .lim .bar { position: absolute; left: 98px; top: 34px; width: 0; height: 46px; border-left: 4px dashed #142E2B; }
+    .lim .t { position: absolute; left: 0; right: 0; top: 0; text-align: center; font: 600 28px Outfit; letter-spacing: .06em; color: #142E2B; white-space: nowrap; }
+    .tick { position: absolute; left: 730px; top: 516px; width: 60px; height: 60px; border-radius: 30px; background: #F87947;
+             color: #142E2B; font: 600 38px/60px Outfit; text-align: center; }
+    .note-wrap { position: absolute; left: 650px; top: 290px; width: 300px; height: 180px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 14px 20px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 44px/1.0 Caveat; color: #142E2B; }
+    .note .ln { display: block; position: relative; width: fit-content; }
+    .note .sul { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #9A3418; border-radius: 2px; }
+  </style>
+  <div id="root" data-composition-id="scale" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="sheet-wrap" id="s-paper"><div class="sheet">
+      <div class="hdr">DEBT SERVICE RATIO · ILLUSTRATION</div>
+      <div class="rule" style="top:74px"></div>
+      <div class="formula"><span class="f" id="f1">Monthly debts</span><span class="f op" id="f2">÷</span><span class="f" id="f3">net income</span><span class="f op" id="f4">=</span><span class="f" id="f5">DSR</span></div>
+      <div class="tag" id="epf">after EPF &amp; tax</div>
+      <div class="post"></div><div class="base"></div>
+      <div class="pan" id="lp" style="left:15px"><svg class="str" viewBox="0 0 300 440"><path d="M150 196 L4 430 M150 196 L296 430"/></svg><div class="tray"></div><div class="blk" id="b-car" style="top:386px"><span>Car loan</span><span>RM800</span></div><div class="blk" id="b-ptp" style="top:342px"><span>PTPTN</span><span>RM200</span></div><div class="blk" id="b-home" style="top:298px"><span>Home loan</span><span>RM2,000</span></div><div class="blk card" id="b-card" style="top:254px"><span>Card</span><span>RM500</span></div></div>
+      <div class="pan" id="rp" style="left:525px"><svg class="str" viewBox="0 0 300 440"><path d="M150 196 L4 430 M150 196 L296 430"/></svg><div class="tray"></div>
+        <div class="inc" id="inc"><div class="l">NET INCOME</div><div class="v">RM5,000<span class="hl" id="inc-hl"></span></div></div></div>
+      <div class="beam" id="beam"></div><div class="cap"></div>
+      <div class="ro1" id="ro1"><b>RM<span id="dn">3,500</span></b> debts ÷ <b>RM5,000</b></div>
+      <div class="ro2" id="ro2"><span class="k">DSR <span class="num" id="pn">??</span>%<span class="ul" id="ro-ul"></span></span></div>
+      <div class="tick" id="tick">✓</div>
+      <div class="lim" id="lim"><div class="t">BANK LIMIT?</div><div class="bar"></div></div>
+      <div class="leftlab" id="leftlab">RM1,500 left</div>
+      <div class="meter"><div class="mfill" id="mfill"></div><div class="left" id="left"></div></div>
+    </div></div>
+    <div class="clip" id="n1c" data-start="28.80" data-duration="6.25" data-track-index="0"><div class="note-wrap" id="n1" data-layout-allow-occlusion><div class="note">
+      <span class="ln">Paid in full?</span><span class="ln" id="n1-b">It may</span><span class="ln" id="n1-c">still count</span></div></div></div>
+    <div class="clip" id="n2c" data-start="40.05" data-duration="5.80" data-track-index="0"><div class="note-wrap" id="n2" data-layout-allow-occlusion><div class="note" style="font-size:40px">
+      <span class="ln">Lower it:</span><span class="ln" id="n2-a">cancel spare cards</span><span class="ln" id="n2-b">clear small loans<span class="sul" id="n2-ul"></span></span></div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut" }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const pulse = (sel, t, s = 1.08) => tl.to(sel, { keyframes: [{ scale: s, duration: 0.14, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, t);
+    const count = (sel, from, to, t, d) => tl.fromTo(sel, { textContent: from }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 }, immediateRender: false }, t);
+
+    const L = 255;
+    const th = (dsr) => (dsr - 40) * 0.30;                         // beam angle, + = debts side down
+    const tilt = (dsr, t, d = 0.8) => {
+      const a = th(dsr), dy = L * Math.sin(a * Math.PI / 180);
+      tl.to("#beam", { rotation: -a, duration: d, ease: "back.out(1.4)" }, t);
+      tl.to("#lp", { y: dy, duration: d, ease: "back.out(1.4)" }, t);
+      tl.to("#rp", { y: -dy, duration: d, ease: "back.out(1.4)" }, t);
+    };
+    const meter = (dsr, t, d = 0.9) => tl.to("#mfill", { scaleX: dsr / 100, duration: d, ease: "power2.out" }, t);
+    const debts = (txt, t) => { tl.set("#dn", { textContent: txt }, t); pulse("#ro1", t, 1.06); };
+    const drop = (sel, t) => tl.fromTo(sel, { y: -380, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "back.out(1.2)", immediateRender: false }, t);
+
+    // resting state = frame 0 thumbnail: loaded scale tipped to the debts, "DSR ??%"
+    // frame 0 rest state (before any tween): beam/pans tipped to 70%, meter empty; tags hidden in CSS
+    gsap.set("#beam", { rotation: -9.00 });
+    gsap.set("#lp", { y: 39.89 });
+    gsap.set("#rp", { y: -39.89 });
+    gsap.set("#mfill", { scaleX: 0, transformOrigin: "0% 50%" });
+    // hook
+    pulse("#inc", 0.59, 1.06);                                     // "salary"
+    pop("#tick", 1.32); tl.to("#tick", { opacity: 0, duration: 0.2 }, 2.2);   // "looks fine"
+    tl.to("#beam", { keyframes: [{ rotation: -14, duration: 0.18, ease: "power2.out" }, { rotation: -th(70), duration: 0.5, ease: "back.out(2)" }] }, 3.02);
+    tl.to("#lp", { keyframes: [{ y: L * Math.sin(14 * Math.PI / 180), duration: 0.18, ease: "power2.out" }, { y: L * Math.sin(th(70) * Math.PI / 180), duration: 0.5, ease: "back.out(2)" }] }, 3.02);
+    tl.to("#rp", { keyframes: [{ y: -L * Math.sin(14 * Math.PI / 180), duration: 0.18, ease: "power2.out" }, { y: -L * Math.sin(th(70) * Math.PI / 180), duration: 0.5, ease: "back.out(2)" }] }, 3.02);   // "say no?"
+    pulse("#ro2", 4.42, 1.1);                                      // "one number"
+    sweep("#ro-ul", 5.30, 0.4);                                    // "your DSR"
+    // formula
+    tl.to("#f5, #f4", { opacity: 1, duration: 0.25 }, 6.54);      // "Debt service ratio"
+    pulse("#lp .blk", 8.15, 1.05);                                 // "Add up"
+    tl.to("#f1", { opacity: 1, duration: 0.25 }, 8.69);           // "monthly debts"
+    tl.to("#f2", { opacity: 1, duration: 0.2 }, 9.85); pop("#f2", 9.85);   // "divide"
+    tl.to("#f3", { opacity: 1, duration: 0.25 }, 10.75); pulse("#inc", 10.75, 1.06);   // "net income"
+    pop("#epf", 11.53);                                            // "after EPF and tax"
+    // illustration: the debts clear and re-stack as they are named
+    tl.to("#lp .blk", { y: -420, opacity: 0, duration: 0.35, ease: "power2.in", stagger: { each: 0.05, from: "end" } }, 13.94);
+    tilt(0, 14.15); debts("0", 14.3);
+    tl.to("#epf", { opacity: 0, duration: 0.3 }, 13.94);
+    sweep("#inc-hl", 14.87, 0.5);                                  // "RM5,000 net"
+    drop("#b-car", 16.72); tilt(16, 17.0); debts("800", 17.24);    // "Car loan, RM800"
+    drop("#b-ptp", 18.21); tilt(20, 18.5); debts("1,000", 19.35);  // "PTPTN, RM200"
+    drop("#b-home", 20.64); tilt(60, 20.95, 1.0); debts("3,000", 21.41);   // "the new home loan, RM2,000"
+    // 60%
+    pulse("#ro1", 23.17, 1.08);                                    // "RM3,000 in debts"
+    pulse("#inc", 25.57, 1.06);                                    // "divide by RM5,000"
+    count("#pn", 0, 60, 26.66, 0.9); meter(60, 26.66);             // "60%"
+    pulse("#rp", 27.73, 1.03);                                     // "of your income"
+    // card
+    noteIn("#n1", 28.86);                                          // "A credit card"
+    reveal("#n1-b", 30.30, 0.4); reveal("#n1-c", 30.55, 0.45);     // "may still count"
+    drop("#b-card", 31.55); tilt(70, 31.85); debts("3,500", 32.04);   // "Here, RM500 more"
+    count("#pn", 60, 70, 33.46, 0.6); meter(70, 33.46, 0.6);       // "now 70%"
+    // each bank: its own limit, and what's left
+    noteOut("#n1", 35.0);
+    pop("#lim", 35.29);                                            // "Each bank"
+    tl.to("#lim", { x: 60, duration: 0.35, ease: "power2.inOut" }, 35.55);   // "sets"
+    tl.to("#lim", { x: -90, duration: 0.4, ease: "power2.inOut" }, 36.02);    // "its own"
+    tl.to("#lim", { x: 0, duration: 0.4, ease: "power2.inOut" }, 36.50);     // "limit"
+    reveal("#left", 37.74, 0.5); tl.to("#left", { opacity: 1, duration: 0.01 }, 37.74);   // "check"
+    pop("#leftlab", 38.24);                                        // "what's left"
+    pulse("#lp .blk", 38.95, 1.05);                                // "after your debts"
+    // lower it
+    tl.to("#lim, #leftlab, #left", { opacity: 0, duration: 0.3 }, 39.9);
+    noteIn("#n2", 40.10);                                          // "To bring it down"
+    reveal("#n2-a", 41.09, 0.5); pulse("#b-card", 41.09, 1.08);    // "cancel cards"
+    reveal("#n2-b", 42.93, 0.5); pulse("#b-car, #b-ptp", 43.19, 1.08);   // "clear small loans"
+    sweep("#n2-ul", 43.82, 0.5);                                   // "before you apply"
+    // same home, 44%
+    noteOut("#n2", 45.40);
+    tl.to("#b-card", { x: 520, rotation: 18, opacity: 0, duration: 0.4, ease: "power3.in" }, 45.6);   // "Cancel that card"
+    tilt(60, 46.04); debts("3,000", 46.04); count("#pn", 70, 60, 46.04, 0.4); meter(60, 46.04, 0.4);
+    tl.to("#b-car", { x: -520, rotation: -16, opacity: 0, duration: 0.4, ease: "power3.in" }, 46.75);  // "clear the car loan"
+    tl.to("#b-ptp, #b-home", { y: 44, duration: 0.3, ease: "power2.in" }, 47.1);
+    tilt(44, 47.26); debts("2,200", 47.26); count("#pn", 60, 44, 47.26, 0.5); meter(44, 47.26, 0.5);
+    pulse("#b-home", 48.54, 1.08);                                 // "same home"
+    pulse("#ro2", 48.97, 1.12); pop("#tick", 48.97);               // "44%"
+    // close: the sheet drops away
+    tl.to("#s-paper", { y: 2000, rotation: 9, duration: 0.45, ease: "power3.in" }, 50.6);
+    window.__timelines["scale"] = tl;
+  </script>
+</template>
