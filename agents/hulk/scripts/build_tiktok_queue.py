@@ -7,14 +7,15 @@ Runs locally because it needs ffmpeg and the licensed music beds (gitignored, ne
 raw). For each posting-history entry not yet on TikTok, oldest first, it:
   1. fetches the post exactly as published: Instagram first, Threads when Instagram can't read it
      (posts before 2026-10-18 belong to an Instagram account the current token can't see);
-  2. renders a 1080x1920 TikTok video whose first frame is the post's cover (first slide, poster,
-     or for a video its themed cover prepended unless it already opens on one — see video_cover),
-     so the thumbnail taken at 250 ms is always the cover;
-  3. lays a music bed under anything without audio of its own (images, carousels, silent animated
-     posters). TikTok's trending sounds can't be added through any API, so this is the licensed
-     catalog music the explainers use;
-  4. writes posters/<profile>-tiktok-<ref>.mp4 (served from raw.githubusercontent, which Buffer
-     accepts) and appends {ref, file, caption, ai_generated} to profiles/<profile>/tiktok_queue.yaml.
+  2. carousels: saves the slides as JPEGs (posters/<profile>-tiktok-<ref>-<n>.jpg) to go out as a
+     TikTok photo carousel (the user's call, 2026-11-16) — queue item {ref, caption, images};
+  3. single images and videos: renders a 1080x1920 TikTok video whose first frame is the cover
+     (the poster, or a video's themed cover prepended unless it already opens on one — see
+     video_cover), so the thumbnail taken at 250 ms is always the cover, with a music bed under
+     anything silent (TikTok's trending sounds can't be added through any API, so this is the
+     licensed catalog music the explainers use) — queue item {ref, caption, file, ai_generated};
+  4. everything is served from raw.githubusercontent (Buffer accepts it) and the queue in
+     profiles/<profile>/tiktok_queue.yaml stays sorted oldest post first.
 tiktok_backlog.py posts one queue item per non-video day. Re-running only adds missing items.
 """
 from __future__ import annotations
@@ -28,6 +29,7 @@ from pathlib import Path
 import requests
 import yaml
 from dotenv import load_dotenv
+from PIL import Image
 
 import common
 import platforms
@@ -155,19 +157,29 @@ def main() -> None:
             print(f"! {ref}: not readable on Instagram or Threads, or has no media; skipped")
             continue
 
-        out = common.POSTERS_DIR / f"{cfg['_profile']}-tiktok-{re.sub(r'[^A-Za-z0-9_-]+', '-', ref.removesuffix('.mp4'))}.mp4"
-        music = MUSIC[len(queue) % len(MUSIC)]
+        stem = f"{cfg['_profile']}-tiktok-{re.sub(r'[^A-Za-z0-9_-]+', '-', ref.removesuffix('.mp4'))}"
+        item = {"ref": ref, "caption": src["caption"].strip()}
         with tempfile.TemporaryDirectory() as tmp:
             files = local or [download(u, Path(tmp) / f"m{i}") for i, u in enumerate(src["urls"])]
-            if src["kind"] == "video":
-                cover = video_cover(cfg, ref, poster)
-                render([cover] if cover else [], files[0], music, out)
+            if len(files) > 1:   # carousel: posted as a TikTok photo carousel, slides as JPEG
+                item["images"] = []
+                for n, f in enumerate(files, 1):
+                    jpg = common.POSTERS_DIR / f"{stem}-{n}.jpg"
+                    Image.open(f).convert("RGB").save(jpg, quality=92)
+                    item["images"].append(jpg.name)
             else:
-                render(files, None, music, out)
-        queue.append({"ref": ref, "file": out.name, "caption": src["caption"].strip(),
-                      "ai_generated": ref.endswith("-video")})   # only the TTS-narrated explainers
+                out = common.POSTERS_DIR / f"{stem}.mp4"
+                music = MUSIC[len(queue) % len(MUSIC)]
+                if src["kind"] == "video":
+                    cover = video_cover(cfg, ref, poster)
+                    render([cover] if cover else [], files[0], music, out)
+                else:
+                    render(files, None, music, out)
+                item.update(file=out.name, ai_generated=ref.endswith("-video"))   # TTS explainers only
+        queue.append(item)
+        queue.sort(key=lambda i: min(p["at"] for p in history[i["ref"]]["posts"]))   # oldest first
         queue_path.write_text(yaml.safe_dump(queue, allow_unicode=True, sort_keys=False, width=1000), encoding="utf-8")
-        print(f"{ref}: {src['kind']} x{len(files)} -> {out.name} ({out.stat().st_size // 1024} KB)")
+        print(f"{ref}: {src['kind']} x{len(files)} -> {item.get('file') or f'{len(files)} slides'}")
     print(f"{len(queue)} item(s) in {queue_path.name}")
 
 

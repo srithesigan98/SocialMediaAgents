@@ -30,6 +30,8 @@ agents/hulk/scripts/state/*
 # old hulk-daily.yml's posted_assets/). The global *.mp4 / *.jpg rules above (Watcher scratch)
 # would otherwise silently drop the animated posters and the campaign photos the cron renders from.
 !agents/hulk/scripts/posters/*.mp4
+# TikTok photo-carousel slides (build_tiktok_queue.py), served from raw.githubusercontent:
+!agents/hulk/scripts/posters/*-tiktok-*.jpg
 !agents/hulk/profiles/*/campaigns/**/*.jpg
 !agents/hulk/profiles/*/photos/*.jpg
 

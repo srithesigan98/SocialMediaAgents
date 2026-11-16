@@ -391,7 +391,6 @@
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20AOSIS%20Mont%27%20Kiara.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
   ai_generated: false
 - ref: recap-20261019
-  file: senang-homes-tiktok-recap-20261019.mp4
   caption: 'This week at Senang Homes 👇 swipe through
 
 
@@ -408,7 +407,13 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20a%20property.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-recap-20261019-1.jpg
+  - senang-homes-tiktok-recap-20261019-2.jpg
+  - senang-homes-tiktok-recap-20261019-3.jpg
+  - senang-homes-tiktok-recap-20261019-4.jpg
+  - senang-homes-tiktok-recap-20261019-5.jpg
+  - senang-homes-tiktok-recap-20261019-6.jpg
 - ref: cappella-embassy-1108
   file: senang-homes-tiktok-cappella-embassy-1108.mp4
   caption: 'Instalment RM3,761. Market rent RM4,150.
@@ -499,7 +504,6 @@
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20Bangsar%20Hill%20Park%20%28Tower%20C%20-%20Talisa%20II%29.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
   ai_generated: false
 - ref: recap-20261026
-  file: senang-homes-tiktok-recap-20261026.mp4
   caption: 'This week at Senang Homes 👇 swipe through
 
 
@@ -518,7 +522,14 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20a%20property.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-recap-20261026-1.jpg
+  - senang-homes-tiktok-recap-20261026-2.jpg
+  - senang-homes-tiktok-recap-20261026-3.jpg
+  - senang-homes-tiktok-recap-20261026-4.jpg
+  - senang-homes-tiktok-recap-20261026-5.jpg
+  - senang-homes-tiktok-recap-20261026-6.jpg
+  - senang-homes-tiktok-recap-20261026-7.jpg
 - ref: one-eleven-menerung-1-001
   file: senang-homes-tiktok-one-eleven-menerung-1-001.mp4
   caption: 'Instalment RM6,987. Estimated market rent RM8,800.
@@ -584,7 +595,6 @@
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20M%20Aspira.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
   ai_generated: false
 - ref: recap-20261102
-  file: senang-homes-tiktok-recap-20261102.mp4
   caption: 'This week at Senang Homes 👇 swipe through
 
 
@@ -603,9 +613,15 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20a%20property.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-recap-20261102-1.jpg
+  - senang-homes-tiktok-recap-20261102-2.jpg
+  - senang-homes-tiktok-recap-20261102-3.jpg
+  - senang-homes-tiktok-recap-20261102-4.jpg
+  - senang-homes-tiktok-recap-20261102-5.jpg
+  - senang-homes-tiktok-recap-20261102-6.jpg
+  - senang-homes-tiktok-recap-20261102-7.jpg
 - ref: campaign-oneseputeh
-  file: senang-homes-tiktok-campaign-oneseputeh.mp4
   caption: 'Freehold, right on Jalan Syed Putra, Seputeh.
 
 
@@ -631,7 +647,17 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20One%20Seputeh%20Residence.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-campaign-oneseputeh-1.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-2.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-3.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-4.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-5.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-6.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-7.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-8.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-9.jpg
+  - senang-homes-tiktok-campaign-oneseputeh-10.jpg
 - ref: campaign-khaya-reel-Khaya_Unit_A_Featured.mp4
   file: senang-homes-tiktok-campaign-khaya-reel-Khaya_Unit_A_Featured.mp4
   caption: 'Unit A tour — Khaya Residences 🎥
@@ -659,7 +685,6 @@
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20Khaya%20Residences.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
   ai_generated: false
 - ref: tip-mrta-mlta
-  file: senang-homes-tiktok-tip-mrta-mlta.mp4
   caption: 'MRTA or MLTA? Your banker will ask. Here''s what you''re choosing between 👇
 
 
@@ -688,7 +713,16 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20a%20property.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-tip-mrta-mlta-1.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-2.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-3.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-4.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-5.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-6.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-7.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-8.jpg
+  - senang-homes-tiktok-tip-mrta-mlta-9.jpg
 - ref: the-atas-residences-1-321
   file: senang-homes-tiktok-the-atas-residences-1-321.mp4
   caption: 'RM3,587 a month. RM4,200 the going rent in the area.
@@ -758,7 +792,6 @@
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20Setia%20Sky%20Seputeh.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
   ai_generated: false
 - ref: recap-20261109
-  file: senang-homes-tiktok-recap-20261109.mp4
   caption: 'This week at Senang Homes 👇 swipe through
 
 
@@ -777,7 +810,14 @@
 
 
     Full details + floor plan on WhatsApp 👉 https://api.whatsapp.com/send?phone=60169559848&text=Hi%2C%20I%27m%20interested%20to%20buy%20a%20property.%20Can%20you%20send%20me%20the%20full%20pricing%20and%20details%3F'
-  ai_generated: false
+  images:
+  - senang-homes-tiktok-recap-20261109-1.jpg
+  - senang-homes-tiktok-recap-20261109-2.jpg
+  - senang-homes-tiktok-recap-20261109-3.jpg
+  - senang-homes-tiktok-recap-20261109-4.jpg
+  - senang-homes-tiktok-recap-20261109-5.jpg
+  - senang-homes-tiktok-recap-20261109-6.jpg
+  - senang-homes-tiktok-recap-20261109-7.jpg
 - ref: pavilion-square-772
   file: senang-homes-tiktok-pavilion-square-772.mp4
   caption: 'Instalment RM7,096. Estimated monthly rental RM7,500.

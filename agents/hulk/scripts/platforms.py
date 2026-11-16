@@ -277,12 +277,24 @@ def tiktok_publish_video(cfg: dict, caption: str, video_url: str, ai_generated: 
     """Publish now and wait until TikTok has it. `video_url` must serve the file directly — Buffer
     rejects redirects, so a GitHub release download link (302) won't do; raw.githubusercontent will.
     Frame 0-0.5 s is the topic cover (reel_covers.prepend_cover), so the thumbnail is taken there."""
+    return _tiktok_publish(cfg, caption, [{"video": {"url": video_url, "metadata": {"thumbnailOffset": 250}}}],
+                           # Explainers are narrated by a synthetic (TTS) voice — TikTok asks for AI disclosure.
+                           {"isAiGenerated": ai_generated})
+
+
+def tiktok_publish_carousel(cfg: dict, caption: str, image_urls: list[str], title: str = "") -> str:
+    """Photo carousel (TikTok photo mode), up to 35 slides; send JPEGs (TikTok takes JPEG/WebP).
+    Buffer exposes no music option for photo posts, so these go out without a sound."""
+    if not 1 <= len(image_urls) <= 35:
+        raise ValueError(f"TikTok carousels take 1-35 images, got {len(image_urls)}")
+    return _tiktok_publish(cfg, caption, [{"image": {"url": u}} for u in image_urls], {"title": title[:90]})
+
+
+def _tiktok_publish(cfg: dict, caption: str, assets: list[dict], tiktok_meta: dict) -> str:
     created = _buffer(cfg, _BUFFER_CREATE, {"input": {
         "channelId": common.credential(cfg, "tiktok_channel_id"),
         "text": caption, "schedulingType": "automatic", "mode": "shareNow",
-        "assets": [{"video": {"url": video_url, "metadata": {"thumbnailOffset": 250}}}],
-        # Explainers are narrated by a synthetic (TTS) voice — TikTok asks for AI disclosure.
-        "metadata": {"tiktok": {"isAiGenerated": ai_generated}},
+        "assets": assets, "metadata": {"tiktok": tiktok_meta},
     }})["createPost"]
     if "post" not in created:
         raise RuntimeError(f"Buffer refused the post ({created['__typename']}): {created.get('message')}")

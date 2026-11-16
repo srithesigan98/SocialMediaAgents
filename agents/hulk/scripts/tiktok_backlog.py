@@ -4,8 +4,9 @@
     python tiktok_backlog.py --profile senang-homes --dry-run
     python tiktok_backlog.py --profile senang-homes          # Sun/Mon/Wed/Thu/Sat 20:30 MYT
 
-The queue holds every post published on Instagram/Threads before TikTok was added, already
-rendered as 9:16 videos with a cover frame and music (build_tiktok_queue.py). Tue/Fri belong to
+The queue holds every post published on Instagram/Threads before TikTok was added
+(build_tiktok_queue.py): carousels as TikTok photo carousels, everything else as 9:16 videos with
+a cover frame and music. Tue/Fri belong to
 the new animated videos (post_video.py), so this fills the other five days, oldest post first.
 """
 from __future__ import annotations
@@ -44,13 +45,19 @@ def main() -> None:
         print("TikTok queue is empty: every earlier post is on TikTok.")
         return
 
-    url = make_poster.public_url(cfg, common.POSTERS_DIR / item["file"])
-    print(f"{item['ref']} ({sum(not done(i['ref']) for i in queue)} left)\n  video {url}\n---\n{item['caption']}\n")
+    urls = [make_poster.public_url(cfg, common.POSTERS_DIR / f) for f in item.get("images") or [item["file"]]]
+    left = sum(not done(i["ref"]) for i in queue)
+    print(f"{item['ref']} ({left} left)\n  " + "\n  ".join(urls) + f"\n---\n{item['caption']}\n")
     if args.dry_run:
         return
     try:
-        platform, post_id = "tiktok", platforms.tiktok_publish_video(
-            cfg, item["caption"], url, ai_generated=item.get("ai_generated", False))
+        if item.get("images"):   # carousels go out as TikTok photo carousels
+            title = next((line.strip() for line in item["caption"].splitlines() if line.strip()), "")
+            post_id = platforms.tiktok_publish_carousel(cfg, item["caption"], urls, title=title)
+        else:
+            post_id = platforms.tiktok_publish_video(
+                cfg, item["caption"], urls[0], ai_generated=item.get("ai_generated", False))
+        platform = "tiktok"
     except Exception as exc:
         # Recorded anyway so tomorrow moves on instead of retrying one broken item forever.
         platform, post_id = "tiktok_failed", str(exc)[:300]
