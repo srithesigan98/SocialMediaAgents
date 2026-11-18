@@ -1,0 +1,98 @@
+[
+ {
+  "id": "w0",
+  "text": "Freehold",
+  "start": 0.07,
+  "end": 0.629
+ },
+ {
+  "id": "w1",
+  "text": "has",
+  "start": 0.629,
+  "end": 0.853
+ },
+ {
+  "id": "w2",
+  "text": "no",
+  "start": 0.853,
+  "end": 1.077
+ },
+ {
+  "id": "w3",
+  "text": "end",
+  "start": 1.077,
+  "end": 1.3
+ },
+ {
+  "id": "w4",
+  "text": "date.",
+  "start": 1.3,
+  "end": 1.58
+ },
+ {
+  "id": "w5",
+  "text": "Leasehold",
+  "start": 2.09,
+  "end": 2.57
+ },
+ {
+  "id": "w6",
+  "text": "is",
+  "start": 2.57,
+  "end": 2.714
+ },
+ {
+  "id": "w7",
+  "text": "a",
+  "start": 2.714,
+  "end": 2.858
+ },
+ {
+  "id": "w8",
+  "text": "lease",
+  "start": 2.858,
+  "end": 3.098
+ },
+ {
+  "id": "w9",
+  "text": "from",
+  "start": 3.098,
+  "end": 3.338
+ },
+ {
+  "id": "w10",
+  "text": "the",
+  "start": 3.338,
+  "end": 3.482
+ },
+ {
+  "id": "w11",
+  "text": "state,",
+  "start": 3.482,
+  "end": 3.77
+ },
+ {
+  "id": "w12",
+  "text": "often",
+  "start": 4.06,
+  "end": 4.377
+ },
+ {
+  "id": "w13",
+  "text": "for",
+  "start": 4.377,
+  "end": 4.695
+ },
+ {
+  "id": "w14",
+  "text": "99",
+  "start": 4.695,
+  "end": 5.393
+ },
+ {
+  "id": "w15",
+  "text": "years.",
+  "start": 5.393,
+  "end": 5.71
+ }
+]

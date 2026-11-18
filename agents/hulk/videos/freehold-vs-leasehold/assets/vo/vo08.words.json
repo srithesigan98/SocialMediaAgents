@@ -1,0 +1,74 @@
+[
+ {
+  "id": "w0",
+  "text": "The",
+  "start": 0.03,
+  "end": 0.219
+ },
+ {
+  "id": "w1",
+  "text": "upside:",
+  "start": 0.219,
+  "end": 0.66
+ },
+ {
+  "id": "w2",
+  "text": "leasehold",
+  "start": 1.06,
+  "end": 1.63
+ },
+ {
+  "id": "w3",
+  "text": "is",
+  "start": 1.63,
+  "end": 1.802
+ },
+ {
+  "id": "w4",
+  "text": "often",
+  "start": 1.802,
+  "end": 2.087
+ },
+ {
+  "id": "w5",
+  "text": "priced",
+  "start": 2.087,
+  "end": 2.486
+ },
+ {
+  "id": "w6",
+  "text": "lower",
+  "start": 2.486,
+  "end": 2.771
+ },
+ {
+  "id": "w7",
+  "text": "than",
+  "start": 2.771,
+  "end": 3.0
+ },
+ {
+  "id": "w8",
+  "text": "a",
+  "start": 3.0,
+  "end": 3.171
+ },
+ {
+  "id": "w9",
+  "text": "similar",
+  "start": 3.171,
+  "end": 3.57
+ },
+ {
+  "id": "w10",
+  "text": "freehold",
+  "start": 3.57,
+  "end": 4.141
+ },
+ {
+  "id": "w11",
+  "text": "nearby.",
+  "start": 4.141,
+  "end": 4.54
+ }
+]

@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "Each",
+  "start": 0.04,
+  "end": 0.3
+ },
+ {
+  "id": "w1",
+  "text": "state",
+  "start": 0.3,
+  "end": 0.613
+ },
+ {
+  "id": "w2",
+  "text": "has",
+  "start": 0.613,
+  "end": 0.821
+ },
+ {
+  "id": "w3",
+  "text": "its",
+  "start": 0.821,
+  "end": 1.029
+ },
+ {
+  "id": "w4",
+  "text": "own",
+  "start": 1.029,
+  "end": 1.237
+ },
+ {
+  "id": "w5",
+  "text": "rules",
+  "start": 1.237,
+  "end": 1.549
+ },
+ {
+  "id": "w6",
+  "text": "and",
+  "start": 1.549,
+  "end": 1.758
+ },
+ {
+  "id": "w7",
+  "text": "rates,",
+  "start": 1.758,
+  "end": 2.07
+ },
+ {
+  "id": "w8",
+  "text": "so",
+  "start": 2.36,
+  "end": 2.556
+ },
+ {
+  "id": "w9",
+  "text": "the",
+  "start": 2.556,
+  "end": 2.703
+ },
+ {
+  "id": "w10",
+  "text": "cost",
+  "start": 2.703,
+  "end": 2.948
+ },
+ {
+  "id": "w11",
+  "text": "can",
+  "start": 2.948,
+  "end": 3.143
+ },
+ {
+  "id": "w12",
+  "text": "differ",
+  "start": 3.143,
+  "end": 3.388
+ },
+ {
+  "id": "w13",
+  "text": "a",
+  "start": 3.388,
+  "end": 3.535
+ },
+ {
+  "id": "w14",
+  "text": "lot.",
+  "start": 3.535,
+  "end": 3.78
+ }
+]

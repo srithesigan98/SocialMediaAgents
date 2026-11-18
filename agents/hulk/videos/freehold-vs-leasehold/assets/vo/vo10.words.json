@@ -1,0 +1,80 @@
+[
+ {
+  "id": "w0",
+  "text": "Comment",
+  "start": 0.02,
+  "end": 0.415
+ },
+ {
+  "id": "w1",
+  "text": "\"TITLE\",",
+  "start": 0.415,
+  "end": 0.76
+ },
+ {
+  "id": "w2",
+  "text": "and",
+  "start": 1.13,
+  "end": 1.318
+ },
+ {
+  "id": "w3",
+  "text": "we'll",
+  "start": 1.318,
+  "end": 1.553
+ },
+ {
+  "id": "w4",
+  "text": "check",
+  "start": 1.553,
+  "end": 1.789
+ },
+ {
+  "id": "w5",
+  "text": "a",
+  "start": 1.789,
+  "end": 1.93
+ },
+ {
+  "id": "w6",
+  "text": "unit's",
+  "start": 1.93,
+  "end": 2.306
+ },
+ {
+  "id": "w7",
+  "text": "tenure",
+  "start": 2.306,
+  "end": 2.588
+ },
+ {
+  "id": "w8",
+  "text": "and",
+  "start": 2.588,
+  "end": 2.776
+ },
+ {
+  "id": "w9",
+  "text": "years",
+  "start": 2.776,
+  "end": 3.011
+ },
+ {
+  "id": "w10",
+  "text": "left",
+  "start": 3.011,
+  "end": 3.247
+ },
+ {
+  "id": "w11",
+  "text": "for",
+  "start": 3.247,
+  "end": 3.482
+ },
+ {
+  "id": "w12",
+  "text": "you.",
+  "start": 3.482,
+  "end": 3.67
+ }
+]

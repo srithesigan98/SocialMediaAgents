@@ -22,7 +22,7 @@ calendar:
     - {date: 2026-11-20, slug: dsr-explained, type: education, angle: how-to-steps,
        title: "Why banks reject home loans: your DSR", object: "a balance scale: debts vs net income", project: videos/dsr-explained, status: ready}
     - {date: 2026-11-24, slug: freehold-vs-leasehold, type: education, angle: before-after,
-       title: "Freehold vs leasehold", object: "a title deed with a lease clock", status: planned}
+       title: "Freehold vs leasehold", object: "a title deed with a lease clock", project: videos/freehold-vs-leasehold, status: ready}
     - {date: 2026-11-27, slug: khaya-by-the-numbers, type: property, angle: by-the-numbers,
        title: "Khaya Residences by the numbers", sheet_projects: [Khaya Residences],
        campaign: campaigns/khaya.yaml, status: planned}

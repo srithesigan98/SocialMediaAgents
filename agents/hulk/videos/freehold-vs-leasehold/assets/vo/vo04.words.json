@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "Renewal",
+  "start": 0.04,
+  "end": 0.594
+ },
+ {
+  "id": "w1",
+  "text": "isn't",
+  "start": 0.594,
+  "end": 0.964
+ },
+ {
+  "id": "w2",
+  "text": "automatic.",
+  "start": 0.964,
+  "end": 1.58
+ },
+ {
+  "id": "w3",
+  "text": "You",
+  "start": 2.02,
+  "end": 2.209
+ },
+ {
+  "id": "w4",
+  "text": "apply",
+  "start": 2.209,
+  "end": 2.492
+ },
+ {
+  "id": "w5",
+  "text": "before",
+  "start": 2.492,
+  "end": 2.822
+ },
+ {
+  "id": "w6",
+  "text": "it",
+  "start": 2.822,
+  "end": 2.964
+ },
+ {
+  "id": "w7",
+  "text": "ends,",
+  "start": 2.964,
+  "end": 3.2
+ },
+ {
+  "id": "w8",
+  "text": "and",
+  "start": 3.43,
+  "end": 3.632
+ },
+ {
+  "id": "w9",
+  "text": "pay",
+  "start": 3.632,
+  "end": 3.835
+ },
+ {
+  "id": "w10",
+  "text": "a",
+  "start": 3.835,
+  "end": 3.986
+ },
+ {
+  "id": "w11",
+  "text": "premium",
+  "start": 3.986,
+  "end": 4.442
+ },
+ {
+  "id": "w12",
+  "text": "the",
+  "start": 4.442,
+  "end": 4.594
+ },
+ {
+  "id": "w13",
+  "text": "state",
+  "start": 4.594,
+  "end": 4.897
+ },
+ {
+  "id": "w14",
+  "text": "sets.",
+  "start": 4.897,
+  "end": 5.15
+ }
+]

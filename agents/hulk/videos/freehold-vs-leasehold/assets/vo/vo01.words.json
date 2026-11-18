@@ -1,0 +1,86 @@
+[
+ {
+  "id": "w0",
+  "text": "Same",
+  "start": 0.03,
+  "end": 0.288
+ },
+ {
+  "id": "w1",
+  "text": "street,",
+  "start": 0.288,
+  "end": 0.65
+ },
+ {
+  "id": "w2",
+  "text": "two",
+  "start": 0.76,
+  "end": 0.988
+ },
+ {
+  "id": "w3",
+  "text": "condos.",
+  "start": 0.988,
+  "end": 1.5
+ },
+ {
+  "id": "w4",
+  "text": "One",
+  "start": 1.81,
+  "end": 2.014
+ },
+ {
+  "id": "w5",
+  "text": "is",
+  "start": 2.014,
+  "end": 2.166
+ },
+ {
+  "id": "w6",
+  "text": "freehold,",
+  "start": 2.166,
+  "end": 2.675
+ },
+ {
+  "id": "w7",
+  "text": "one",
+  "start": 2.675,
+  "end": 2.879
+ },
+ {
+  "id": "w8",
+  "text": "is",
+  "start": 2.879,
+  "end": 3.031
+ },
+ {
+  "id": "w9",
+  "text": "leasehold.",
+  "start": 3.031,
+  "end": 3.54
+ },
+ {
+  "id": "w10",
+  "text": "What",
+  "start": 3.91,
+  "end": 4.077
+ },
+ {
+  "id": "w11",
+  "text": "changes",
+  "start": 4.077,
+  "end": 4.494
+ },
+ {
+  "id": "w12",
+  "text": "for",
+  "start": 4.494,
+  "end": 4.703
+ },
+ {
+  "id": "w13",
+  "text": "you?",
+  "start": 4.703,
+  "end": 4.87
+ }
+]

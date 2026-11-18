@@ -1,0 +1,98 @@
+[
+ {
+  "id": "w0",
+  "text": "Some",
+  "start": 0.03,
+  "end": 0.163
+ },
+ {
+  "id": "w1",
+  "text": "titles",
+  "start": 0.163,
+  "end": 0.428
+ },
+ {
+  "id": "w2",
+  "text": "also",
+  "start": 0.428,
+  "end": 0.66
+ },
+ {
+  "id": "w3",
+  "text": "need",
+  "start": 0.66,
+  "end": 0.826
+ },
+ {
+  "id": "w4",
+  "text": "state",
+  "start": 0.826,
+  "end": 1.025
+ },
+ {
+  "id": "w5",
+  "text": "consent",
+  "start": 1.025,
+  "end": 1.29
+ },
+ {
+  "id": "w6",
+  "text": "to",
+  "start": 1.29,
+  "end": 1.423
+ },
+ {
+  "id": "w7",
+  "text": "sell",
+  "start": 1.423,
+  "end": 1.556
+ },
+ {
+  "id": "w8",
+  "text": "or",
+  "start": 1.556,
+  "end": 1.688
+ },
+ {
+  "id": "w9",
+  "text": "refinance.",
+  "start": 1.688,
+  "end": 2.02
+ },
+ {
+  "id": "w10",
+  "text": "That",
+  "start": 2.16,
+  "end": 2.487
+ },
+ {
+  "id": "w11",
+  "text": "can",
+  "start": 2.487,
+  "end": 2.814
+ },
+ {
+  "id": "w12",
+  "text": "add",
+  "start": 2.814,
+  "end": 3.059
+ },
+ {
+  "id": "w13",
+  "text": "weeks,",
+  "start": 3.059,
+  "end": 3.55
+ },
+ {
+  "id": "w14",
+  "text": "or",
+  "start": 4.07,
+  "end": 4.718
+ },
+ {
+  "id": "w15",
+  "text": "months.",
+  "start": 4.718,
+  "end": 5.69
+ }
+]

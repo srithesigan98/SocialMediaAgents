@@ -1,0 +1,186 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/Outfit-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Gelasio"; src: url("assets/fonts/Gelasio-MediumItalic.ttf"); font-weight: 500; font-style: italic; }
+@font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat.ttf"); font-weight: 400 700; }
+
+.ground { position: absolute; inset: 0; background: #142E2B; }
+.hw { display: inline-block; }
+
+    .sheet-wrap { position: absolute; left: 120px; top: 480px; width: 840px; height: 670px; }
+    .sheet { position: absolute; inset: 0; background: #F3F0E7; color: #142E2B; box-shadow: 0 24px 48px rgba(0,0,0,.35); }
+    .hdr { position: absolute; left: 0; right: 0; top: 24px; text-align: center; font: 600 28px Outfit; letter-spacing: .14em; }
+    .rule { position: absolute; left: 40px; right: 40px; height: 0; border-top: 3px dotted #B9B2A3; }
+    .tog { position: absolute; left: 120px; top: 94px; width: 600px; height: 66px; border: 3px solid #142E2B; border-radius: 33px; overflow: hidden; }
+    .slider { position: absolute; left: 0; top: 0; width: 297px; height: 60px; background: #F87947; border-radius: 30px; }
+    .tl { position: absolute; top: 0; width: 297px; height: 60px; line-height: 60px; text-align: center; font: 600 30px Outfit; letter-spacing: .1em; }
+    .clock { position: absolute; left: 40px; top: 196px; width: 340px; height: 340px; }
+    .clock svg { position: absolute; inset: 0; overflow: visible; }
+    .clock circle { fill: none; stroke-width: 26; }
+    .cn { position: absolute; left: 0; right: 0; top: 104px; text-align: center; font: 600 112px/1 Outfit; }
+    .cn .num { color: #B5531C; }
+    .cinf { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 600 128px/1 Outfit; color: #142E2B; opacity: 0; }
+    .cl { position: absolute; left: 0; right: 0; top: 226px; text-align: center; font: 500 28px Outfit; color: #5B6B66; }
+    .row { position: absolute; left: 420px; width: 380px; height: 90px; }
+    .rl { font: 500 28px Outfit; letter-spacing: .12em; color: #5B6B66; }
+    .rv { position: relative; font: 600 38px/1.15 Outfit; color: #142E2B; white-space: nowrap; }
+    .hl { position: absolute; top: 6px; bottom: 0; background: #FFD84D; opacity: .55; mix-blend-mode: multiply; }
+    .bar { position: absolute; left: 0; top: 44px; width: 380px; height: 30px; background: #E5DED0; border-radius: 3px; opacity: 0; }
+    .bfill { position: absolute; left: 0; top: 0; width: 380px; height: 30px; background: #F87947; border-radius: 3px; }
+    .bsub { position: absolute; left: 0; top: 82px; font: 600 28px Outfit; color: #B5531C; white-space: nowrap; opacity: 0; }
+    .renew { position: absolute; left: 236px; top: 470px; width: 56px; height: 56px; border-radius: 28px; background: #F87947;
+              font: 600 38px/56px Outfit; text-align: center; color: #142E2B; opacity: 0; }
+    .price { position: absolute; left: 40px; top: 586px; height: 60px; padding: 0 22px; border-radius: 30px; background: #142E2B; color: #F3F0E7;
+              font: 600 30px/60px Outfit; white-space: nowrap; }
+    .price .dn { display: inline-block; color: #FFAA78; }
+    .stamp { position: absolute; left: 388px; top: 590px; padding: 4px 12px; border: 5px solid #9A3418; border-radius: 8px; color: #9A3418;
+              font: 600 28px Outfit; letter-spacing: .06em; white-space: nowrap; transform: rotate(-8deg); opacity: 0; }
+    .wk { position: absolute; left: 690px; top: 584px; font: 600 28px/1.1 Outfit; color: #9A3418; white-space: nowrap; opacity: 0; }
+    .tick { position: absolute; width: 56px; height: 56px; border-radius: 28px; background: #F87947; color: #142E2B;
+             font: 600 36px/56px Outfit; text-align: center; opacity: 0; }
+    .note-wrap { position: absolute; left: 650px; top: 290px; width: 300px; height: 180px; }
+    .note { position: absolute; inset: 0; background: #FFAA78; transform: rotate(4deg); padding: 14px 20px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.25); font: 600 44px/1.0 Caveat; color: #142E2B; }
+    .note .ln { display: block; position: relative; width: fit-content; }
+    .note .sul { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #9A3418; border-radius: 2px; }
+  </style>
+  <div id="root" data-composition-id="title" data-width="1080" data-height="1920">
+    <div class="ground"></div>
+    <div class="sheet-wrap" id="s-paper"><div class="sheet">
+      <div class="hdr" id="hdr">LAND TITLE · ILLUSTRATION</div>
+      <div class="rule" style="top:74px"></div>
+      <div class="tog" id="tog"><div class="slider" id="slider"></div>
+        <div class="tl" id="t-fh" style="left:0">FREEHOLD</div><div class="tl" id="t-lh" style="left:297px">LEASEHOLD</div></div>
+      <div class="clock" id="clock">
+        <svg viewBox="0 0 340 340"><circle cx="170" cy="170" r="128" stroke="#E5DED0"/>
+          <circle id="ring" cx="170" cy="170" r="128" stroke="#F87947" stroke-dasharray="804.25 804.25" transform="rotate(-90 170 170)"/>
+          <circle id="ring-fh" cx="170" cy="170" r="128" stroke="#142E2B" opacity="0"/></svg>
+        <div class="cn" id="cn"><span class="num" id="cnum">99</span></div>
+        <div class="cinf" id="cinf" data-layout-allow-overlap>∞</div>
+        <div class="cl" id="cl">years left</div>
+      </div>
+      <div class="renew" id="renew">↻</div>
+      <div class="row" id="r1" style="top:186px"><div class="rl">TENURE</div><div class="rv" id="v1">Leasehold</div></div><div class="row" id="r2" style="top:272px"><div class="rl">TERM</div><div class="rv" id="v2">?</div></div><div class="row" id="r3" style="top:358px"><div class="rl">AT THE END</div><div class="rv" id="v3"><span id="v3a">?</span> <span style="position:relative"><span id="v3b"></span><span class="hl" id="v3hl" style="left:-6px;right:-6px;transform:scaleX(0)"></span></span></div></div><div class="row" id="r4" style="top:444px"><div class="rl">BANK LOAN</div><div class="rv" id="v4">?</div></div>
+      <div class="bar" id="bar" style="left:420px;top:488px"><div class="bfill" id="bfill"></div></div>
+      <div class="bsub" id="bsub" style="left:420px;top:524px">less, or shorter</div>
+      <div class="price" id="price">PRICE · often lower <span class="dn" id="pdn">↓</span></div>
+      <div class="stamp" id="stamp">STATE CONSENT</div>
+      <div class="wk" id="wk">+ weeks,<br/>or months</div>
+      <div class="tick" id="k1" style="left:770px;top:218px">✓</div>
+      <div class="tick" id="k2" style="left:316px;top:200px">✓</div>
+      <div class="tick" id="k3" style="left:636px;top:536px">✓</div>
+    </div></div>
+    <div class="clip" id="n1c" data-start="17.49" data-duration="6.46" data-track-index="0"><div class="note-wrap" id="n1" data-layout-allow-occlusion><div class="note">
+      <span class="ln">Not automatic:</span><span class="ln" id="n1-b">apply first,</span><span class="ln" id="n1-c">pay a premium<span class="sul" id="n1-ul"></span></span></div></div></div>
+    <div class="clip" id="n2c" data-start="23.50" data-duration="5.20" data-track-index="0"><div class="note-wrap" id="n2" data-layout-allow-occlusion><div class="note">
+      <span class="ln">Each state:</span><span class="ln" id="n2-a">own rules,</span><span class="ln" id="n2-b">own rates<span class="sul" id="n2-ul"></span></span></div></div></div>
+  </div>
+  <script>
+    
+    const tl = gsap.timeline({ paused: true });
+    const words = (sel, t, gap = 0.07) => tl.fromTo(sel + " .hw", { opacity: 0, filter: "blur(10px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out", stagger: gap }, t);
+    const sweep = (sel, t, d = 0.45) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.inOut", transformOrigin: "0% 50%" }, t);
+    const pop = (sel, t, s = 0.08) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.2)", stagger: s }, t);
+    const reveal = (sel, t, d = 0.6) => tl.fromTo(sel, { clipPath: "inset(-10% 100% -10% 0)" }, { clipPath: "inset(-10% 0% -10% 0)", duration: d, ease: "power2.inOut", immediateRender: false }, t);
+    const noteIn = (sel, t) => tl.fromTo(sel, { y: -760, rotation: 16 }, { y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.3)" }, t);
+    const noteOut = (sel, t) => tl.to(sel, { x: 700, rotation: 25, duration: 0.4, ease: "power3.in" }, t);
+    const pulse = (sel, t, s = 1.08) => tl.to(sel, { keyframes: [{ scale: s, duration: 0.14, ease: "power2.out" }, { scale: 1, duration: 0.3, ease: "power2.inOut" }] }, t);
+    const count = (sel, from, to, t, d) => tl.fromTo(sel, { textContent: from }, { textContent: to, duration: d, ease: "power2.out", snap: { textContent: 1 }, immediateRender: false }, t);
+
+    const flip = (side, t) => {   // side: "fh" or "lh"
+      tl.to("#slider", { x: side === "fh" ? 0 : 297, duration: 0.35, ease: "back.out(1.6)" }, t);
+      const fh = side === "fh";
+      tl.to("#ring-fh, #cinf", { opacity: fh ? 1 : 0, duration: 0.25 }, t + 0.1);
+      tl.to("#ring, #cn", { opacity: fh ? 0 : 1, duration: 0.25 }, t + 0.1);
+      tl.set("#cl", { textContent: fh ? "no end date" : "years left" }, t + 0.1);
+      tl.set("#v1", { textContent: fh ? "Freehold" : "Leasehold" }, t + 0.1);
+      reveal("#v1", t + 0.1, 0.35);
+    };
+    const ring = (yrs, t, d = 0.9) => tl.to("#ring", { strokeDashoffset: 804.25 * (1 - yrs / 99), duration: d, ease: "power2.inOut" }, t);
+    const swap = (sel, text, t, d = 0.45) => { tl.set(sel, { textContent: text }, t); tl.set(sel === "#v3a" ? "#v3" : sel, { color: "#142E2B" }, t); reveal(sel === "#v3a" ? "#v3" : sel, t, d); };
+
+    // frame 0 rest state = thumbnail: switch on LEASEHOLD, full 99-year ring, "?" fields
+    gsap.set("#slider", { x: 297 });
+    gsap.set("#ring", { strokeDashoffset: 0 });
+    gsap.set("#v2, #v3, #v4", { color: "#8A8478" });
+    gsap.set("#bfill", { transformOrigin: "0% 50%" });
+    gsap.set("#price", { opacity: 0 });
+    // hook
+    pulse("#s-paper", 0.33, 1.03);                       // "Same street"
+    pulse("#tog", 1.06, 1.06);                            // "two condos"
+    flip("fh", 2.47);                                // "freehold"
+    flip("lh", 3.33);                               // "leasehold"
+    pulse("#v2, #v3, #v4", 4.21, 1.15);                  // "What changes"
+    // freehold / leasehold
+    flip("fh", 6.17);                                // "Freehold"
+    swap("#v2", "No end date", 6.95);                      // "no end date"
+    flip("lh", 8.19);                               // "Leasehold"
+    swap("#v2", "Lease from state", 8.19);             // "a lease from the state"
+    ring(0, 9.76, 0.3); count("#cnum", 99, 0, 9.76, 0.3);
+    ring(99, 10.79, 0.8); count("#cnum", 0, 99, 10.79, 0.8);   // "often for 99 years"
+    swap("#v2", "Often 99 years", 10.79);
+    // the lease runs out
+    ring(0, 13.26, 1.0); count("#cnum", 99, 0, 13.26, 1.0);   // "runs out"
+    swap("#v3a", "Back to the state", 14.09);              // "the land goes back to the state"
+    pulse("#v3", 15.12, 1.06);
+    pop("#renew", 15.69);                               // "unless it's renewed"
+    ring(99, 16.22, 0.8); count("#cnum", 0, 99, 16.22, 0.8);
+    // renewal
+    noteIn("#n1", 17.54);                              // "Renewal isn't automatic"
+    tl.to("#renew", { rotation: -360, duration: 0.6, ease: "power2.inOut" }, 18.46);
+    reveal("#n1-b", 19.71, 0.45);                        // "You apply"
+    tl.set("#v3a", { textContent: "Renew:" }, 19.71); tl.set("#v3b", { textContent: "premium" }, 19.71);
+    reveal("#v3", 19.71, 0.45);
+    reveal("#n1-c", 21.13, 0.45);                          // "pay a premium"
+    sweep("#n1-ul", 21.49, 0.5);
+    sweep("#v3hl", 21.49, 0.5);
+    pulse("#v3", 22.09, 1.06);                        // "the state sets"
+    noteOut("#n1", 23.30);
+    // each state
+    noteIn("#n2", 23.54);                                 // "Each state"
+    reveal("#n2-a", 24.74, 0.4);                         // "own rules"
+    reveal("#n2-b", 25.26, 0.4);                         // "and rates"
+    sweep("#n2-ul", 26.2, 0.5);                          // "the cost can differ"
+    pulse("#v3", 26.64, 1.08);
+    noteOut("#n2", 28.00);
+    // illustration: 35 years left, the loan shrinks
+    pulse("#hdr", 28.23, 1.08);                   // "Illustration"
+    tl.to("#renew", { opacity: 0, duration: 0.2 }, 28.23);
+    ring(35, 29.23, 1.0); count("#cnum", 99, 35, 29.23, 1.0);   // "35 years left"
+    pulse("#clock", 30.64, 1.04);
+    tl.to("#bar", { opacity: 1, duration: 0.01 }, 31.39);
+    reveal("#bar", 31.39, 0.5);                           // "Some banks"
+    swap("#v4", "", 31.39);
+    tl.to("#bfill", { scaleX: 0.6, duration: 0.6, ease: "power2.inOut" }, 32.53);   // "lend less"
+    tl.to("#bsub", { opacity: 1, duration: 0.01 }, 33.36);
+    reveal("#bsub", 33.36, 0.5);                         // "or for fewer years"
+    // state consent
+    tl.fromTo("#stamp", { opacity: 0, scale: 1.8, rotation: -26 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.2, ease: "power4.out" }, 35.82);
+    tl.to("#s-paper", { keyframes: [{ x: -6, duration: 0.033 }, { x: 5, duration: 0.033 }, { x: 0, duration: 0.033 }] }, 36.02);
+    pulse("#v1", 36.22, 1.06);                            // "to sell"
+    pulse("#bar", 36.49, 1.04);                      // "or refinance"
+    tl.to("#wk", { opacity: 1, duration: 0.01 }, 37.86);
+    reveal("#wk", 37.86, 0.4);                           // "weeks"
+    pulse("#wk", 39.52, 1.1);                           // "or months"
+    // the upside
+    tl.to("#price", { opacity: 1, duration: 0.01 }, 41.62);
+    reveal("#price", 41.62, 0.5);                       // "The upside"
+    tl.fromTo("#pdn", { y: -14 }, { y: 4, duration: 0.35, ease: "back.out(2)" }, 43.89);   // "priced lower"
+    pulse("#price", 43.89, 1.06);
+    tl.to("#slider", { keyframes: [{ x: 0, duration: 0.3, ease: "power2.inOut" }, { x: 297, duration: 0.3, ease: "power2.inOut", delay: 0.5 }] }, 44.97);   // "a similar freehold"
+    // checklist
+    pulse("#s-paper", 48.09, 1.03);                      // "check the title"
+    pop("#k1", 49.09);                                  // "the tenure"
+    pop("#k2", 49.62);                                   // "the years left"
+    pop("#k3", 50.68);                             // "any restriction"
+    pulse("#stamp", 50.68, 1.08);
+    // close: the sheet drops away
+    tl.to("#s-paper", { y: 2000, rotation: 9, duration: 0.45, ease: "power3.in" }, 52.0);
+    window.__timelines["title"] = tl;
+  </script>
+</template>

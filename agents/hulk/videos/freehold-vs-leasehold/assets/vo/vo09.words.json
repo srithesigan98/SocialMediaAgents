@@ -1,0 +1,86 @@
+[
+ {
+  "id": "w0",
+  "text": "Before",
+  "start": 0.03,
+  "end": 0.382
+ },
+ {
+  "id": "w1",
+  "text": "you",
+  "start": 0.382,
+  "end": 0.584
+ },
+ {
+  "id": "w2",
+  "text": "buy,",
+  "start": 0.584,
+  "end": 0.785
+ },
+ {
+  "id": "w3",
+  "text": "check",
+  "start": 0.785,
+  "end": 1.037
+ },
+ {
+  "id": "w4",
+  "text": "the",
+  "start": 1.037,
+  "end": 1.188
+ },
+ {
+  "id": "w5",
+  "text": "title:",
+  "start": 1.188,
+  "end": 1.54
+ },
+ {
+  "id": "w6",
+  "text": "the",
+  "start": 2.01,
+  "end": 2.187
+ },
+ {
+  "id": "w7",
+  "text": "tenure,",
+  "start": 2.187,
+  "end": 2.541
+ },
+ {
+  "id": "w8",
+  "text": "the",
+  "start": 2.541,
+  "end": 2.718
+ },
+ {
+  "id": "w9",
+  "text": "years",
+  "start": 2.718,
+  "end": 3.013
+ },
+ {
+  "id": "w10",
+  "text": "left,",
+  "start": 3.013,
+  "end": 3.309
+ },
+ {
+  "id": "w11",
+  "text": "and",
+  "start": 3.309,
+  "end": 3.545
+ },
+ {
+  "id": "w12",
+  "text": "any",
+  "start": 3.545,
+  "end": 3.781
+ },
+ {
+  "id": "w13",
+  "text": "restriction.",
+  "start": 3.781,
+  "end": 4.43
+ }
+]

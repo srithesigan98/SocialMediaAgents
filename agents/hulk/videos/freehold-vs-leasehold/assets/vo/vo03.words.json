@@ -1,0 +1,92 @@
+[
+ {
+  "id": "w0",
+  "text": "When",
+  "start": 0.05,
+  "end": 0.221
+ },
+ {
+  "id": "w1",
+  "text": "the",
+  "start": 0.221,
+  "end": 0.35
+ },
+ {
+  "id": "w2",
+  "text": "lease",
+  "start": 0.35,
+  "end": 0.564
+ },
+ {
+  "id": "w3",
+  "text": "runs",
+  "start": 0.564,
+  "end": 0.779
+ },
+ {
+  "id": "w4",
+  "text": "out,",
+  "start": 0.779,
+  "end": 0.95
+ },
+ {
+  "id": "w5",
+  "text": "the",
+  "start": 1.24,
+  "end": 1.387
+ },
+ {
+  "id": "w6",
+  "text": "land",
+  "start": 1.387,
+  "end": 1.632
+ },
+ {
+  "id": "w7",
+  "text": "goes",
+  "start": 1.632,
+  "end": 1.877
+ },
+ {
+  "id": "w8",
+  "text": "back",
+  "start": 1.877,
+  "end": 2.073
+ },
+ {
+  "id": "w9",
+  "text": "to",
+  "start": 2.073,
+  "end": 2.269
+ },
+ {
+  "id": "w10",
+  "text": "the",
+  "start": 2.269,
+  "end": 2.416
+ },
+ {
+  "id": "w11",
+  "text": "state,",
+  "start": 2.416,
+  "end": 2.71
+ },
+ {
+  "id": "w12",
+  "text": "unless",
+  "start": 2.99,
+  "end": 3.308
+ },
+ {
+  "id": "w13",
+  "text": "it's",
+  "start": 3.308,
+  "end": 3.519
+ },
+ {
+  "id": "w14",
+  "text": "renewed.",
+  "start": 3.519,
+  "end": 3.89
+ }
+]
