@@ -9,7 +9,8 @@ The queue holds every post published on Instagram/Threads before TikTok was adde
 a cover frame and music. Tue/Fri belong to the new animated videos (post_video.py), so this fills
 the other five days, oldest post first.
 
-Every item must clear tiktok_guard first (no prices or money amounts, TikTok Community Guidelines).
+Every item must clear tiktok_guard first (no property prices or instalments, captions cleaned of money
+amounts, TikTok Community Guidelines).
 An item that fails is recorded as tiktok_skipped with the reasons and never re-checked; the run moves
 on to the next item. If the check itself can't run, nothing is posted and the run fails (retried later).
 """
@@ -54,8 +55,9 @@ def main() -> None:
 
     for item in [i for i in queue if not done(i["ref"])]:
         media = [common.POSTERS_DIR / f for f in item.get("images") or [item["file"]]]
+        caption = tiktok_guard.clean_caption(item["caption"])   # owner's rule: no money amounts in captions
         try:
-            found = tiktok_guard.problems(item["caption"], media)
+            found = tiktok_guard.problems(caption, media)
         except tiktok_guard.CheckError as exc:
             sys.exit(f"Guideline check unavailable, nothing posted: {exc}")
         if found:
@@ -65,16 +67,16 @@ def main() -> None:
             continue
 
         urls = [make_poster.public_url(cfg, m) for m in media]
-        print(f"{item['ref']}: cleared\n  " + "\n  ".join(urls) + f"\n---\n{item['caption']}\n")
+        print(f"{item['ref']}: cleared\n  " + "\n  ".join(urls) + f"\n---\n{caption}\n")
         if args.dry_run:
             return
         try:
             if item.get("images"):   # carousels go out as TikTok photo carousels
-                title = next((line.strip() for line in item["caption"].splitlines() if line.strip()), "")
-                post_id = platforms.tiktok_publish_carousel(cfg, item["caption"], urls, title=title)
+                title = next((line.strip() for line in caption.splitlines() if line.strip()), "")
+                post_id = platforms.tiktok_publish_carousel(cfg, caption, urls, title=title)
             else:
                 post_id = platforms.tiktok_publish_video(
-                    cfg, item["caption"], urls[0], ai_generated=item.get("ai_generated", False))
+                    cfg, caption, urls[0], ai_generated=item.get("ai_generated", False))
             platform = "tiktok"
         except Exception as exc:
             # Recorded anyway so the next run moves on instead of retrying one broken item forever.

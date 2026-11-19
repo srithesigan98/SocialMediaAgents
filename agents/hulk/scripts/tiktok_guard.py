@@ -4,10 +4,12 @@
     import tiktok_guard
     problems = tiktok_guard.problems(caption, [Path("slide-1.jpg"), Path("video.mp4")])   # [] = clean
 
-Added 2026-11-19 after TikTok issued Community Guidelines violations on posts showing prices: the
-owner ruled that nothing with a price goes to TikTok, and that every TikTok post is checked first.
+Added 2026-11-19 after TikTok issued Community Guidelines violations on posts showing prices. The
+owner's rule (as corrected the same day): no price or instalment of an actual property on TikTok;
+educational figures (DSR examples, illustrations) are fine on screen; captions carry no money amounts
+at all (callers pass clean_caption(...)). Every TikTok post is checked first.
 
-Two layers. A regex catches money amounts in the caption for free. Otherwise Claude reads the caption
+Two layers. A regex catches money amounts left in the caption for free. Otherwise Claude reads the caption
 and every slide / a frame every 2 s of each video against RULES. A failed check (API error, refusal,
 unreadable answer) raises CheckError instead of returning [] — nothing reaches TikTok unchecked.
 Videos need ffmpeg on PATH.
@@ -31,13 +33,17 @@ RULES = """You check posts for Senang Homes, a Malaysian property agent, before 
 The account has already received TikTok Community Guidelines violations, so be strict: if a rule is broken
 anywhere — on screen in any image or video frame, or in the caption — the post is rejected.
 
-1. No prices or money amounts (the owner's rule). Reject any amount of money: property prices or starting
-   prices ("from RM785K", "RM970K"), nett/SPA price, price per sqft, monthly instalments, rent, deposits,
-   fees, stamp duty, rebates or discounts in RM, loan amounts, salaries, and illustrative figures
-   ("a RM500K home"). Price tags and price stickers count. Percentages on their own are not money amounts.
+1. No property prices (the owner's rule). Reject the price of an actual property, unit or project shown
+   anywhere: sale or starting price ("from RM785,000", "Priced at RM970K"), nett/SPA price, price per sqft
+   of a real project, a listing's monthly instalment or estimated rent, and rebates or discounts on a
+   project. Price tags and price stickers on real listings count.
+   Educational money figures ARE allowed on screen: worked examples and illustrations that are not the price
+   of a real listing — a DSR example on a RM5,000 salary, an illustrative RM500K loan or home, fees on an
+   example purchase, a made-up price-per-sqft comparison.
+   The caption must contain no money amounts at all (the video may show educational figures).
 2. No financial promises (TikTok: Frauds and Scams — fake investment offers, get-rich-quick schemes).
-   Reject guaranteed or certain returns, rental yield, capital appreciation or "passive income", loan-approval
-   guarantees, "can't lose" claims, and invented urgency or scarcity ("last unit", "today only").
+   Reject claims that returns, rental yield, capital appreciation or income are guaranteed or certain,
+   loan-approval guarantees, "can't lose" claims, and invented urgency or scarcity ("last unit", "today only").
 3. No marketing of regulated financial products (TikTok: Regulated Goods and Services): pushing people to
    sign up for a loan, insurance or investment scheme. Neutral education about how they work is fine.
 4. Nothing misleading presented as fact, no personal data of other people (names with contact details, IC
@@ -49,6 +55,17 @@ Reply with JSON only: {"ok": true or false, "problems": ["<where: 'image N' or '
 
 class CheckError(RuntimeError):
     """The check itself could not run — treat as 'not cleared', never as clean."""
+
+
+def clean_caption(caption: str) -> str:
+    """TikTok captions carry no money amounts (owner's rule): drop every sentence that has one.
+    The video itself may still show educational figures."""
+    lines = []
+    for line in caption.splitlines():
+        kept = " ".join(s for s in re.split(r"(?<=[.!?])\s+", line) if not MONEY.search(s))
+        if kept.strip() or not line.strip():   # drop lines emptied by the cut, keep paragraph breaks
+            lines.append(kept.rstrip())
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
 
 
 def caption_problems(caption: str) -> list[str]:

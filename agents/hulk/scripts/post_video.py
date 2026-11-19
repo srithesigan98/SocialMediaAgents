@@ -77,6 +77,8 @@ def main() -> None:
             print("--- tiktok skipped: Buffer API key / TikTok channel id not set ---\n")
             continue
         caption = post["captions"].get(platform) or post["captions"]["instagram"]  # TikTok reuses IG's
+        if platform == "tiktok":
+            caption = tiktok_guard.clean_caption(caption)   # owner's rule: no money amounts in TikTok captions
         text = caption.rstrip() + "\n\n" + cta
         print(f"--- {platform} ({len(text)} chars) ---\n{text}\n")
         if args.dry_run or (not args.yes and input(f"Publish to {platform}? [y/N] ").strip().lower() != "y"):
