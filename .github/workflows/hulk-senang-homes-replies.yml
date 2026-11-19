@@ -13,7 +13,12 @@ name: Hulk (Senang Homes) comment replies
 on:
   schedule:
     - cron: "7 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      once:
+        description: "One pass, then stop (to check new tokens; read its log after)"
+        type: boolean
+        default: false
 
 concurrency:
   group: hulk-senang-homes-replies   # never two runs answering the same comments at once
@@ -55,9 +60,11 @@ jobs:
             git add agents/hulk/scripts/state/senang-homes-replied.json
             git diff --cached --quiet || git commit -qm "hulk: senang-homes replied comments"
             git push -q origin HEAD:main || true   # lost a push race? the next pass rebases and retries
+            if [ "${{ inputs.once }}" = "true" ]; then break; fi
             sleep 120
           done
       - name: Start the next poller
+        if: ${{ !inputs.once }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run hulk-senang-homes-replies.yml --ref main -R "$GITHUB_REPOSITORY"
