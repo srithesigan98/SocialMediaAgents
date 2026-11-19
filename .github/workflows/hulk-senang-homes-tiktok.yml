@@ -23,9 +23,12 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Install ffmpeg (the TikTok guideline check reads video frames)
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
       - name: Post the next queued post to TikTok
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SENANG_TIKTOK_CHANNEL_ID: ${{ secrets.SENANG_TIKTOK_CHANNEL_ID }}
         run: |
           cd agents/hulk/scripts

@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 import common
 import make_poster
 import platforms
+import tiktok_guard
 
 HERE = Path(__file__).resolve().parent
 MYT = timezone(timedelta(hours=8))
@@ -84,6 +85,12 @@ def main() -> None:
             if platform == "threads":
                 pid = platforms.threads_publish_video(cfg, text, post["video_url"])
             elif platform == "tiktok":
+                # Owner's rule + TikTok Community Guidelines (tiktok_guard): checked on the committed
+                # copy of the video; a CheckError lands in the except below, so nothing goes up unchecked.
+                found = tiktok_guard.problems(text, [common.POSTERS_DIR / Path(post["video_url"]).name])
+                if found:
+                    print("  - tiktok held back by the guideline check:", *found, sep="\n    ")
+                    continue
                 pid = platforms.tiktok_publish_video(cfg, text, post["video_url"])
             else:
                 pid = platforms.instagram_publish_reel(cfg, text, post["video_url"], cover_url=cover)
