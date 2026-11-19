@@ -4,10 +4,15 @@ name: Hulk (Senang Homes) comment replies
 # full details" promise on the posters. Threads: public reply with the WhatsApp link (Threads has
 # no DM API). Instagram: private DM + public reply. Already-answered comment ids are committed
 # to state/senang-homes-replied.json so no comment is answered twice.
+#
+# A poller, not a cron job: GitHub throttles frequent crons (the old */15 schedule really fired
+# every 4-9 hours). Each run checks for comments every 2 minutes for 5.5 hours, then starts its
+# own successor. The hourly cron only restarts the chain if it ever breaks — while a poller is
+# running it just queues behind it. Public repo, so the minutes are free.
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # GitHub may delay scheduled runs a few minutes under load
+    - cron: "7 * * * *"
   workflow_dispatch: {}
 
 concurrency:
@@ -16,10 +21,12 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # to start the next poller run
 
 jobs:
   reply:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,21 +36,36 @@ jobs:
           cache-dependency-path: agents/hulk/scripts/requirements.txt
       - name: Install dependencies
         run: pip install -r agents/hulk/scripts/requirements.txt
-      - name: Answer new comments
+      - name: Answer new comments every 2 minutes
         env:
           SENANG_THREADS_USER_ID: ${{ secrets.SENANG_THREADS_USER_ID }}
           SENANG_THREADS_ACCESS_TOKEN: ${{ secrets.SENANG_THREADS_ACCESS_TOKEN }}
           SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
           SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
           SENANG_HOMES_LISTINGS_URL: ${{ secrets.SENANG_HOMES_LISTINGS_URL }}
-        run: cd agents/hulk/scripts && python reply_bot.py --profile senang-homes
-      - name: Save answered comments
-        if: always()
         run: |
           git config user.name "hulk-bot"
           git config user.email "hulk-bot@users.noreply.github.com"
-          git add agents/hulk/scripts/state/senang-homes-replied.json
-          git diff --cached --quiet && exit 0
-          git commit -m "hulk: senang-homes replied comments"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          end=$((SECONDS + 330 * 60))
+          while [ $SECONDS -lt $end ]; do
+            # Pull first: picks up posts the daily workflows made since the last pass.
+            git pull -q --rebase origin main || git rebase --abort || true
+            (cd agents/hulk/scripts && python reply_bot.py --profile senang-homes) 2>&1 \
+              | tee -a "$RUNNER_TEMP/replies.log" || true
+            git add agents/hulk/scripts/state/senang-homes-replied.json
+            git diff --cached --quiet || git commit -qm "hulk: senang-homes replied comments"
+            git push -q origin HEAD:main || true   # lost a push race? the next pass rebases and retries
+            sleep 120
+          done
+      - name: Start the next poller
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run hulk-senang-homes-replies.yml --ref main -R "$GITHUB_REPOSITORY"
+      - name: Fail loudly on an expired token
+        if: always()
+        run: |
+          # reply_bot skips posts it can't read, so an expired token used to look like a green run.
+          if grep -qi "access token" "$RUNNER_TEMP/replies.log" 2>/dev/null; then
+            echo "::error::A Threads/Instagram access token is invalid or expired. Renew the secret."
+            exit 1
+          fi
