@@ -20,7 +20,7 @@ calendar:
        title: "Compare homes by price per sqft", object: "a comparison sheet with two drawn floor plans",
        note: "swapped in from backlog: what-rm600k-buys needs listings-sheet numbers", project: videos/price-per-sqft, status: posted}
     - {date: 2026-11-20, slug: dsr-explained, type: education, angle: how-to-steps,
-       title: "Why banks reject home loans: your DSR", object: "a balance scale: debts vs net income", project: videos/dsr-explained, status: ready}
+       title: "Why banks reject home loans: your DSR", object: "a balance scale: debts vs net income", project: videos/dsr-explained, status: posted}
     - {date: 2026-11-24, slug: freehold-vs-leasehold, type: education, angle: before-after,
        title: "Freehold vs leasehold", object: "a title deed with a lease clock", project: videos/freehold-vs-leasehold, status: ready}
     - {date: 2026-11-27, slug: khaya-by-the-numbers, type: property, angle: by-the-numbers,
