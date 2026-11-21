@@ -1,0 +1,99 @@
+name: Hulk (Senang Homes) one-off — 2,000–5,000 sqft carousel
+
+# One-off: posts the "7 big homes" carousel at 20:00 MYT on 2026-11-21.
+#   Threads + Instagram — the priced slides (senang-homes-big-homes-2k-5k-N.png)
+#   TikTok (Buffer)     — the price-free slides (senang-homes-tiktok-big-homes-2k-5k-N.jpg), after tiktok_guard
+# Starts 19:40 MYT and sleeps to 20:00 so GitHub's cron lag doesn't make it late. The date check
+# stops it firing again on 2027-11-21; delete this file once it has run. Platforms already in the
+# posting history are skipped, so a manual re-run only fills in whichever side failed.
+
+on:
+  schedule:
+    - cron: "40 11 21 11 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to commit the posting history
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r agents/hulk/scripts/requirements.txt
+      - name: Wait until 20:00 MYT
+        if: github.event_name == 'schedule'
+        run: |
+          [ "$(date -u +%F)" = 2026-11-21 ] || { echo "Not 2026-11-21, nothing to do."; exit 1; }
+          wait=$(( $(date -u -d "2026-11-21 12:00:00" +%s) - $(date -u +%s) ))
+          [ "$wait" -gt 0 ] && sleep "$wait" || true
+      - name: Post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SENANG_THREADS_USER_ID: ${{ secrets.SENANG_THREADS_USER_ID }}
+          SENANG_THREADS_ACCESS_TOKEN: ${{ secrets.SENANG_THREADS_ACCESS_TOKEN }}
+          SENANG_IG_USER_ID: ${{ secrets.SENANG_IG_USER_ID }}
+          SENANG_IG_ACCESS_TOKEN: ${{ secrets.SENANG_IG_ACCESS_TOKEN }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          SENANG_TIKTOK_CHANNEL_ID: ${{ secrets.SENANG_TIKTOK_CHANNEL_ID }}
+        working-directory: agents/hulk/scripts
+        run: |
+          python - <<'EOF'
+          import sys
+          import common, platforms, tiktok_guard
+
+          cfg = common.load_config("senang-homes")
+          P, base, name = common.POSTERS_DIR, cfg["poster"]["public_base_url"], "big-homes-2k-5k"
+          REF = f"carousel-{name}"
+          state = common.read_state(cfg, "posted")
+          done = {p["platform"] for p in state.get("listings", {}).get(REF, {}).get("posts", [])}
+          caption = lambda p: (P / f"senang-homes-{name}-{p}.txt").read_text(encoding="utf-8")
+          priced = [f"{base}/senang-homes-{name}-{i}.png" for i in range(1, 10)]
+          failed = False
+
+          for platform, publish in (("threads", platforms.threads_publish_carousel),
+                                    ("instagram", platforms.instagram_publish_carousel)):
+              if platform in done:
+                  print(f"{platform}: already posted, skipping"); continue
+              try:
+                  post_id = publish(cfg, caption(platform), priced)
+                  common.mark_posted(cfg, REF, platform, post_id)
+                  print(f"{platform}: posted {post_id}")
+              except Exception as exc:
+                  failed = True
+                  print(f"{platform}: FAILED {exc}")
+
+          if "tiktok" not in done:
+              media = [P / f"senang-homes-tiktok-{name}-{i}.jpg" for i in range(1, 10)]
+              tt = tiktok_guard.clean_caption(caption("tiktok"))   # no money amounts on TikTok
+              try:
+                  found = tiktok_guard.problems(tt, media)
+                  if found:
+                      raise RuntimeError("held back by tiktok_guard: " + "; ".join(found))
+                  link = platforms.tiktok_publish_carousel(
+                      cfg, tt, [f"{base}/{m.name}" for m in media], title=tt.splitlines()[0])
+                  # appended without touching last_posted, as tiktok_backlog.py does
+                  state = common.read_state(cfg, "posted")
+                  state["listings"].setdefault(REF, {}).setdefault("posts", []).append(
+                      {"platform": "tiktok", "post_id": link, "at": common.now_utc().isoformat()})
+                  common.write_state(cfg, "posted", state)
+                  print(f"tiktok: posted {link}")
+              except Exception as exc:
+                  failed = True
+                  print(f"tiktok: FAILED {exc}")
+          sys.exit(1 if failed else 0)
+          EOF
+      - name: Save posting history
+        if: always()
+        run: |
+          git config user.name "hulk-bot"
+          git config user.email "hulk-bot@users.noreply.github.com"
+          git add agents/hulk/scripts/state/senang-homes-posted.json
+          git diff --cached --quiet && exit 0
+          git commit -m "hulk: senang-homes posting history"
+          git pull --rebase origin main
+          git push origin HEAD:main
