@@ -2,7 +2,7 @@
 
 _Last updated: 21 November 2026_
 
-Senang Homes (Instagram and Threads: **@senanghomes**) uses a small automation app, "Hulk", to
+Senang Homes (Instagram and Threads: **@senanghomes**) uses its own automation app, "Senang Homes", to
 publish its own property posts and to answer comments left on those posts. This page explains
 what that app does with your information.
 
