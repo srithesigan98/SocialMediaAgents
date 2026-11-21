@@ -6,17 +6,28 @@ name: Hulk (Senang Homes) one-off — 2,000–5,000 sqft carousel
 # Starts 19:40 MYT and sleeps to 20:00 so GitHub's cron lag doesn't make it late. The date check
 # stops it firing again on 2027-11-21; delete this file once it has run. Platforms already in the
 # posting history are skipped, so a manual re-run only fills in whichever side failed.
+#
+# The carousel is tonight's only post: the regular daily post (19:30) and TikTok backlog (20:30)
+# workflows were disabled by hand for tonight. This job re-enables them at 22:00 MYT; the 23:00
+# cron is a backup in case this job never started.
 
 on:
   schedule:
-    - cron: "40 11 21 11 *"
+    - cron: "40 11 21 11 *"   # post
+    - cron: "0 15 21 11 *"    # backup: re-enable the regular workflows
   workflow_dispatch:
 
 permissions:
   contents: write   # to commit the posting history
+  actions: write    # to re-enable the regular workflows
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
 
 jobs:
   post:
+    if: github.event.schedule != '0 15 21 11 *'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -97,3 +108,19 @@ jobs:
           git commit -m "hulk: senang-homes posting history"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Resume the regular schedule at 22:00 MYT
+        # Well after tonight's 19:30 and 20:30 slots, so neither fires late; runs even if posting failed.
+        if: always()
+        run: |
+          wait=$(( $(date -u -d "2026-11-21 14:00:00" +%s) - $(date -u +%s) ))
+          [ "$wait" -gt 0 ] && sleep "$wait" || true
+          gh workflow enable hulk-senang-homes-daily.yml
+          gh workflow enable hulk-senang-homes-tiktok.yml
+
+  reenable-backup:
+    if: github.event.schedule == '0 15 21 11 *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          gh workflow enable hulk-senang-homes-daily.yml
+          gh workflow enable hulk-senang-homes-tiktok.yml
